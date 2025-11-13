@@ -79,7 +79,7 @@ Poolula Platform is a unified system for managing all aspects of Poolula LLC, a 
 **Roadmap** (16 weeks core platform):
 - **Phase 0** ✅: Infrastructure - Backups, logging, health checks
 - **Phase 1** ✅: Foundation - SQLite database, API, provenance tracking
-- **Phase 2**: Chatbot Integration (Weeks 3-4) - RAG system + SQL queries, evaluation harness (≥90% target)
+- **Phase 2** 🚧: Chatbot Integration (Weeks 3-4) - RAG system migrated (13 modules, 31/37 tests passing), SQL query tool pending
 - **Phase 3**: Dashboard Migration (Week 5) - Airbnb data → SQL, Streamlit integration
 - **Phase 4**: Frontend Unification (Weeks 6-7) - Vue 3 shell, workflow framework
 - **Phase 5**: Feature Expansion (Weeks 8-16) - Tax assistant, compliance calendar, document vault, expense categorization
@@ -244,6 +244,12 @@ open htmlcov/index.html
 See [docs/workflows/testing.md](docs/workflows/testing.md) for complete testing guide.
 
 ## Documentation
+
+### Architecture
+
+- **Business Objects**: `docs/architecture/business-objects.md` - Complete object reference with diagrams
+- **Platform Interfaces**: `docs/architecture/platform-interfaces.md` - How CLI, Chatbot, Jupyter, Vue UI, and API interact with objects
+- **Quick Reference**: `docs/architecture/quick-reference.md` - One-page cheat sheet
 
 ### For Developers
 

@@ -40,7 +40,14 @@ dependencies = [
     "pydantic-settings>=2.6.0",  # Settings management
     "python-dateutil>=2.9.0",  # Date parsing
     "pytz>=2024.1",  # Timezone handling
+
+    # CLI
+    "click>=8.1.0",  # Command-line interface
+    "requests>=2.32.0",  # HTTP requests for API calls
 ]
+
+[project.scripts]
+poolula = "scripts.cli:cli"
 
 [dependency-groups]
 dev = [

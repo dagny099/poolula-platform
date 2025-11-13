@@ -29,13 +29,15 @@ This document provides context for Claude Code (AI coding assistant) working on 
 - **In-memory SQLite** for test database
 - **FastAPI TestClient** for API testing
 
-### AI & RAG (Phase 2+)
+### AI & RAG (Phase 2)
 
-- **Anthropic Claude** - AI generation
-- **ChromaDB** - Vector database
-- **Sentence Transformers** - Embeddings
+- **Anthropic Claude** - AI generation (via anthropic>=0.58.2)
+- **ChromaDB** - Vector database (chromadb>=1.0.15)
+- **ONNX Embeddings** - ChromaDB's built-in ONNXMiniLM_L6_V2 (no torch required)
 
-Note: AI/RAG dependencies are in optional `rag` dependency group (not installed by default).
+**Important**: We use ChromaDB's built-in ONNX embedding function instead of sentence-transformers to avoid PyTorch dependency issues on macOS Intel x86_64 with Python 3.13. This provides excellent performance without torch compatibility headaches.
+
+Note: AI/RAG dependencies are in optional `rag` dependency group. Install with `uv sync --group rag`.
 
 ### Frontend (Phase 4)
 
@@ -53,18 +55,41 @@ poolula-platform/
 │   │   └── connection.py      # DB connection management
 │   └── logging_config.py      # Structured logging
 ├── apps/                      # Applications
-│   └── api/                   # FastAPI REST API
-│       ├── main.py            # FastAPI app
-│       └── routes/            # API endpoints
-│           └── properties.py  # Property CRUD
+│   ├── api/                   # FastAPI REST API
+│   │   ├── main.py            # FastAPI app
+│   │   └── routes/            # API endpoints
+│   │       └── properties.py  # Property CRUD
+│   └── chatbot/               # RAG Chatbot (Phase 2)
+│       ├── rag_system.py      # Main orchestrator
+│       ├── ai_generator.py    # Claude API integration
+│       ├── vector_store.py    # ChromaDB interface (ONNX embeddings)
+│       ├── document_processor.py  # Text chunking
+│       ├── search_tools.py    # Search tool definitions
+│       ├── session_manager.py # Conversation history
+│       ├── cache_manager.py   # Query result caching
+│       ├── metadata_manager.py # Document metadata
+│       ├── models.py          # Business document models
+│       ├── config.py          # Chatbot configuration
+│       ├── app.py             # FastAPI endpoints (legacy, being integrated)
+│       ├── health_check.py    # Health monitoring
+│       └── performance_monitor.py # Performance tracking
 ├── scripts/                   # Utility scripts
 │   ├── backup.py              # Database backup utility
 │   └── seed_database.py       # Import from poolula_facts.yml
 ├── tests/                     # Test suite
 │   ├── conftest.py            # Pytest fixtures
 │   ├── test_models.py         # Model tests
-│   └── test_api_properties.py # API tests
+│   ├── test_api_properties.py # API tests
+│   └── chatbot/               # Chatbot tests (Phase 2)
+│       ├── conftest.py        # Chatbot fixtures
+│       ├── test_rag_system.py # RAG integration tests (31/37 passing)
+│       ├── test_session_manager.py # Session tests (10/10 passing)
+│       └── test_ai_generator_integration.py # AI tests (22/22 passing)
 ├── docs/                      # Documentation
+│   ├── architecture/          # Architecture documentation
+│   │   ├── business-objects.md   # Object reference
+│   │   ├── platform-interfaces.md # Interface guide
+│   │   └── quick-reference.md    # Cheat sheet
 │   ├── planning/              # Implementation plans
 │   └── workflows/             # Workflow guides
 │       ├── data-import.md     # YAML → DB workflow

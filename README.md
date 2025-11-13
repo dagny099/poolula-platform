@@ -67,16 +67,18 @@ Poolula Platform is a unified system for managing all aspects of Poolula LLC, a 
 
 ## Current Status
 
-**Phase 0: Infrastructure Setup** 🔄 (In Progress)
-- ✅ Repository initialized
-- ✅ Architecture documentation complete
-- ✅ Revised implementation plan with quantitative success criteria
-- ⏭️ Backup/restore scripts
-- ⏭️ Structured logging setup
+**Phase 1: Foundation** ✅ (Complete)
+- ✅ Database schema (5 tables: Property, Transaction, Document, Obligation, AuditLog)
+- ✅ SQLModel models with provenance tracking
+- ✅ Alembic migrations
+- ✅ FastAPI REST API with Property CRUD endpoints
+- ✅ Comprehensive test suite (≥80% coverage)
+- ✅ Seed script for importing from poolula_facts.yml
+- ✅ Workflow documentation (data-import, API usage, testing)
 
 **Roadmap** (16 weeks core platform):
-- **Phase 0**: Infrastructure (1-2 days) - Backups, logging, health checks
-- **Phase 1**: Foundation (Weeks 1-2) - SQLite database, API, provenance tracking
+- **Phase 0** ✅: Infrastructure - Backups, logging, health checks
+- **Phase 1** ✅: Foundation - SQLite database, API, provenance tracking
 - **Phase 2**: Chatbot Integration (Weeks 3-4) - RAG system + SQL queries, evaluation harness (≥90% target)
 - **Phase 3**: Dashboard Migration (Week 5) - Airbnb data → SQL, Streamlit integration
 - **Phase 4**: Frontend Unification (Weeks 6-7) - Vue 3 shell, workflow framework
@@ -140,71 +142,126 @@ poolula-platform/
 
 **Prerequisites:**
 - Python 3.13+
-- uv package manager
-- Node.js 18+ (for frontend development)
-- Anthropic API key
+- uv package manager (`pip install uv` or `brew install uv`)
 
 **Setup:**
 ```bash
 # Install Python dependencies
 uv sync
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env and add your ANTHROPIC_API_KEY
+# Run database migrations
+.venv/bin/alembic upgrade head
 
-# Initialize database
-uv run python scripts/init_db.py
+# Seed database from poolula_facts.yml
+uv run python scripts/seed_database.py --initial
 
-# Seed with existing data
-uv run python scripts/seed_from_legacy.py
-
-# Run development server
-uv run python -m backend.app
+# Start API server
+uv run uvicorn apps.api.main:app --reload --port 8082
 ```
 
-**Frontend (separate terminal):**
+**Access:**
+- **API**: http://localhost:8082
+- **Interactive API docs (Swagger)**: http://localhost:8082/docs
+- **Health check**: http://localhost:8082/health
+
+**Example API Calls:**
 ```bash
-cd frontend
-npm install
-npm run dev
+# List all properties
+curl http://localhost:8082/api/v1/properties
+
+# Get health status
+curl http://localhost:8082/health
 ```
 
-Access the platform at `http://localhost:5173` (frontend) with API at `http://localhost:8000`.
+See **[docs/workflows/](docs/workflows/)** for detailed guides:
+- [data-import.md](docs/workflows/data-import.md) - YAML → DB workflow
+- [api-usage.md](docs/workflows/api-usage.md) - API endpoint examples
+- [testing.md](docs/workflows/testing.md) - Test execution guide
 
 ## Development Workflow
 
+**Common Tasks:**
+
+```bash
+# Run API server (development mode with auto-reload)
+uv run uvicorn apps.api.main:app --reload --port 8082
+
+# Run tests
+uv run pytest
+
+# Run tests with coverage
+uv run pytest --cov=core --cov=apps --cov-report=html
+
+# Create database migration
+.venv/bin/alembic revision --autogenerate -m "Description"
+
+# Apply migrations
+.venv/bin/alembic upgrade head
+
+# Seed/update from YAML
+uv run python scripts/seed_database.py --initial  # First time
+uv run python scripts/seed_database.py --update   # Fill in UNKNOWN values
+
+# Create database backup
+python scripts/backup.py
+```
+
 **Adding a new feature:**
 1. Define data model in `core/database/models.py`
-2. Create migration with `alembic revision --autogenerate`
-3. Implement business logic in `core/services/`
-4. Build API endpoints in `apps/{module}/api.py`
-5. Create frontend components in `frontend/src/components/`
-6. Write tests in `tests/`
-7. Update documentation in `docs/`
+2. Create migration with `.venv/bin/alembic revision --autogenerate`
+3. Build API endpoints in `apps/api/routes/`
+4. Write tests in `tests/`
+5. Update documentation in `docs/workflows/`
 
 **Key design patterns:**
-- **Repository pattern**: All database access through repository classes
-- **Service layer**: Business logic isolated from API/UI concerns
+- **Direct SQLModel usage**: No repository pattern (simplicity for small scale)
 - **Provenance tracking**: Every data point records its source and lineage
-- **Audit logging**: All mutations tracked with timestamp, user, and reason
+- **Audit logging**: Immutable audit trail (to be used in Phase 5)
+- **Soft deletes**: Mark inactive, don't hard delete
 - **Progressive disclosure**: Simple defaults with expandable details
 
 ## Testing Strategy
 
-- **Unit tests**: Core business logic and calculations
-- **Integration tests**: API endpoints and workflows
-- **E2E tests**: Critical user journeys
-- **Evaluation harness**: AI accuracy against golden sets (≥90% required)
+**Coverage target: ≥80%**
 
-Run tests: `uv run pytest tests/ -v`
+- **Unit tests**: Model validation, computed properties, relationships
+- **Integration tests**: API endpoints with full CRUD coverage
+- **In-memory database**: Fast, isolated test execution
+
+Run tests:
+```bash
+# All tests
+uv run pytest
+
+# Specific test file
+uv run pytest tests/test_models.py
+
+# With coverage report
+uv run pytest --cov=core --cov=apps --cov-report=html
+open htmlcov/index.html
+```
+
+See [docs/workflows/testing.md](docs/workflows/testing.md) for complete testing guide.
 
 ## Documentation
 
-- **Architecture decisions**: See `docs/architecture/`
-- **Data model**: See `docs/data-model.md`
-- **API reference**: See `docs/api/` or visit `/docs` endpoint
-- **Planning history**: See `docs/planning/`
+### For Developers
+
+- **Implementation plan**: `docs/planning/2025-11-13-revised-implementation-plan.md`
+- **CLAUDE.md**: Quick reference guide for AI coding assistants
+- **API reference**: Interactive docs at http://localhost:8082/docs (Swagger UI)
+
+### Workflow Guides
+
+- **Data Import**: `docs/workflows/data-import.md` - YAML → DB workflow with UNKNOWN handling
+- **API Usage**: `docs/workflows/api-usage.md` - Complete API endpoint examples
+- **Testing**: `docs/workflows/testing.md` - Running and writing tests
+
+### Code Documentation
+
+- **Database Models**: See `core/database/models.py` (inline documentation)
+- **API Endpoints**: See `apps/api/routes/properties.py` (inline documentation)
+- **Enums**: See `core/database/enums.py` (30+ transaction categories)
 
 ## Contributing
 

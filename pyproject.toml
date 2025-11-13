@@ -1,0 +1,151 @@
+[project]
+name = "poolula-platform"
+version = "0.1.0"
+description = "Unified management platform for Poolula LLC operations - analytics, AI assistance, and compliance tools"
+readme = "README.md"
+requires-python = ">=3.13"
+authors = [
+    {name = "Poolula LLC", email = "noreply@poolula.example"}
+]
+keywords = ["property-management", "llc", "rag", "compliance", "analytics"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Office/Business :: Financial",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    # Core web framework
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "python-multipart>=0.0.20",  # For file uploads
+
+    # Database
+    "sqlmodel>=0.0.22",  # SQLAlchemy + Pydantic
+    "alembic>=1.14.0",  # Database migrations
+
+    # AI & RAG
+    "anthropic>=0.58.2",  # Claude API
+    "chromadb>=1.0.15",  # Vector database
+    "sentence-transformers>=5.0.0",  # Embeddings
+
+    # Document processing
+    "pymupdf>=1.24.0",  # PDF parsing
+    "python-docx>=1.1.0",  # Word documents
+    "pytesseract>=0.3.10",  # OCR (requires system tesseract)
+
+    # Data handling
+    "pandas>=2.2.0",
+    "openpyxl>=3.1.0",  # Excel support
+    "pyyaml>=6.0",  # YAML parsing
+
+    # Utilities
+    "python-dotenv>=1.1.1",  # Environment variables
+    "pydantic>=2.10.0",  # Data validation
+    "pydantic-settings>=2.6.0",  # Settings management
+    "python-dateutil>=2.9.0",  # Date parsing
+    "pytz>=2024.1",  # Timezone handling
+]
+
+[dependency-groups]
+dev = [
+    # Testing
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "pytest-cov>=6.0.0",  # Coverage reporting
+    "pytest-mock>=3.14.1",
+    "httpx>=0.28.1",  # Async HTTP client for API tests
+
+    # Code quality
+    "ruff>=0.8.0",  # Fast linter/formatter
+    "mypy>=1.14.0",  # Type checking
+
+    # Development tools
+    "ipython>=8.31.0",  # Better REPL
+    "rich>=13.9.0",  # Pretty printing
+]
+
+docs = [
+    # Documentation generation
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.6.0",
+    "mkdocs-mermaid2-plugin>=1.1.0",
+    "pymdown-extensions>=10.14.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--tb=short",
+    "--cov=core",
+    "--cov=apps",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["core", "apps"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # function is too complex
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # Allow unused imports in __init__.py
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false  # Gradually enable
+ignore_missing_imports = true  # For now, until all stubs available
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false

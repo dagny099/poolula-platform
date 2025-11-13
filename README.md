@@ -48,6 +48,7 @@ Poolula Platform is a unified system for managing all aspects of Poolula LLC, a 
 - ChromaDB for vector embeddings
 - Anthropic Claude for AI generation
 - uv for fast, reliable dependency management
+- Neo4j (Phase 7+) for graph-based relationship exploration
 
 **Frontend:**
 - Vue 3 with Composition API and TypeScript
@@ -55,27 +56,33 @@ Poolula Platform is a unified system for managing all aspects of Poolula LLC, a 
 - Pinia for state management
 - TailwindCSS for styling
 - Chart.js / Plotly for visualizations
+- D3.js / vis.js for graph visualization (Phase 7+)
 
 **Infrastructure:**
-- SQLite (development) → PostgreSQL (production)
+- SQLite (development/small deployment) → PostgreSQL (production scaling)
 - Git for version control
 - pytest for comprehensive testing
 - MkDocs for documentation
+- Docker (optional, for Neo4j and production deployment)
 
 ## Current Status
 
-**Phase 0: Foundation Setup** ✅ (You are here)
-- Repository initialized
-- Architecture documentation complete
-- Migration strategy defined
+**Phase 0: Infrastructure Setup** 🔄 (In Progress)
+- ✅ Repository initialized
+- ✅ Architecture documentation complete
+- ✅ Revised implementation plan with quantitative success criteria
+- ⏭️ Backup/restore scripts
+- ⏭️ Structured logging setup
 
-**Next Steps:**
-- Phase 1: Database schema and core data layer (Weeks 1-2)
-- Phase 2: Integrate existing chatbot (Weeks 3-4)
-- Phase 3: Integrate existing dashboard (Week 5)
-- Phase 4: Implement evaluation harness (Week 6)
-- Phase 5: Build unified frontend (Weeks 7-8)
-- Phase 6: Add future tools as needed (Ongoing)
+**Roadmap** (16 weeks core platform):
+- **Phase 0**: Infrastructure (1-2 days) - Backups, logging, health checks
+- **Phase 1**: Foundation (Weeks 1-2) - SQLite database, API, provenance tracking
+- **Phase 2**: Chatbot Integration (Weeks 3-4) - RAG system + SQL queries, evaluation harness (≥90% target)
+- **Phase 3**: Dashboard Migration (Week 5) - Airbnb data → SQL, Streamlit integration
+- **Phase 4**: Frontend Unification (Weeks 6-7) - Vue 3 shell, workflow framework
+- **Phase 5**: Feature Expansion (Weeks 8-16) - Tax assistant, compliance calendar, document vault, expense categorization
+- **Phase 6**: Evaluation Dashboard (Week 17) - Quality monitoring, CI integration
+- **Phase 7+**: Neo4j Integration (Flexible) - Graph database for exploration and learning
 
 ## Project Components
 

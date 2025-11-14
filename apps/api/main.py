@@ -14,8 +14,11 @@ import os
 from contextlib import asynccontextmanager
 from typing import Dict, Any
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from core.database.connection import check_connection, close_engine
 from core.logging_config import get_logger
@@ -104,9 +107,22 @@ def health_check() -> Dict[str, Any]:
 
 
 # Import and mount routes
-from apps.api.routes import properties
+from apps.api.routes import properties, chat
 
 app.include_router(properties.router, prefix="/api/v1", tags=["properties"])
+app.include_router(chat.router, prefix="/api", tags=["chat"])
+
+
+# Mount static files for frontend
+# Get project root (2 levels up from this file)
+project_root = Path(__file__).parent.parent.parent
+frontend_dir = project_root / "frontend"
+
+if frontend_dir.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
+    logger.info(f"✅ Frontend mounted at: {frontend_dir}")
+else:
+    logger.warning(f"⚠️  Frontend directory not found: {frontend_dir}")
 
 
 # Root endpoint

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="buildingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A7C59;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2D4A35;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Building/LLC Symbol -->
+  <rect x="6" y="10" width="12" height="18" fill="url(#buildingGrad)" stroke="#2D4A35" stroke-width="0.5"/>
+  
+  <!-- Building Windows -->
+  <rect x="8" y="13" width="2" height="2" fill="#E5F4EA"/>
+  <rect x="12" y="13" width="2" height="2" fill="#E5F4EA"/>
+  <rect x="8" y="17" width="2" height="2" fill="#E5F4EA"/>
+  <rect x="12" y="17" width="2" height="2" fill="#E5F4EA"/>
+  <rect x="8" y="21" width="2" height="2" fill="#E5F4EA"/>
+  <rect x="12" y="21" width="2" height="2" fill="#E5F4EA"/>
+  
+  <!-- Document/Paper Stack -->
+  <rect x="19" y="4" width="10" height="12" fill="white" stroke="#4A7C59" stroke-width="1"/>
+  <rect x="20" y="6" width="10" height="12" fill="white" stroke="#4A7C59" stroke-width="1"/>
+  <rect x="21" y="8" width="10" height="12" fill="white" stroke="#4A7C59" stroke-width="1"/>
+  
+  <!-- Document Lines -->
+  <line x1="23" y1="11" x2="29" y2="11" stroke="#4A7C59" stroke-width="0.5"/>
+  <line x1="23" y1="13" x2="29" y2="13" stroke="#4A7C59" stroke-width="0.5"/>
+  <line x1="23" y1="15" x2="27" y2="15" stroke="#4A7C59" stroke-width="0.5"/>
+  
+  <!-- LLC Text -->
+  <text x="10" y="26" font-family="Arial, sans-serif" font-size="3" font-weight="bold" fill="white" text-anchor="middle">LLC</text>
+</svg>

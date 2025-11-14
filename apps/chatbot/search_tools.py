@@ -1,6 +1,7 @@
 from typing import Dict, Any, Optional, Protocol
 from abc import ABC, abstractmethod
 from .vector_store import VectorStore, SearchResults
+from .database_tool import DatabaseQueryTool, execute_database_query, get_database_tool_definition
 
 
 class Tool(ABC):
@@ -517,3 +518,39 @@ class DocumentListTool(Tool):
                 
         except Exception as e:
             return f"Error listing documents: {str(e)}"
+
+
+class DatabaseTool(Tool):
+    """Tool for querying business database (properties, transactions, documents, obligations)"""
+
+    def __init__(self):
+        self.db_tool = DatabaseQueryTool()
+        self.last_sources = []
+
+    def get_tool_definition(self) -> Dict[str, Any]:
+        """Return Anthropic tool definition for this tool"""
+        return get_database_tool_definition()
+
+    def execute(self, query_type: str, filters: Optional[Dict[str, Any]] = None) -> str:
+        """
+        Execute database query with given parameters.
+
+        Args:
+            query_type: Type of query (properties, transactions, etc.)
+            filters: Optional filters for the query
+
+        Returns:
+            JSON string with query results
+        """
+        result = execute_database_query(query_type, filters)
+
+        # Track sources for database queries
+        # Database queries don't have traditional "sources" like documents,
+        # but we can track what type of data was queried
+        self.last_sources = [{
+            "text": f"Database Query: {query_type}",
+            "query_type": query_type,
+            "filters": filters or {}
+        }]
+
+        return result

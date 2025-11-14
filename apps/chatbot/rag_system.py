@@ -1,13 +1,15 @@
 from typing import List, Tuple, Optional, Dict, Any
 import os
 import logging
+import time
 from .document_processor import DocumentProcessor
 from .vector_store import VectorStore
 from .ai_generator import AIGenerator
 from .session_manager import SessionManager
-from .search_tools import ToolManager, DocumentSearchTool, DocumentListTool
+from .search_tools import ToolManager, DocumentSearchTool, DocumentListTool, DatabaseTool
 from .metadata_manager import MetadataManager
 from .cache_manager import QueryResultCache
+from .audit_logger import ChatbotAuditLogger
 from .models import BusinessDocument, DocumentChunk
 
 class RAGSystem:
@@ -24,13 +26,16 @@ class RAGSystem:
         self.session_manager = SessionManager(config.MAX_HISTORY)
         self.metadata_manager = MetadataManager(config.METADATA_CSV_PATH)
         self.query_cache = QueryResultCache(config.CACHE_TTL_MINUTES)
+        self.audit_logger = ChatbotAuditLogger()
         
         # Initialize search tools with cache support
         self.tool_manager = ToolManager()
         self.document_search_tool = DocumentSearchTool(self.vector_store, self.query_cache)
         self.document_list_tool = DocumentListTool(self.vector_store)
+        self.database_tool = DatabaseTool()
         self.tool_manager.register_tool(self.document_search_tool)
         self.tool_manager.register_tool(self.document_list_tool)
+        self.tool_manager.register_tool(self.database_tool)
         
         self.logger.info(f"RAG System initialized - Vector store: {config.CHROMA_PATH}, Model: {config.ANTHROPIC_MODEL}")
     
@@ -119,26 +124,28 @@ class RAGSystem:
     def query(self, query: str, session_id: Optional[str] = None) -> Tuple[str, List[str]]:
         """
         Process a user query using the RAG system with tool-based search.
-        
+
         Args:
             query: User's question
             session_id: Optional session ID for conversation context
-            
+
         Returns:
             Tuple of (response, sources list - empty for tool-based approach)
         """
         response = None
         sources = []
-        
+        error = None
+        start_time = time.time()
+
         try:
-            # Create prompt for the AI with clear instructions for business documents
-            prompt = f"""You are a helpful assistant for a small business LLC. Answer this question about the business documents, accounting, tax matters, or general business operations: {query}"""
-            
+            # Create prompt for the AI with clear instructions for business context
+            prompt = query
+
             # Get conversation history if session exists
             history = None
             if session_id:
                 history = self.session_manager.get_conversation_history(session_id)
-            
+
             # Generate response using AI with tools
             response = self.ai_generator.generate_response(
                 query=prompt,
@@ -146,16 +153,48 @@ class RAGSystem:
                 tools=self.tool_manager.get_tool_definitions(),
                 tool_manager=self.tool_manager
             )
-            
+
             # Update conversation history
             if session_id:
                 self.session_manager.add_exchange(session_id, query, response)
-            
+
+        except Exception as e:
+            error = str(e)
+            self.logger.error(f"Query failed: {e}", exc_info=True)
+            raise
+
         finally:
+            # Calculate response time
+            response_time_ms = (time.time() - start_time) * 1000
+
             # Always get and reset sources after retrieving them, even if an error occurred
             sources = self.tool_manager.get_last_sources()
+
+            # Extract tool names from sources (if available)
+            tools_used = []
+            for source in sources:
+                if "query_type" in source:
+                    tools_used.append(f"query_database:{source['query_type']}")
+                elif "document_title" in source:
+                    tools_used.append("search_document_content")
+
+            # Remove duplicates
+            tools_used = list(set(tools_used))
+
+            # Log to audit trail
+            if response or error:
+                self.audit_logger.log_query_exchange(
+                    user_query=query,
+                    ai_response=response or "ERROR: Query failed",
+                    session_id=session_id,
+                    tools_used=tools_used,
+                    sources=sources,
+                    response_time_ms=response_time_ms,
+                    error=error
+                )
+
             self.tool_manager.reset_sources()
-        
+
         # Return response with sources from tool searches
         return response, sources
     

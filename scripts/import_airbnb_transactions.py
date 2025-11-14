@@ -31,7 +31,7 @@ Date: 2025-11-13
 import argparse
 import csv
 import sys
-from datetime import datetime
+from datetime import datetime, UTC
 from decimal import Decimal
 from pathlib import Path
 from typing import List, Dict, Any
@@ -82,7 +82,7 @@ def import_airbnb_csv(
     csv_path: str,
     property_id: UUID,
     dry_run: bool = False
-) -> List[Transaction]:
+) -> tuple[List[Transaction], Dict[str, Any]]:
     """
     Import transactions from real Airbnb CSV export
 
@@ -97,7 +97,7 @@ def import_airbnb_csv(
         dry_run: If True, don't save to database
 
     Returns:
-        List of Transaction objects created
+        Tuple of (transactions list, summary dict)
     """
     csv_file = Path(csv_path)
 
@@ -157,6 +157,22 @@ def import_airbnb_csv(
 
     logger.info(f"\nParsed {len(transactions)} transactions from CSV")
 
+    # Calculate summary statistics BEFORE session operations (to avoid detached instance errors)
+    summary = {}
+    if transactions:
+        revenue_transactions = [t for t in transactions if t.transaction_type == TransactionType.REVENUE]
+        expense_transactions = [t for t in transactions if t.transaction_type == TransactionType.EXPENSE]
+
+        summary = {
+            "total_count": len(transactions),
+            "revenue_count": len(revenue_transactions),
+            "expense_count": len(expense_transactions),
+            "revenue_total": sum(t.amount for t in revenue_transactions),
+            "expense_total": sum(t.amount for t in expense_transactions),
+            "date_min": min(t.transaction_date for t in transactions),
+            "date_max": max(t.transaction_date for t in transactions)
+        }
+
     # Save to database if not dry run
     if not dry_run:
         engine = get_engine()
@@ -169,7 +185,7 @@ def import_airbnb_csv(
     else:
         logger.info("🔍 DRY RUN - No changes saved to database")
 
-    return transactions
+    return transactions, summary
 
 
 def process_reservation(row: dict, row_num: int, payout_date, property_id: UUID, csv_file: str) -> List[Transaction]:
@@ -261,7 +277,7 @@ def process_reservation(row: dict, row_num: int, payout_date, property_id: UUID,
             "occupancy_taxes": str(occupancy_taxes),
             "csv_file": csv_file,
             "csv_row": row_num,
-            "imported_at": datetime.utcnow().isoformat()
+            "imported_at": datetime.now(UTC).isoformat()
         }
     )
 
@@ -291,7 +307,7 @@ def process_reservation(row: dict, row_num: int, payout_date, property_id: UUID,
                 "guest": guest,
                 "csv_file": csv_file,
                 "csv_row": row_num,
-                "imported_at": datetime.utcnow().isoformat()
+                "imported_at": datetime.now(UTC).isoformat()
             }
         )
 
@@ -349,7 +365,7 @@ def process_resolution_payout(row: dict, row_num: int, transaction_date, propert
             "details": details,
             "csv_file": csv_file,
             "csv_row": row_num,
-            "imported_at": datetime.utcnow().isoformat()
+            "imported_at": datetime.now(UTC).isoformat()
         }
     )
 
@@ -439,7 +455,7 @@ Metadata Tracked:
 
     # Import transactions
     try:
-        transactions = import_airbnb_csv(
+        transactions, summary = import_airbnb_csv(
             csv_path=args.csv_file,
             property_id=property_id,
             dry_run=args.dry_run
@@ -450,20 +466,16 @@ Metadata Tracked:
         print("Import Summary")
         print("=" * 60)
         print(f"CSV File: {args.csv_file}")
-        print(f"Transactions: {len(transactions)}")
+        print(f"Transactions: {summary.get('total_count', 0)}")
 
-        if transactions:
-            # Calculate totals by type
-            revenue_total = sum(t.amount for t in transactions if t.transaction_type == TransactionType.REVENUE)
-            expense_total = sum(t.amount for t in transactions if t.transaction_type == TransactionType.EXPENSE)
+        if summary:
+            print(f"\nRevenue Transactions: {summary['revenue_count']}")
+            print(f"  Total Revenue: ${summary['revenue_total']:,.2f}")
+            print(f"\nExpense Transactions: {summary['expense_count']}")
+            print(f"  Total Expenses: ${summary['expense_total']:,.2f}")
+            print(f"\nNet: ${summary['revenue_total'] - summary['expense_total']:,.2f}")
 
-            print(f"\nRevenue Transactions: {sum(1 for t in transactions if t.transaction_type == TransactionType.REVENUE)}")
-            print(f"  Total Revenue: ${revenue_total:,.2f}")
-            print(f"\nExpense Transactions: {sum(1 for t in transactions if t.transaction_type == TransactionType.EXPENSE)}")
-            print(f"  Total Expenses: ${expense_total:,.2f}")
-            print(f"\nNet: ${revenue_total - expense_total:,.2f}")
-
-            print(f"\nDate Range: {min(t.transaction_date for t in transactions)} to {max(t.transaction_date for t in transactions)}")
+            print(f"\nDate Range: {summary['date_min']} to {summary['date_max']}")
 
         if args.dry_run:
             print("\n🔍 DRY RUN - No changes saved")

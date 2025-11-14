@@ -76,3 +76,9 @@ Thumbs.db
 uploads/
 temp/
 *.tmp
+
+# User data files (keep templates in data/ folder)
+/*.csv
+/data/imports/
+/data/*.csv
+!data/airbnb_template.csv

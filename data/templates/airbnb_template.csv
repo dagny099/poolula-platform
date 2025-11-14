@@ -1,0 +1,5 @@
+Date,Type,Confirmation Code,Amount,Notes
+2024-11-01,Reservation,HM123ABC,150.00,November booking
+2024-11-15,Reservation,HM456DEF,200.00,Mid-month booking
+2024-11-20,Service Fee,HM456DEF,-18.00,Airbnb service fee
+2024-11-30,Payout,PAYOUT_123,332.00,Monthly payout

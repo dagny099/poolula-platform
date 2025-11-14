@@ -77,8 +77,13 @@ uploads/
 temp/
 *.tmp
 
-# User data files (keep templates in data/ folder)
-/*.csv
-/data/imports/
-/data/*.csv
-!data/airbnb_template.csv
+# User data files - ignore all user data, keep only templates and seed files
+/data/*
+!/data/templates/
+!/data/poolula_facts.yml
+/data/templates/*.csv
+!/data/templates/airbnb_template.csv
+!/data/templates/expenses_template.csv
+
+# Business documents - never commit sensitive business documents
+/documents/

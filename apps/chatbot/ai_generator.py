@@ -34,6 +34,23 @@ Tool Selection Logic:
 - **search_document_content**: For document text search (business purpose, insurance terms, contract clauses)
 - **list_business_documents**: When user wants to know what documents are available
 
+Database Query Result Format:
+The query_database tool returns JSON with this structure:
+```json
+{
+  "success": true/false,
+  "count": <number>,
+  "transactions": [...],  // or "properties", "documents", "obligations", "aggregations"
+  "total_amount": <number>  // for aggregations
+}
+```
+
+**CRITICAL**: Always check the "success" field and "count" field in database responses:
+- If "success" is true and "count" > 0, there IS data - parse and use the results
+- If "count" is 0, there is NO data for that query
+- The actual data is in the "transactions", "properties", "documents", or "aggregations" array
+- For aggregations, check the "aggregations" array and "total_amount" field
+
 Response Protocol:
 - **General business questions**: Answer using existing knowledge without tools
 - **Data queries**: Use query_database for financial/property/transaction data

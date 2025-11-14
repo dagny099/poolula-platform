@@ -1,0 +1,142 @@
+site_name: Poolula Platform Documentation
+site_description: Technical documentation for Poolula Platform - property management and compliance system for Poolula LLC
+site_author: Poolula LLC
+site_url: https://poolula-platform.example.com
+
+# Repository
+repo_name: poolula-platform
+repo_url: https://github.com/dagny099/poolula-platform
+edit_uri: ""
+
+# Copyright
+copyright: Copyright &copy; 2024 Poolula LLC
+
+# Configuration
+theme:
+  name: material
+  language: en
+  palette:
+    # Light mode
+    - scheme: default
+      primary: blue grey
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: blue grey
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+
+  icon:
+    repo: fontawesome/brands/github
+
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+# Extensions
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Plugins
+plugins:
+  - search:
+      lang: en
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+  - mermaid2:
+      version: 10.6.0
+
+# Customization
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/dagny099/poolula-platform
+      name: GitHub Repository
+
+  version:
+    provider: mike
+    default: latest
+
+extra_css:
+  - stylesheets/extra.css
+
+# Page tree
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Overview: getting-started/overview.md
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quick-start.md
+  - User Guide:
+      - Using the Chatbot: user-guide/chatbot.md
+      - Importing Data: user-guide/importing-data.md
+      - Managing Obligations: user-guide/obligations.md
+  - Architecture:
+      - System Design: architecture/system-design.md
+      - Data Models: architecture/data-models.md
+      - API Design: architecture/api-design.md
+  - API Reference:
+      - Overview: api/overview.md
+      - Chat Endpoints: api/chat.md
+      - Property Endpoints: api/properties.md
+      - Transaction Endpoints: api/transactions.md
+  - Development:
+      - Contributing: development/contributing.md
+      - Testing: development/testing.md
+      - Database Migrations: development/migrations.md
+  - FAQ: faq.md

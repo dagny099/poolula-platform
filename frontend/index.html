@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Poolula LLC Bookkeeping Assistant - Professional Business Management</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css?v=10">
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <div class="header-banner">
+                <div class="header-content">
+                    <h1>Poolula LLC Bookkeeping Assistant</h1>
+                    <p class="header-subtitle">Professional management for your Colorado-based LLC - streamline compliance, taxes, and financial documentation</p>
+                </div>
+                <div class="header-date" id="currentDate"></div>
+            </div>
+        </header>
+
+        <!-- Notification Banner -->
+        <div id="notificationBanner" class="notification-banner" style="display: none;">
+            <div class="notification-content">
+                <div class="notification-icon">📄</div>
+                <div class="notification-text">
+                    <div class="notification-title">Unprocessed documents found</div>
+                    <div class="notification-files" id="notificationFiles"></div>
+                </div>
+                <div class="notification-actions">
+                    <button id="processNowButton" class="process-now-button">Process Now</button>
+                    <button id="dismissBanner" class="dismiss-button">×</button>
+                </div>
+            </div>
+            <div id="processingProgress" class="processing-progress" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Processing files...</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Left Sidebar -->
+            <aside class="sidebar">
+                <!-- Persona-Based Help -->
+                <div class="sidebar-section">
+                    <details class="suggested-collapsible" open>
+                        <summary class="suggested-header">💼 Try asking:</summary>
+                        <div class="persona-help">
+                            
+                            <!-- New LLC Owner -->
+                            <details class="persona-section" open>
+                                <summary class="persona-header">👩‍💼 New LLC Owner</summary>
+                                <div class="suggested-items">
+                                    <button class="suggested-item" data-question="How do I complete my first year of LLC compliance requirements?">First year compliance</button>
+                                    <button class="suggested-item" data-question="What documents do I need to maintain for my LLC?">Required documents</button>
+                                    <button class="suggested-item" data-question="When are my important LLC deadlines and filing dates?">Key deadlines</button>
+                                </div>
+                            </details>
+
+                            <!-- Bookkeeper/Accountant -->
+                            <details class="persona-section">
+                                <summary class="persona-header">📊 Bookkeeper</summary>
+                                <div class="suggested-items">
+                                    <button class="suggested-item" data-question="What's the current tax basis of our property and assets?">Property tax basis</button>
+                                    <button class="suggested-item" data-question="Show me all accounting records and financial documents for 2024">2024 financial records</button>
+                                    <button class="suggested-item" data-question="What depreciation schedule should I use for our rental property?">Depreciation schedule</button>
+                                </div>
+                            </details>
+
+                            <!-- Property Manager -->
+                            <details class="persona-section">
+                                <summary class="persona-header">🏡 Property Manager</summary>
+                                <div class="suggested-items">
+                                    <button class="suggested-item" data-question="What are the current lease terms and key dates for our property?">Lease terms & dates</button>
+                                    <button class="suggested-item" data-question="What insurance coverage do we have and when does it renew?">Insurance coverage</button>
+                                    <button class="suggested-item" data-question="Who should I contact for property maintenance and vendor services?">Maintenance contacts</button>
+                                </div>
+                            </details>
+
+                            <!-- Compliance Officer -->
+                            <details class="persona-section">
+                                <summary class="persona-header">⚖️ Compliance Officer</summary>
+                                <div class="suggested-items">
+                                    <button class="suggested-item" data-question="When is the next Colorado periodic report due and what's required?">CO periodic report</button>
+                                    <button class="suggested-item" data-question="What tax filings and compliance items are due this quarter?">Quarterly requirements</button>
+                                    <button class="suggested-item" data-question="Are we compliant with all LLC requirements and regulations?">Compliance status</button>
+                                </div>
+                            </details>
+
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Document Stats -->
+                <div class="sidebar-section">
+                    <details class="stats-collapsible">
+                        <summary class="stats-header">📋 LLC Documents (<span id="totalDocuments">-</span>)</summary>
+                        <div class="document-stats" id="documentStats">
+                            <div class="documents-table-container">
+                                <table class="documents-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Document Type</th>
+                                            <th>File Name</th>
+                                            <th>Tab</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="documentTableBody">
+                                        <tr>
+                                            <td colspan="3" class="loading-cell">
+                                                <span class="loading">Loading...</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Document Upload -->
+                <div class="sidebar-section">
+                    <details class="upload-collapsible">
+                        <summary class="upload-header">Add Documents 📤</summary>
+                        <div class="upload-section">
+                            <div class="upload-area" id="uploadArea">
+                                <div class="upload-icon">📄</div>
+                                <div class="upload-text">
+                                    <div class="upload-primary">Drop files here or click to browse</div>
+                                    <div class="upload-secondary">PDF, DOCX, TXT, MD, CSV, XLSX files</div>
+                                </div>
+                                <input type="file" id="fileInput" multiple accept=".pdf,.docx,.txt,.md,.csv,.xlsx,.xls" style="display: none;">
+                            </div>
+                            <div id="uploadProgress" class="upload-progress" style="display: none;">
+                                <div class="upload-file-list" id="uploadFileList"></div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Resources Section -->
+                <div class="sidebar-section">
+                    <details class="resources-collapsible">
+                        <summary class="resources-header">📚 Resources</summary>
+                        <div class="resources-content" id="resourcesContent">
+                            <div class="loading">Loading resources...</div>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- New Chat Button -->
+                <div class="sidebar-section">
+                    <button class="new-chat-button" id="newChatButton">
+                        <span class="new-chat-icon">+</span>
+                        <span class="new-chat-text">NEW CHAT</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Chat Area -->
+            <main class="chat-main">
+                <div class="chat-container">
+                    <div id="chatMessages" class="chat-messages"></div>
+                    <div class="chat-input-container">
+                        <input 
+                            type="text" 
+                            id="chatInput" 
+                            placeholder="Ask about LLC compliance, tax planning, financial records, or business documentation 📊"
+                            autocomplete="off"
+                        >
+                        <button id="sendButton">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="script.js?v=10"></script>
+</body>
+</html>

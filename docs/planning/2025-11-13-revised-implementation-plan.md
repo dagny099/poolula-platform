@@ -280,10 +280,10 @@ class TransactionCategory(str, Enum):
 ### Tasks
 
 #### Week 3: Integration
-- [ ] Copy RAG codebase to `apps/chatbot/`
-- [ ] Update imports and directory structure
-- [ ] Migrate 32 existing tests to new structure
-- [ ] Connect to audit log (log every Q&A pair)
+- [x] Copy RAG codebase to `apps/chatbot/` (13 modules migrated)
+- [x] Update imports and directory structure (all imports updated to relative imports)
+- [x] Migrate 32 existing tests to new structure (5 test files migrated, 31/37 passing)
+- [ ] Connect to audit log (log every Q&A pair) - Pending Week 4
 
 #### Week 4: Enhancement & Validation
 - [ ] Build database query tool for Claude:

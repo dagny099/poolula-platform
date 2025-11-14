@@ -40,7 +40,14 @@ dependencies = [
     "pydantic-settings>=2.6.0",  # Settings management
     "python-dateutil>=2.9.0",  # Date parsing
     "pytz>=2024.1",  # Timezone handling
+
+    # CLI
+    "click>=8.1.0",  # Command-line interface
+    "requests>=2.32.0",  # HTTP requests for API calls
 ]
+
+[project.scripts]
+poolula = "scripts.cli:cli"
 
 [dependency-groups]
 dev = [
@@ -70,10 +77,12 @@ docs = [
 
 rag = [
     # AI & RAG (Phase 2)
-    # Note: Requires platform-specific torch installation
+    # Note: macOS Intel x86_64 with Python 3.13 has limited torch support
+    # Consider using Python 3.12 or ARM Mac for full functionality
     "anthropic>=0.58.2",  # Claude API
     "chromadb>=1.0.15",  # Vector database
-    "sentence-transformers>=5.0.0",  # Embeddings
+    # Skip sentence-transformers for now - ChromaDB has built-in embedding functions
+    # "sentence-transformers>=5.0.0",  # Requires torch with macOS Intel + Python 3.13 support
     "pytesseract>=0.3.10",  # OCR (requires system tesseract)
 ]
 

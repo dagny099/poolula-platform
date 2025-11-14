@@ -1,214 +1,497 @@
 # Poolula Platform
 
-**An integrated management platform for Poolula LLC - combining operational analytics, AI-powered assistance, and compliance tools.**
+A data hub and natural language query system for Poolula LLC, a Colorado single-member LLC operating rental properties.
 
-## Vision
+## Project Goals
 
-Poolula Platform is a unified system for managing all aspects of Poolula LLC, a Colorado single-member LLC that owns and operates rental properties. The platform provides:
+### Short-Term (Current Phase)
+- **Transaction Analysis**: Automated categorization and querying of rental income, expenses, and capital transactions (Level 1 analysis with basic Level 2 aggregations)
+- **LLC Compliance Q&A**: AI-powered assistant for answering questions about formation documents, operating agreements, insurance policies, leases, and tax obligations
+- **Verification System**: Rigorous evaluation harness to validate AI responses against known correct answers (target: ≥90% accuracy)
 
-- **Operational Insights**: Real-time analytics on property performance, revenue, and expenses
-- **AI Assistant**: Natural language interface for compliance questions, document retrieval, and operational guidance
-- **Quality Assurance**: Automated evaluation harness to ensure AI accuracy and prevent hallucinations
-- **Future Capabilities**: Tax preparation, compliance calendaring, document management, and financial reporting
+### Long-Term Vision
+Build a consolidated document and data hub where business questions get verifiable answers through:
+- Natural language queries over structured transaction data and unstructured documents
+- Automated transaction import from sources (Airbnb, bank statements, expense receipts)
+- Compliance obligation tracking with document-backed answers
+- **NOT** reinventing accounting software - focus on question answering and verification
 
-## Core Principles
+## Core Business Models
 
-1. **UNDERSTANDING** - Every calculation, decision, and data transformation is explainable and traceable
-2. **TRANSPARENCY** - Complete audit trails, data provenance, and source citations for all information
-3. **USER FRIENDLINESS** - Task-oriented workflows with progressive disclosure of complexity
+The system models five primary entities:
 
-## Architecture
+1. **Property** (`core/database/models.py:Property`)
+   - Rental properties with acquisition details, basis calculations, and depreciation tracking
+   - Fields: address, acquisition_date, purchase_price_total, land_basis, building_basis, ffe_basis, placed_in_service, status
+   - Computed: total_basis, depreciable_basis
 
-**Hybrid: Data-First Modular Monolith + Workflow UI Layer**
+2. **Transaction** (`core/database/models.py:Transaction`)
+   - Financial events with full provenance tracking
+   - Fields: property_id, transaction_date, amount, category, transaction_type, description, source_account
+   - Categories: RENTAL_INCOME, UTILITIES_GAS, REPAIRS_MAINTENANCE, PROPERTY_MANAGEMENT, etc. (30+ categories)
+   - Types: REVENUE, EXPENSE, CAPITAL, MEMBER_TRANSACTION
 
-### Foundation
-- **Single codebase** with clear module boundaries for maintainability
-- **Central database** (SQLite → PostgreSQL) as single source of truth
-- **Vector store** (ChromaDB) for semantic document search
-- **Service layer** with business logic isolation and provenance tracking
+3. **Document** (`core/database/models.py:Document`)
+   - Business documents with metadata and vector embeddings for semantic search
+   - Fields: property_id, filename, doc_type, effective_date, version, confidentiality, storage_path
+   - Types: Formation, Operating Agreement, Lease, Insurance, Tax Document, Bank Statement, etc.
 
-### Applications
-- **Chatbot**: RAG-powered Q&A with database and document context
-- **Analytics**: Interactive dashboards for financial and operational metrics
-- **Evaluator**: Automated testing against golden Q&A sets
-- **Future modules**: Tax assistant, compliance calendar, document vault
+4. **Obligation** (`core/database/models.py:Obligation`)
+   - Compliance and operational deadlines
+   - Fields: property_id, obligation_type, due_date, status, description, recurrence
+   - Computed: is_overdue, days_until_due
 
-### User Experience
-- **Workflow-oriented UI** for guided multi-step tasks (e.g., "Close the Month")
-- **Ad-hoc exploration** via chat interface and interactive dashboards
-- **Progressive disclosure** - simple answers with "show more" for details
-- **Consistent navigation** and styling across all modules
+5. **Provenance** (`core/database/models.py:Provenance`)
+   - Data lineage tracking for all transactions
+   - Fields: transaction_id, source_type, source_id, confidence, notes
+   - Sources: MANUAL_ENTRY, CSV_IMPORT, AIRBNB_EXPORT, BANK_STATEMENT, etc.
+
+## API Endpoints
+
+### Core REST API (`apps/api/main.py`)
+
+**Base URL**: `http://localhost:8082/api/v1`
+
+#### Properties
+- `GET /properties` - List all properties with optional filters
+- `GET /properties/{property_id}` - Get property details
+- `POST /properties` - Create new property
+- `PUT /properties/{property_id}` - Update property
+- `DELETE /properties/{property_id}` - Soft delete property
+
+#### Transactions
+- `GET /transactions` - List transactions with filters (property, date range, category, type)
+- `GET /transactions/{transaction_id}` - Get transaction details
+- `POST /transactions` - Create transaction
+- `PUT /transactions/{transaction_id}` - Update transaction
+- `DELETE /transactions/{transaction_id}` - Soft delete transaction
+
+#### Documents
+- `GET /documents` - List documents with filters
+- `GET /documents/{document_id}` - Get document metadata
+- `POST /documents` - Upload document with metadata
+- `DELETE /documents/{document_id}` - Soft delete document
+
+#### Obligations
+- `GET /obligations` - List obligations with filters (due_date, status)
+- `GET /obligations/{obligation_id}` - Get obligation details
+- `POST /obligations` - Create obligation
+- `PUT /obligations/{obligation_id}` - Update obligation
+- `DELETE /obligations/{obligation_id}` - Soft delete obligation
+
+#### Chatbot
+- `POST /chat/query` - Send natural language query, get AI response with sources
+  - Request: `{"query": "What was my rental income in August 2025?", "session_id": "optional-uuid"}`
+  - Response: `{"response": "...", "sources": [...], "session_id": "..."}`
+
+#### System
+- `GET /health` - Health check endpoint
+- `GET /docs` - Interactive API documentation (Swagger UI)
+
+## System Dataflow
+
+```
+┌─────────────────┐
+│ Data Sources    │
+│ - Airbnb CSV    │──┐
+│ - Bank Stmt     │  │
+│ - Manual Entry  │  │  Import Scripts
+│ - Expense CSV   │  │  (scripts/)
+└─────────────────┘  │
+                     ▼
+                ┌─────────────┐
+                │  Database   │
+                │  (SQLite)   │◄──── Migrations (alembic/)
+                │             │
+                │ 5 Tables:   │
+                │ - Property  │
+                │ - Transaction
+                │ - Document  │
+                │ - Obligation│
+                │ - Provenance│
+                └──────┬──────┘
+                       │
+                       ▼
+            ┌──────────────────────┐
+            │   FastAPI Service    │
+            │   (apps/api/)        │
+            └─────────┬────────────┘
+                      │
+        ┌─────────────┼─────────────┐
+        ▼             ▼             ▼
+  ┌──────────┐  ┌──────────┐  ┌──────────┐
+  │ Chatbot  │  │Frontend  │  │  Scripts │
+  │ RAG      │  │(Vanilla  │  │  (CLI)   │
+  │ System   │  │   JS)    │  │          │
+  └────┬─────┘  └──────────┘  └──────────┘
+       │
+       ├──► Database Query Tool
+       │    (SQL SELECT-only, structured data)
+       │
+       └──► Document Search Tool
+            (ChromaDB vector search, semantic queries)
+
+User Query: "What was my rental income in August 2025?"
+    ↓
+AI determines tools needed (query_database)
+    ↓
+Execute: query_database(query_type="aggregate_transactions",
+                        filters={category: "RENTAL_INCOME",
+                                transaction_type: "REVENUE",
+                                start_date: "2025-08-01",
+                                end_date: "2025-08-31"})
+    ↓
+Returns: {"success": true, "count": 12, "total_amount": "16144.12", ...}
+    ↓
+AI synthesizes answer: "Your rental income in August 2025 was $16,144.12
+                        from 12 transactions."
+    ↓
+Audit log records: query, response, sources, timestamp
+```
 
 ## Technology Stack
 
 **Backend:**
-- Python 3.13+ with modern async patterns
-- FastAPI for REST API and WebSocket support
-- SQLModel (SQLAlchemy + Pydantic) for type-safe database access
-- ChromaDB for vector embeddings
-- Anthropic Claude for AI generation
-- uv for fast, reliable dependency management
-- Neo4j (Phase 7+) for graph-based relationship exploration
+- Python 3.13+ (`uv` package manager)
+- FastAPI (REST API)
+- SQLModel (SQLAlchemy + Pydantic ORM)
+- SQLite database (single file: `poolula.db`)
+- ChromaDB (vector store for document embeddings)
+- Anthropic Claude API (Sonnet 4.5 model)
+- Alembic (database migrations)
 
 **Frontend:**
-- Vue 3 with Composition API and TypeScript
-- Vite for fast development and optimized builds
-- Pinia for state management
-- TailwindCSS for styling
-- Chart.js / Plotly for visualizations
-- D3.js / vis.js for graph visualization (Phase 7+)
+- Vanilla JavaScript (no framework)
+- HTML5 + CSS3
+- Marked.js (markdown rendering)
+- 4 persona-based help sections (New LLC Owner, Bookkeeper, Property Manager, Compliance Officer)
 
-**Infrastructure:**
-- SQLite (development/small deployment) → PostgreSQL (production scaling)
-- Git for version control
-- pytest for comprehensive testing
-- MkDocs for documentation
-- Docker (optional, for Neo4j and production deployment)
+**Testing & Quality:**
+- pytest (test framework)
+- Coverage target: ≥80%
+- Evaluation harness with golden question set (target: ≥90% AI accuracy)
 
-## Current Status
-
-**Phase 0: Infrastructure Setup** 🔄 (In Progress)
-- ✅ Repository initialized
-- ✅ Architecture documentation complete
-- ✅ Revised implementation plan with quantitative success criteria
-- ⏭️ Backup/restore scripts
-- ⏭️ Structured logging setup
-
-**Roadmap** (16 weeks core platform):
-- **Phase 0**: Infrastructure (1-2 days) - Backups, logging, health checks
-- **Phase 1**: Foundation (Weeks 1-2) - SQLite database, API, provenance tracking
-- **Phase 2**: Chatbot Integration (Weeks 3-4) - RAG system + SQL queries, evaluation harness (≥90% target)
-- **Phase 3**: Dashboard Migration (Week 5) - Airbnb data → SQL, Streamlit integration
-- **Phase 4**: Frontend Unification (Weeks 6-7) - Vue 3 shell, workflow framework
-- **Phase 5**: Feature Expansion (Weeks 8-16) - Tax assistant, compliance calendar, document vault, expense categorization
-- **Phase 6**: Evaluation Dashboard (Week 17) - Quality monitoring, CI integration
-- **Phase 7+**: Neo4j Integration (Flexible) - Graph database for exploration and learning
-
-## Project Components
-
-### Migrating from Existing Projects
-
-This platform consolidates three existing components:
-
-1. **RAG Chatbot** (`../ragchatbot-codebase/`)
-   - 56 files, 32 passing tests, production-ready
-   - Will be integrated as `apps/chatbot/` module
-   - Enhanced to query structured database alongside document search
-
-2. **Airbnb Dashboard** (`../AirBnB Dashboard/dashboard/`)
-   - Streamlit analytics application
-   - Will be reimplemented as `apps/analytics/` with database backing
-   - Data migrated from CSV-based to persistent storage
-
-3. **Evaluation Harness** (`../AirBnB Dashboard/evaluation/`)
-   - Design specifications for quality assurance
-   - Will be implemented as `apps/evaluator/` module
-   - Ensures chatbot accuracy against golden Q&A sets
+**Documentation:**
+- MkDocs with Material theme
+- Inline code documentation
+- Workflow guides
 
 ## Repository Structure
 
 ```
 poolula-platform/
 ├── README.md                    # This file
-├── pyproject.toml              # Project metadata and dependencies
+├── pyproject.toml              # Python dependencies (uv managed)
 ├── .env.example                # Environment variable template
-├── .gitignore
+├── .gitignore                  # Ignore .env, *.db, uploads/, logs/, etc.
+│
 ├── core/                       # Platform foundation
-│   ├── database/              # Data models and migrations
-│   ├── vector_store/          # Document embeddings
-│   ├── schemas/               # Pydantic models
-│   ├── services/              # Business logic
-│   └── repositories/          # Data access patterns
+│   ├── database/
+│   │   ├── connection.py       # Database engine and session management
+│   │   ├── models.py           # SQLModel definitions (5 core models)
+│   │   └── enums.py            # Transaction categories, types, statuses
+│   ├── logging_config.py       # Centralized logging setup
+│   └── config.py               # Settings (from environment variables)
+│
 ├── apps/                       # Feature modules
-│   ├── chatbot/               # RAG assistant
-│   ├── analytics/             # Dashboards and reports
-│   ├── evaluator/             # Quality assurance
-│   └── [future modules]
-├── workflows/                  # Task orchestration
-│   ├── monthly_close/
-│   ├── tax_preparation/
-│   └── compliance_check/
-├── frontend/                   # Vue 3 web interface
-│   ├── src/
-│   └── public/
-├── tests/                      # Comprehensive test suite
-├── docs/                       # Architecture and API documentation
-└── scripts/                    # Utility scripts
+│   ├── api/
+│   │   ├── main.py             # FastAPI application
+│   │   └── routes/             # Endpoint definitions
+│   ├── chatbot/
+│   │   ├── ai_generator.py     # Claude API integration
+│   │   ├── database_tool.py    # SQL query tool (SELECT-only)
+│   │   ├── document_tool.py    # ChromaDB document search
+│   │   ├── vector_store.py     # Document embedding and retrieval
+│   │   └── tool_manager.py     # Tool execution orchestration
+│   └── evaluator/
+│       ├── evaluation_harness.py   # Golden question testing
+│       └── poolula_eval_set.jsonl  # Evaluation questions and answers
+│
+├── alembic/                    # Database migrations
+│   ├── versions/               # Migration scripts
+│   └── env.py                  # Alembic configuration
+│
+├── scripts/                    # Utility scripts
+│   ├── cli.py                  # Interactive chatbot CLI
+│   ├── seed_database.py        # Initialize database from YAML
+│   ├── import_airbnb_transactions.py   # Import Airbnb CSV exports
+│   ├── remove_duplicate_transactions.py # Data cleanup
+│   └── backup.py               # Database backup script
+│
+├── data/                       # Data files (see .gitignore)
+│   ├── templates/              # Template files (git tracked)
+│   │   ├── airbnb_template.csv
+│   │   └── expenses_template.csv
+│   ├── poolula_facts.yml       # Seed data for properties (git tracked)
+│   └── [user data files not tracked - see .gitignore]
+│
+├── documents/                  # Business documents (not git tracked)
+│   ├── formation/              # LLC formation documents
+│   ├── insurance/              # Insurance policies
+│   ├── leases/                 # Lease agreements
+│   ├── tax/                    # Tax documents
+│   └── [other document types]
+│
+├── tests/                      # Test suite (pytest)
+│   ├── test_models.py          # Model validation tests
+│   ├── test_api.py             # API endpoint tests
+│   ├── test_chatbot.py         # Chatbot integration tests
+│   └── test_evaluation.py      # Evaluation harness tests
+│
+├── docs/                       # Documentation (MkDocs)
+│   ├── architecture/           # System design documentation
+│   ├── workflows/              # Task-oriented guides
+│   └── planning/               # Implementation plans and decisions
+│
+└── frontend/                   # Web interface
+    ├── index.html              # Main chat interface
+    ├── styles.css              # Styling
+    └── script.js               # Client-side logic
 ```
 
 ## Quick Start
 
-**Prerequisites:**
+### Prerequisites
 - Python 3.13+
-- uv package manager
-- Node.js 18+ (for frontend development)
-- Anthropic API key
+- `uv` package manager: `pip install uv` or `brew install uv`
+- Anthropic API key: Sign up at https://console.anthropic.com/
 
-**Setup:**
+### Installation
+
 ```bash
-# Install Python dependencies
+# 1. Clone repository
+cd /path/to/poolula-platform
+
+# 2. Install dependencies
 uv sync
 
-# Set up environment variables
+# 3. Set up environment variables
 cp .env.example .env
-# Edit .env and add your ANTHROPIC_API_KEY
+# Edit .env and set ANTHROPIC_API_KEY=your-key-here
 
-# Initialize database
-uv run python scripts/init_db.py
+# 4. Run database migrations
+.venv/bin/alembic upgrade head
 
-# Seed with existing data
-uv run python scripts/seed_from_legacy.py
-
-# Run development server
-uv run python -m backend.app
+# 5. Seed initial data (optional - creates sample property)
+uv run python scripts/seed_database.py --initial
 ```
 
-**Frontend (separate terminal):**
+### Usage
+
+**Start API server:**
 ```bash
-cd frontend
-npm install
-npm run dev
+uv run uvicorn apps.api.main:app --reload --port 8082
+# Access: http://localhost:8082
+# API docs: http://localhost:8082/docs
 ```
 
-Access the platform at `http://localhost:5173` (frontend) with API at `http://localhost:8000`.
+**Interactive chatbot CLI:**
+```bash
+uv run python scripts/cli.py chat
+# Ask questions like:
+# > What was my rental income in August 2025?
+# > List all active properties
+# > What are the business formation documents?
+```
+
+**Import Airbnb transactions:**
+```bash
+# Preview import (dry run)
+uv run python scripts/import_airbnb_transactions.py \
+    --csv data/airbnb_export.csv \
+    --property-id <uuid> \
+    --dry-run
+
+# Actually import
+uv run python scripts/import_airbnb_transactions.py \
+    --csv data/airbnb_export.csv \
+    --property-id <uuid>
+```
+
+**Run evaluation:**
+```bash
+uv run python apps/evaluator/evaluation_harness.py
+# Outputs score report to docs/evaluation/
+```
+
+### Key Configuration
+
+**Environment Variables** (`.env` file):
+- `ANTHROPIC_API_KEY` - Required for chatbot functionality
+- `DATABASE_URL` - Database connection (default: `sqlite:///poolula.db`)
+- `LOG_LEVEL` - Logging verbosity (default: `INFO`)
+
+**Database Location**:
+- Development: `poolula.db` (SQLite file in project root, NOT git tracked)
+- Production: PostgreSQL (connection string in DATABASE_URL)
 
 ## Development Workflow
 
-**Adding a new feature:**
-1. Define data model in `core/database/models.py`
-2. Create migration with `alembic revision --autogenerate`
-3. Implement business logic in `core/services/`
-4. Build API endpoints in `apps/{module}/api.py`
-5. Create frontend components in `frontend/src/components/`
-6. Write tests in `tests/`
-7. Update documentation in `docs/`
+### Common Tasks
 
-**Key design patterns:**
-- **Repository pattern**: All database access through repository classes
-- **Service layer**: Business logic isolated from API/UI concerns
-- **Provenance tracking**: Every data point records its source and lineage
-- **Audit logging**: All mutations tracked with timestamp, user, and reason
-- **Progressive disclosure**: Simple defaults with expandable details
+```bash
+# Run API server (auto-reload on code changes)
+uv run uvicorn apps.api.main:app --reload --port 8082
 
-## Testing Strategy
+# Run all tests
+uv run pytest
 
-- **Unit tests**: Core business logic and calculations
-- **Integration tests**: API endpoints and workflows
-- **E2E tests**: Critical user journeys
-- **Evaluation harness**: AI accuracy against golden sets (≥90% required)
+# Run tests with coverage report
+uv run pytest --cov=core --cov=apps --cov-report=html
+open htmlcov/index.html
 
-Run tests: `uv run pytest tests/ -v`
+# Create database migration
+.venv/bin/alembic revision --autogenerate -m "Add new field to Transaction"
+
+# Apply migrations
+.venv/bin/alembic upgrade head
+
+# Create database backup
+uv run python scripts/backup.py
+# Creates: backups/poolula_YYYYMMDD_HHMMSS.db
+
+# Remove duplicate transactions
+uv run python scripts/remove_duplicate_transactions.py --dry-run  # Preview
+uv run python scripts/remove_duplicate_transactions.py            # Execute
+```
+
+### Adding New Features
+
+**Example: Add new transaction category**
+
+1. Edit `core/database/enums.py`:
+   ```python
+   class TransactionCategory(str, Enum):
+       # ... existing categories ...
+       NEW_CATEGORY = "NEW_CATEGORY"  # Add new value
+   ```
+
+2. Create migration:
+   ```bash
+   .venv/bin/alembic revision --autogenerate -m "Add NEW_CATEGORY to TransactionCategory"
+   .venv/bin/alembic upgrade head
+   ```
+
+3. Update tests in `tests/test_models.py`
+
+4. Update documentation
+
+### Design Patterns
+
+- **Provenance Tracking**: Every transaction records its source (CSV import, manual entry, etc.) via Provenance table
+- **Soft Deletes**: Set `deleted_at` timestamp instead of hard DELETE (preserves audit trail)
+- **Audit Logging**: All chatbot queries logged to database (query, response, sources, timestamp)
+- **Type Safety**: SQLModel provides Pydantic validation + SQLAlchemy ORM
+- **No ORMs Within ORMs**: Direct SQLModel usage, no repository pattern (simplicity for single-developer project)
+
+## Testing
+
+**Coverage Target**: ≥80%
+
+### Test Categories
+
+1. **Unit Tests**: Model validation, computed properties, enums
+2. **Integration Tests**: API endpoints with full CRUD operations
+3. **Chatbot Tests**: Tool execution, multi-round queries, error handling
+4. **Evaluation Tests**: Golden question set accuracy
+
+### Running Tests
+
+```bash
+# All tests
+uv run pytest
+
+# Specific test file
+uv run pytest tests/test_models.py
+
+# Specific test function
+uv run pytest tests/test_api.py::test_create_property
+
+# With verbose output
+uv run pytest -v
+
+# With coverage
+uv run pytest --cov=core --cov=apps --cov-report=term-missing
+
+# Generate HTML coverage report
+uv run pytest --cov=core --cov=apps --cov-report=html
+open htmlcov/index.html
+```
+
+### Evaluation Harness
+
+The evaluation harness tests AI accuracy against known correct answers:
+
+```bash
+# Run evaluation
+uv run python apps/evaluator/evaluation_harness.py
+
+# Output: docs/evaluation/evaluation_report_YYYYMMDD_HHMMSS.json
+```
+
+**Scoring Dimensions:**
+- Tool usage correctness (did AI use right tools?)
+- Content relevance (does answer address the question?)
+- Semantic similarity (answer matches expected content)
+- Numerical accuracy (financial figures match expected values)
+- Citation accuracy (sources are correct and relevant)
+
+**Target Score**: ≥90%
 
 ## Documentation
 
-- **Architecture decisions**: See `docs/architecture/`
-- **Data model**: See `docs/data-model.md`
-- **API reference**: See `docs/api/` or visit `/docs` endpoint
-- **Planning history**: See `docs/planning/`
+### For Developers
+- **CLAUDE.md**: Quick reference for AI coding assistants
+- **Implementation Plan**: `docs/planning/implementation-plan-2024-11-14.md`
+- **API Reference**: http://localhost:8082/docs (interactive Swagger UI)
+
+### Architecture
+- **Business Objects**: `docs/architecture/business-objects.md`
+- **Platform Interfaces**: `docs/architecture/platform-interfaces.md`
+- **Quick Reference**: `docs/architecture/quick-reference.md`
+
+### Workflow Guides
+- **Data Import**: `docs/workflows/data-import.md`
+- **API Usage**: `docs/workflows/api-usage.md`
+- **Testing**: `docs/workflows/testing.md`
+
+### Code Documentation
+- Database models: See `core/database/models.py` (inline docstrings)
+- API endpoints: See `apps/api/routes/` (inline docstrings)
+- Enums: See `core/database/enums.py` (30+ transaction categories)
+
+## Current Status
+
+**Phase**: Week 0 - README revision and approval
+
+**Completed**:
+- ✅ Database schema (5 tables: Property, Transaction, Document, Obligation, Provenance)
+- ✅ SQLModel models with provenance tracking
+- ✅ Alembic migrations
+- ✅ FastAPI REST API (properties, transactions, documents, obligations endpoints)
+- ✅ Database query tool for chatbot (SELECT-only, safe queries)
+- ✅ RAG system integration (database + document search)
+- ✅ Chatbot CLI with source citations
+- ✅ Airbnb CSV import script with accrual accounting
+- ✅ Duplicate transaction removal script
+- ✅ Evaluation harness with 15 golden questions
+- ✅ Comprehensive test suite (31/37 tests passing, ≥80% coverage)
+- ✅ Audit logging for all chatbot interactions
+
+**Next Steps** (pending README approval):
+- Fix ChromaDB document search bug
+- Re-ingest LLC documents (formation, insurance, leases, tax)
+- Port vanilla JS frontend with 4 persona sections
+- Expand evaluation set (15 → 40 questions)
+- Improve evaluation metrics (semantic similarity, numerical accuracy)
+- Build evaluation reporting dashboard
+- Achieve ≥90% evaluation score
+
+See `docs/planning/implementation-plan-2024-11-14.md` for detailed 3-week plan.
 
 ## Contributing
 
-This is a solo-developer project for Poolula LLC. For major architectural changes, document decisions in `docs/architecture/` with date and rationale.
+This is a solo-developer project for Poolula LLC. Architectural decisions are documented in `docs/architecture/` with rationale.
 
 ## License
 
@@ -216,5 +499,5 @@ Proprietary - Internal use only for Poolula LLC operations.
 
 ---
 
-**Last Updated**: 2025-11-13
-**Status**: Foundation phase - actively under development
+**Last Updated**: 2024-11-14
+**Status**: Week 0 - Foundation complete, awaiting README approval to proceed

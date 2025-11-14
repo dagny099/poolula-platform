@@ -1,0 +1,6 @@
+Date,Description,Amount,Category,Source Account,Notes
+2025-01-15,Natural gas bill - January,125.50,UTILITIES_GAS,Chase Checking,Winter heating
+2025-01-20,Plumber - fix leaky faucet,185.00,REPAIRS_MAINTENANCE,Chase Checking,Kitchen sink repair
+2025-02-01,Property tax - Q1 2025,1250.00,PROPERTY_TAXES,Chase Checking,County assessor
+2025-02-10,Electric bill - February,89.30,UTILITIES_ELECTRIC,Chase Checking,
+2025-03-05,Lawn maintenance,75.00,LANDSCAPING,Chase Checking,Monthly service

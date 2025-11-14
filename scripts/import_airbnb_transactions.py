@@ -16,12 +16,13 @@ Real Airbnb CSV Format:
     Nights,Guest,Listing,Details,Reference code,Currency,Amount,Paid out,
     Service fee,Fast pay fee,Cleaning fee,Pet fee,Gross earnings,Occupancy taxes,Earnings year
 
-Import Strategy:
+Import Strategy (Accrual Accounting):
     - SKIP "Payout" rows (just bank transfers, not revenue)
-    - IMPORT "Reservation" rows as RENTAL_INCOME using "Gross earnings"
-    - CREATE separate EXPENSE transactions for "Service fee" as PROPERTY_MANAGEMENT
+    - IMPORT "Reservation" rows as TWO transactions:
+        * RENTAL_INCOME on check-out date (End date) - when service provided
+        * PROPERTY_MANAGEMENT expense on payout date (Date) - when fee charged
     - IMPORT "Resolution Payout" rows as RENTAL_INCOME (damage reimbursements)
-    - TRACK cleaning fees, pet fees, and taxes in metadata
+    - TRACK cleaning fees, pet fees, and taxes in metadata for analysis
 
 Author: Poolula Platform
 Date: 2025-11-13
@@ -135,7 +136,7 @@ def import_airbnb_csv(
                     continue
 
                 elif trans_type == "Reservation":
-                    # Import reservation as revenue
+                    # Import reservation as revenue (using accrual dates)
                     transactions.extend(
                         process_reservation(row, row_num, transaction_date, property_id, csv_file.name)
                     )
@@ -171,13 +172,16 @@ def import_airbnb_csv(
     return transactions
 
 
-def process_reservation(row: dict, row_num: int, transaction_date, property_id: UUID, csv_file: str) -> List[Transaction]:
+def process_reservation(row: dict, row_num: int, payout_date, property_id: UUID, csv_file: str) -> List[Transaction]:
     """
-    Process a Reservation row into transactions
+    Process a Reservation row into transactions using accrual accounting
 
     Creates:
-    1. RENTAL_INCOME transaction for gross earnings
-    2. PROPERTY_MANAGEMENT expense transaction for Airbnb service fee
+    1. RENTAL_INCOME transaction for gross earnings on END DATE (when service provided)
+    2. PROPERTY_MANAGEMENT expense for service fee on PAYOUT DATE (when fee charged)
+
+    Args:
+        payout_date: Date from "Date" column (when Airbnb paid out)
 
     Returns list of 1-2 transactions
     """
@@ -187,8 +191,14 @@ def process_reservation(row: dict, row_num: int, transaction_date, property_id: 
     confirmation = row.get('Confirmation code', '').strip()
     guest = row.get('Guest', '').strip()
     nights = row.get('Nights', '')
-    start_date = row.get('Start date', '')
-    end_date = row.get('End date', '')
+    start_date_str = row.get('Start date', '')
+    end_date_str = row.get('End date', '')
+
+    # Parse check-out date for revenue recognition
+    checkout_date = parse_airbnb_date(end_date_str)
+    if not checkout_date:
+        logger.warning(f"Row {row_num}: No end date for revenue recognition, using payout date")
+        checkout_date = payout_date
 
     # Financial fields
     gross_earnings_str = row.get('Gross earnings', '0')
@@ -226,10 +236,10 @@ def process_reservation(row: dict, row_num: int, transaction_date, property_id: 
         notes=f"Imported from Airbnb CSV export (Reservation)"
     )
 
-    # Transaction 1: Gross earnings as RENTAL_INCOME
+    # Transaction 1: Gross earnings as RENTAL_INCOME on check-out date (accrual)
     revenue_transaction = Transaction(
         property_id=property_id,
-        transaction_date=transaction_date,
+        transaction_date=checkout_date,  # Revenue recognized when earned (check-out)
         amount=gross_earnings,
         category=TransactionCategory.RENTAL_INCOME,
         transaction_type=TransactionType.REVENUE,
@@ -241,8 +251,9 @@ def process_reservation(row: dict, row_num: int, transaction_date, property_id: 
             "airbnb_type": "Reservation",
             "guest": guest,
             "nights": nights,
-            "start_date": start_date,
-            "end_date": end_date,
+            "start_date": start_date_str,
+            "end_date": end_date_str,
+            "payout_date": str(payout_date),
             "gross_earnings": str(gross_earnings),
             "service_fee": str(service_fee),
             "cleaning_fee": str(cleaning_fee),
@@ -255,15 +266,17 @@ def process_reservation(row: dict, row_num: int, transaction_date, property_id: 
     )
 
     transactions.append(revenue_transaction)
-    logger.info(f"  ✓ Row {row_num}: {transaction_date} - REVENUE ${gross_earnings} - {confirmation}")
+    logger.info(f"  ✓ Row {row_num}: {checkout_date} - REVENUE ${gross_earnings} - {confirmation} ({guest})")
 
-    # Transaction 2: Service fee as EXPENSE (if exists)
+    # Transaction 2: Service fee as EXPENSE on payout date (when charged)
     if service_fee > Decimal("0.00"):
         fee_description = f"Airbnb Service Fee - {confirmation}"
+        if guest:
+            fee_description += f" ({guest})"
 
         fee_transaction = Transaction(
             property_id=property_id,
-            transaction_date=transaction_date,
+            transaction_date=payout_date,  # Expense when actually charged by Airbnb
             amount=service_fee,
             category=TransactionCategory.PROPERTY_MANAGEMENT,
             transaction_type=TransactionType.EXPENSE,
@@ -274,6 +287,8 @@ def process_reservation(row: dict, row_num: int, transaction_date, property_id: 
                 "airbnb_confirmation": confirmation,
                 "airbnb_type": "Service Fee",
                 "related_reservation": confirmation,
+                "related_checkout_date": str(checkout_date),
+                "guest": guest,
                 "csv_file": csv_file,
                 "csv_row": row_num,
                 "imported_at": datetime.utcnow().isoformat()
@@ -281,7 +296,7 @@ def process_reservation(row: dict, row_num: int, transaction_date, property_id: 
         )
 
         transactions.append(fee_transaction)
-        logger.info(f"  ✓ Row {row_num}: {transaction_date} - EXPENSE ${service_fee} - Service Fee")
+        logger.info(f"  ✓ Row {row_num}: {payout_date} - EXPENSE ${service_fee} - Service Fee")
 
     return transactions
 
@@ -372,16 +387,24 @@ Examples:
     python scripts/import_airbnb_transactions.py airbnb_12_2024-11_2025.csv \\
         --property-id 12345678-1234-1234-1234-123456789012
 
-What Gets Imported:
-    - Reservations → RENTAL_INCOME (gross earnings) + PROPERTY_MANAGEMENT (service fee)
-    - Resolution Payouts → RENTAL_INCOME (damage reimbursements)
-    - Payouts → SKIPPED (just bank transfers, not revenue)
+What Gets Imported (Accrual Accounting):
+    - Reservations → TWO transactions:
+        * Revenue on CHECK-OUT date (End date field)
+        * Expense on PAYOUT date (Date field)
+    - Resolution Payouts → RENTAL_INCOME on payout date
+    - Payouts → SKIPPED (just bank transfers)
+
+Why Accrual Dates:
+    - Revenue: Recognized when EARNED (guest checks out)
+    - Expense: Recognized when CHARGED (Airbnb processes fee)
+    - Better for: "How much did I earn in October?" vs "When did money hit my bank?"
+    - IRS Schedule E compatible (gross revenue + itemized expenses)
 
 Metadata Tracked:
-    - Guest name, nights, dates
+    - Guest names, nights, stay dates, payout dates
     - Confirmation codes
-    - Cleaning fees, pet fees, taxes
-    - CSV file and row number
+    - Gross earnings, service fees, cleaning fees, pet fees, taxes
+    - CSV file and row number for audit trail
         """
     )
 

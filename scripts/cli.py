@@ -75,11 +75,27 @@ def chat():
 
                 if sources:
                     click.echo()
-                    click.secho("Sources:", fg="yellow", dim=True)
+                    click.secho("Sources:", fg="yellow")
                     for i, source in enumerate(sources, 1):
-                        course = source.get('course_title', 'Unknown')
-                        lesson = source.get('lesson_number', 'N/A')
-                        click.echo(f"  [{i}] {course} - Lesson {lesson}", dim=True)
+                        # Handle different source types
+                        source_text = source.get('text', '')
+
+                        # Database query sources
+                        if 'query_type' in source:
+                            click.echo(f"  [{i}] Database Query: {source['query_type']}")
+                        # Document sources
+                        elif 'document_title' in source:
+                            doc_title = source.get('document_title', 'Unknown')
+                            page = source.get('page_number', '')
+                            if page:
+                                click.echo(f"  [{i}] {doc_title} - Page {page}")
+                            else:
+                                click.echo(f"  [{i}] {doc_title}")
+                        # Generic source text
+                        elif source_text:
+                            click.echo(f"  [{i}] {source_text}")
+                        else:
+                            click.echo(f"  [{i}] Unknown source")
 
             except KeyboardInterrupt:
                 click.echo("\n\n👋 Goodbye!")

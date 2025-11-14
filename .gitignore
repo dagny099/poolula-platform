@@ -81,6 +81,7 @@ temp/
 /data/*
 !/data/templates/
 !/data/poolula_facts.yml
+!/data/document_metadata.csv
 /data/templates/*.csv
 !/data/templates/airbnb_template.csv
 !/data/templates/expenses_template.csv

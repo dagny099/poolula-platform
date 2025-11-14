@@ -6,7 +6,7 @@ Complete guide for importing data from `poolula_facts.yml` into the Poolula Plat
 
 Poolula Platform uses `poolula_facts.yml` as the **single source of truth** for property and LLC data. This workflow describes how to import and update data from YAML into the SQL database.
 
-**Source file:** `/Users/barbaraihidalgo-sotelo/PROJECTS/AirBnB Dashboard/poolula_facts.yml`
+**Source file:** `poolula_facts.yml`
 
 ## Quick Start
 

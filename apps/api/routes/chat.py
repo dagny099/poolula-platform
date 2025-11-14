@@ -5,11 +5,13 @@ Provides chatbot query interface and document search via RAG system
 """
 
 import os
+import uuid
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from apps.chatbot.rag_system import RAGSystem
+from apps.chatbot.config import Config
 from core.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -25,12 +27,12 @@ def get_rag_system() -> RAGSystem:
     """Get or create RAG system instance"""
     global _rag_system
     if _rag_system is None:
-        # Get API key from environment
-        api_key = os.getenv("ANTHROPIC_API_KEY")
-        if not api_key:
+        # Create config (reads ANTHROPIC_API_KEY from environment)
+        config = Config()
+        if not config.ANTHROPIC_API_KEY:
             raise RuntimeError("ANTHROPIC_API_KEY environment variable not set")
 
-        _rag_system = RAGSystem(api_key=api_key)
+        _rag_system = RAGSystem(config=config)
         logger.info("RAG system initialized")
 
     return _rag_system
@@ -90,17 +92,20 @@ async def query_chatbot(request: QueryRequest) -> QueryResponse:
         # Get RAG system
         rag = get_rag_system()
 
-        # Process query
-        response = rag.query(
+        # Generate session ID if not provided
+        session_id = request.session_id or str(uuid.uuid4())
+
+        # Process query - returns tuple (response_text, sources_list)
+        response_text, sources_list = rag.query(
             query=request.query,
-            session_id=request.session_id
+            session_id=session_id
         )
 
         # Format response for frontend
         return QueryResponse(
-            answer=response.get("response", ""),
-            sources=response.get("sources", []),
-            session_id=response.get("session_id", "")
+            answer=response_text,
+            sources=sources_list,
+            session_id=session_id
         )
 
     except Exception as e:

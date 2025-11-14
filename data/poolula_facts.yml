@@ -1,0 +1,114 @@
+meta:
+  org_name: "Poolula LLC"
+  prepared_for: "Internal use / chatbot evaluation / accounting workpapers"
+  last_updated: "2025-10-26"
+  notes: >
+    This file is the ONLY source of truth for downstream generated Q&A. If it's
+    not in here, the model should say 'not documented' instead of hallucinating.
+
+entity:
+  legal_name: "Poolula LLC"
+  entity_type: "Single-member Limited Liability Company (LLC)"
+  jurisdiction_of_formation: "Colorado"
+  formation_date: "2024-04"          # YYYY-MM if exact day not critical
+  tax_classification: "Disregarded entity for tax purposes"  # assumed, confirm with tax pro
+  sole_member: "Hidalgo-Sotelo Living Trust (revocable)"
+  trust_is_revocable: true
+  trustee_age_at_formation: 72
+
+governance:
+  management_structure: "UNKNOWN"     # e.g. 'member-managed' or 'manager-managed'
+  signing_authority: "UNKNOWN"        # who can bind the LLC
+  annual_meeting_requirements: >
+    Not specified. Colorado does not force an annual member meeting date by statute.
+    Follow the Operating Agreement.
+  operating_agreement_on_file: "UNKNOWN"
+  registered_agent_name: "UNKNOWN"
+  mailing_address_for_llc: "UNKNOWN"  # DO NOT invent; fill when you decide final
+
+assets:
+  as_of_2024_12_31:
+    real_property:
+      address: "900 S 9th St"
+      acquisition_date: "2024-04-15"
+      purchase_price_total_usd: 442300.00
+      allocation:
+        land_usd: 78200.00
+        building_and_improvements_usd: 364100.00
+      notes: >
+        Land is non-depreciable. Building & Improvements depreciable under residential rental rules.
+    other_assets:
+      furniture_FF&E_usd: "10000.00 (CLOSE STATEMENT LINE; confirm final)"
+      cash_and_bank_balances: "See NuVista checking / Chase Ink CC statements as of close of period"
+  placed_in_service_date_for_depreciation: "UNKNOWN"  # when rental became available for rent
+  capitalization_policy_threshold: "UNKNOWN"          # e.g. $500 or $2,500 safe harbor
+  utilities_roster:
+    gas: "Black Hills Energy"
+    water: "City of Montrose Water"
+    internet: "Elevate Internet (fiber)"
+    electric: "DMEA / Delta-Montrose Electric"
+
+banking_and_liabilities:
+  llc_accounts:
+    - name: "NuVista Business Share Draft / LLC Checking"
+      type: "Checking"
+    - name: "Chase Ink Credit Card"
+      type: "Credit Card"
+  personal_or_trust_accounts_relevant_to_funding:
+    - "RBFCU Checking (Trust / personal)"
+    - "RBFCU Savings (Trust / personal)"
+    - "RBFCU Credit Card (personal)"
+  autopay_and_transfers:
+    notes: >
+      Some Chase Ink CC payments are auto-drafted from NuVista.
+      Some early wires / closing funds originated from RBFCU personal accounts.
+
+accounting_policy:
+  depreciation:
+    building_and_improvements_method: "27.5-year residential rental property depreciation"
+    land_depreciable: false
+  basis_treatment:
+    capitalize_to_basis:
+      - property inspection / appraisal directly tied to purchased property
+      - title company fees
+      - escrow / closing fees
+      - document recording fees
+      - transfer / documentary / filing fees
+      - furniture & fixtures conveyed at closing (~$10,000 FF&E bucket)
+    expense_current_year:
+      - normal utilities
+      - routine repairs and maintenance below capitalization threshold
+    needs_policy_decision:
+      - travel / general search costs for properties not ultimately purchased
+      - large repairs >= capitalization_threshold_usd (e.g. HVAC replacement)
+  member_equity_rules:
+    description: >
+      If the member (the Trust / trustee) pays LLC costs personally,
+      record:
+        Dr Asset or Expense (depending on nature)
+        Cr Member Equity – Contributions
+      This also applies to funds wired in for cash-to-close.
+    prelim_documented_equity_contributions_usd: 10210.00
+    equity_contribution_window: "2024-03-01 to 2024-05-31"
+    note: >
+      This 10,210.00 figure is what we've already flagged as personal-to-LLC
+      funding around closing. Final number should be reconciled to the
+      settlement statement.
+
+close_process:
+  bookkeeping_tasks:
+    - "Classify each LLC transaction (NuVista, Chase Ink) as Utilities / Repairs & Maintenance / Capital Improvements / Property Taxes / Closing Costs (Basis) / Bank Charges / etc."
+    - "Identify personal transactions that actually belong to the LLC and rebook them as Member Equity."
+    - "Tie total Member Equity to cash-to-close / settlement statement."
+    - "Generate journal entry for Basis (Land, Building & Improvements, Closing Costs, FF&E)."
+    - "Generate depreciation schedule for Building & Improvements (27.5-year)."
+    - "Export QuickBooks-ready CSV mapped to COA accounts 1500–5600."
+
+gaps_to_fill:
+  mailing_address_for_llc: "UNKNOWN"
+  registered_agent_name_and_address: "UNKNOWN"
+  management_structure_member_vs_manager_managed: "UNKNOWN"
+  placed_in_service_date_for_rental_use: "UNKNOWN"
+  capitalization_threshold_usd: "UNKNOWN"
+  insurance_carrier_for_property: "UNKNOWN"
+  bank_signers_authorized: "UNKNOWN"

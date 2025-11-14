@@ -40,7 +40,7 @@ from core.logging_config import get_logger
 logger = get_logger(__name__)
 
 # Path to poolula_facts.yml
-YAML_PATH = Path("/Users/barbaraihidalgo-sotelo/PROJECTS/AirBnB Dashboard/poolula_facts.yml")
+YAML_PATH = Path("poolula_facts.yml")
 
 
 def load_yaml() -> dict:

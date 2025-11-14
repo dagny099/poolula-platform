@@ -458,37 +458,44 @@ class VectorStore:
             print(error_msg)
             return SearchResults.empty(error_msg)
     
-    def _build_enhanced_document_filter(self, document_title: Optional[str], doc_type: Optional[str], 
-                                      entity: Optional[str], year: Optional[int], 
+    def _build_enhanced_document_filter(self, document_title: Optional[str], doc_type: Optional[str],
+                                      entity: Optional[str], year: Optional[int],
                                       file_type: Optional[str]) -> Optional[Dict]:
-        """Build enhanced filter dictionary for ChromaDB queries"""
+        """Build enhanced filter dictionary for ChromaDB queries
+
+        Note: Entity filtering is not supported because entities are stored as JSON strings
+        and ChromaDB doesn't support text search operators like $contains. Entity filtering
+        must be done post-query if needed.
+        """
         filters = {}
-        
+
         # Document title filter
         if document_title:
             filters["document_title"] = document_title
-        
+
         # Business document type filter
         if doc_type:
             filters["doc_type"] = doc_type
-        
+
         # File type filter
         if file_type:
             filters["file_type"] = file_type
-        
-        # Entity filter - need to search in JSON array
+
+        # Entity filter - NOT SUPPORTED by ChromaDB
+        # ChromaDB only supports: $gt, $gte, $lt, $lte, $ne, $eq, $in, $nin
+        # Since entities are stored as JSON strings, we can't query them directly
+        # Entity filtering would need to be done post-query in Python if needed
         if entity:
-            # ChromaDB doesn't have great JSON array search, so we'll use contains
-            # This is approximate but should work for most cases
-            filters["entities"] = {"$contains": f'"{entity}"'}
-        
+            # Log warning but don't add to filters to avoid ChromaDB error
+            print(f"Warning: Entity filter '{entity}' is not supported in ChromaDB queries. Ignoring.")
+
         # Year filter - search effective dates
         if year:
             # Filter for dates in the specified year
             year_start = f"{year}-01-01"
             year_end = f"{year}-12-31"
             filters["effective_date"] = {"$gte": year_start, "$lte": year_end}
-        
+
         return filters if filters else None
     
     def search_documents(self, 

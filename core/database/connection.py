@@ -17,7 +17,7 @@ import os
 from pathlib import Path
 from typing import Generator, Optional
 
-from sqlmodel import SQLModel, Session, create_engine
+from sqlmodel import SQLModel, Session, create_engine, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.pool import StaticPool
 
@@ -244,7 +244,7 @@ def check_connection() -> bool:
 
         with Session(engine) as session:
             # Simple query to test connection
-            session.exec("SELECT 1")
+            session.exec(text("SELECT 1"))
 
         logger.info("✅ Database connection healthy")
         return True

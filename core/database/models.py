@@ -124,9 +124,9 @@ class Property(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
 
     # Relationships (populated by SQLModel)
-    transactions: List["Transaction"] = Relationship(back_populates="property")
-    documents: List["Document"] = Relationship(back_populates="property")
-    obligations: List["Obligation"] = Relationship(back_populates="property")
+    transactions: List["Transaction"] = Relationship(back_populates="property_obj")
+    documents: List["Document"] = Relationship(back_populates="property_obj")
+    obligations: List["Obligation"] = Relationship(back_populates="property_obj")
 
     @property
     def total_basis(self) -> Decimal:

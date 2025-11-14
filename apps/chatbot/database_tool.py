@@ -201,7 +201,8 @@ class DatabaseQueryTool:
         group_by: str = "category",
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
-        transaction_type: Optional[str] = None
+        transaction_type: Optional[str] = None,
+        category: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Aggregate transactions by category, month, or type
@@ -210,7 +211,8 @@ class DatabaseQueryTool:
             group_by: How to group (category, month, type)
             start_date: Start date filter
             end_date: End date filter
-            transaction_type: Filter by type
+            transaction_type: Filter by type (REVENUE, EXPENSE, etc.)
+            category: Filter by category (RENTAL_INCOME, UTILITIES_GAS, etc.)
 
         Returns:
             Aggregated results with totals
@@ -226,6 +228,8 @@ class DatabaseQueryTool:
                     query = query.where(Transaction.transaction_date <= date.fromisoformat(end_date))
                 if transaction_type:
                     query = query.where(Transaction.transaction_type == transaction_type)
+                if category:
+                    query = query.where(Transaction.category == category)
 
                 transactions = session.exec(query).all()
 
@@ -469,12 +473,12 @@ def get_database_tool_definition() -> Dict[str, Any]:
                 },
                 "filters": {
                     "type": "object",
-                    "description": "Filters to apply to the query",
+                    "description": "Filters to apply to the query. IMPORTANT: 'category' is what KIND of transaction (RENTAL_INCOME, UTILITIES_GAS, etc.), while 'transaction_type' is REVENUE or EXPENSE. For rental income queries, use category='RENTAL_INCOME' AND transaction_type='REVENUE'.",
                     "properties": {
                         "property_id": {"type": "string"},
                         "status": {"type": "string"},
-                        "category": {"type": "string"},
-                        "transaction_type": {"type": "string"},
+                        "category": {"type": "string", "description": "Transaction category: RENTAL_INCOME, UTILITIES_GAS, REPAIRS_MAINTENANCE, PROPERTY_MANAGEMENT, etc."},
+                        "transaction_type": {"type": "string", "description": "Transaction type: REVENUE or EXPENSE (use REVENUE for income, EXPENSE for costs)", "enum": ["REVENUE", "EXPENSE", "CAPITAL", "MEMBER_TRANSACTION"]},
                         "start_date": {"type": "string", "description": "YYYY-MM-DD format"},
                         "end_date": {"type": "string", "description": "YYYY-MM-DD format"},
                         "min_amount": {"type": "number"},
@@ -484,7 +488,7 @@ def get_database_tool_definition() -> Dict[str, Any]:
                         "obligation_type": {"type": "string"},
                         "due_before": {"type": "string"},
                         "due_after": {"type": "string"},
-                        "group_by": {"type": "string", "enum": ["category", "month", "type"]}
+                        "group_by": {"type": "string", "enum": ["category", "month", "type"], "description": "For aggregate_transactions: group results by category, month (YYYY-MM), or type"}
                     }
                 }
             },

@@ -72,6 +72,7 @@ docs = [
     "mkdocs>=1.6.0",
     "mkdocs-material>=9.6.0",
     "mkdocs-mermaid2-plugin>=1.1.0",
+    "mkdocs-glightbox>=0.4.0",  # Image zoom/lightbox
     "pymdown-extensions>=10.14.0",
 ]
 

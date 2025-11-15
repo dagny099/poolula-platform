@@ -2,7 +2,16 @@
 
 Current evaluation metrics and performance baselines for the Poolula Platform chatbot.
 
-## Latest Evaluation Results
+!!! warning "Example Results"
+    **These are example/target results** that demonstrate the evaluation methodology and expected performance levels. The evaluation harness (`scripts/evaluate_chatbot.py`) and test dataset (`apps/evaluator/poolula_eval_set.jsonl`) are fully functional and ready to use. Actual results will be added after running the evaluation script against the production chatbot.
+
+    **To generate real results:**
+    ```bash
+    # Run the evaluation harness
+    uv run python scripts/evaluate_chatbot.py --verbose
+    ```
+
+## Latest Evaluation Results (Example)
 
 **Run Date:** 2024-11-15
 

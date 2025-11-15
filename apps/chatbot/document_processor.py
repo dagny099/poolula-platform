@@ -269,6 +269,25 @@ class DocumentProcessor:
             doc_metadata = {}
         
         # Create business document object with enhanced metadata
+        # Use try/except for enum conversions with fallback to defaults
+        try:
+            doc_type = DocumentType(doc_metadata.get('doc_type', 'index'))
+        except ValueError as e:
+            logger.warning(f"Invalid doc_type '{doc_metadata.get('doc_type')}' for {filename}, defaulting to 'index': {e}")
+            doc_type = DocumentType.INDEX
+
+        try:
+            version = VersionStatus(doc_metadata.get('version', 'final'))
+        except ValueError as e:
+            logger.warning(f"Invalid version '{doc_metadata.get('version')}' for {filename}, defaulting to 'final': {e}")
+            version = VersionStatus.FINAL
+
+        try:
+            confidentiality = ConfidentialityLevel(doc_metadata.get('confidentiality', 'internal'))
+        except ValueError as e:
+            logger.warning(f"Invalid confidentiality '{doc_metadata.get('confidentiality')}' for {filename}, defaulting to 'internal': {e}")
+            confidentiality = ConfidentialityLevel.INTERNAL
+
         document = BusinessDocument(
             title=doc_metadata.get('title', filename),
             file_path=file_path,
@@ -276,16 +295,16 @@ class DocumentProcessor:
             created_date=created_date,
             file_size=file_size,
             content_hash=content_hash,
-            
-            # Business metadata (from CSV or defaults)
-            doc_type=DocumentType(doc_metadata.get('doc_type', 'index')),
+
+            # Business metadata (from CSV or defaults with error handling)
+            doc_type=doc_type,
             effective_date=doc_metadata.get('effective_date'),
             entities=doc_metadata.get('entities', []),
             address=doc_metadata.get('address'),
-            version=VersionStatus(doc_metadata.get('version', 'final')),
-            confidentiality=ConfidentialityLevel(doc_metadata.get('confidentiality', 'internal')),
+            version=version,
+            confidentiality=confidentiality,
             notes=doc_metadata.get('notes'),
-            
+
             # Legacy metadata field
             metadata=doc_metadata.get('metadata', {})
         )

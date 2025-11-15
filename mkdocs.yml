@@ -124,6 +124,7 @@ nav:
       - Quick Start: getting-started/quick-start.md
   - User Guide:
       - Using the Chatbot: user-guide/chatbot.md
+      - Managing Documents: user-guide/document-management.md
       - Importing Data: user-guide/importing-data.md
       - Managing Obligations: user-guide/obligations.md
   - Architecture:

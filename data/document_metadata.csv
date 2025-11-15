@@ -1,9 +1,9 @@
 doc_id,title,doc_type,effective_date,entities,address,version,confidentiality,notes
-240515_Articles_Poolula.pdf,Poolula LLC Articles of Organization,formation,2024-05-15,"Poolula LLC, Hidalgo-Sotelo Living Trust",900 S 9th St, Montrose, CO,final,internal,Filed with Colorado Secretary of State
-240515_Operating_agreement.pdf,Poolula LLC Operating Agreement,formation,2024-05-15,"Poolula LLC, Rosalba Sotelo",900 S 9th St, Montrose, CO,final,internal,LLC operating agreement and member responsibilities
+240515_Articles_Poolula.pdf,Poolula LLC Articles of Organization,formation,2024-05-15,"Poolula LLC, Hidalgo-Sotelo Living Trust","900 S 9th St, Montrose, CO",final,internal,Filed with Colorado Secretary of State
+240515_Operating_agreement.pdf,Poolula LLC Operating Agreement,formation,2024-05-15,"Poolula LLC, Rosalba Sotelo","900 S 9th St, Montrose, CO",final,internal,LLC operating agreement and member responsibilities
 240515_SOA.pdf,Statement of Authority - Living Trust,formation,2024-05-15,"Hidalgo-Sotelo Living Trust, Rosalba Sotelo",,final,internal,Trustee authority documentation
 240515_LLC_Letter.pdf,LLC Formation Letter,formation,2024-05-15,Poolula LLC,,final,internal,Formation correspondence and instructions
 EIN for Poolula LLC.pdf,EIN Assignment Letter,formation,2024-01-20,Poolula LLC,,final,internal,Federal tax ID (EIN) assignment from IRS
-ACCOUNTING NOTES - 2025.docx,Accounting Notes 2025,internal,2025-01-01,Poolula LLC,,draft,internal,Internal accounting procedures and notes
+ACCOUNTING NOTES - 2025.docx,Accounting Notes 2025,accounting,2025-01-01,Poolula LLC,,draft,internal,Internal accounting procedures and notes
 poolula-llc-binder-annual-compliance-checklist.md,Annual Compliance Checklist,compliance,2024-01-01,Poolula LLC,,final,internal,Annual LLC compliance requirements for Colorado
-poolula-llc-binder-table-of-contents.md,LLC Binder Table of Contents,internal,2024-01-01,Poolula LLC,,final,internal,Organization of LLC documents and binder structure
+poolula-llc-binder-table-of-contents.md,LLC Binder Table of Contents,index,2024-01-01,Poolula LLC,,final,internal,Organization of LLC documents and binder structure

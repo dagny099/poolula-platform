@@ -136,8 +136,17 @@ nav:
       - Chat Endpoints: api/chat.md
       - Property Endpoints: api/properties.md
       - Transaction Endpoints: api/transactions.md
-  - Development:
-      - Contributing: development/contributing.md
-      - Testing: development/testing.md
-      - Database Migrations: development/migrations.md
+      - Document Endpoints: api/documents.md
+      - Obligation Endpoints: api/obligations.md
+  - Evaluation:
+      - Why Evaluate LLMs: evaluation/index.md
+      - Evaluation Harness: evaluation/harness.md
+      - Question Design: evaluation/questions.md
+      - Scoring Methodology: evaluation/scoring.md
+      - Results & Baselines: evaluation/results.md
+      - Improvement Roadmap: evaluation/roadmap.md
+  - Testing & Operations:
+      - Testing Guide: testing/testing.md
+      - Database Migrations: testing/migrations.md
+      - Deployment: testing/deployment.md
   - FAQ: faq.md

@@ -7,10 +7,15 @@ Complete guide for managing business documents in Poolula Platform's AI-powered 
 Poolula Platform uses a **RAG (Retrieval-Augmented Generation)** system to make your business documents searchable through natural language queries. The chatbot can answer questions by searching through your:
 
 - Formation documents (Articles, Operating Agreement)
+
 - Financial statements and accounting notes
+
 - Compliance checklists and reports
+
 - Insurance policies
+
 - Contracts and leases
+
 - Tax documents
 
 **How it works:**
@@ -130,9 +135,13 @@ documents/
 ```
 
 **Tips:**
+
 - Use descriptive filenames (`Articles_of_Organization.pdf` not `doc1.pdf`)
+
 - Include dates in filenames (`Annual_Report_2024.pdf`)
+
 - Avoid special characters and spaces (use underscores)
+
 - Skip README.md files (automatically excluded)
 
 ---

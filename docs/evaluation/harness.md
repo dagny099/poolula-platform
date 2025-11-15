@@ -341,4 +341,4 @@ See [Improvement Roadmap](roadmap.md) for planned features:
 - [Question Design](questions.md) - How questions are designed
 - [Scoring Methodology](scoring.md) - Detailed scoring explanation
 - [Results & Baselines](results.md) - Current performance
-- [Testing Guide](../testing/guide.md) - Traditional pytest tests
+- [Testing Guide](../testing/testing.md) - Traditional pytest tests

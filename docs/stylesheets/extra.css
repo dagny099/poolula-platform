@@ -89,10 +89,33 @@ table a:hover {
     text-decoration: underline;
 }
 
-/* Mermaid diagram styling */
+/* Mermaid diagram styling - Enhanced for better visibility */
 .mermaid {
     text-align: center;
-    margin: 1.5em 0;
+    margin: 2em 0;
+    overflow: visible;
+}
+
+/* Make Mermaid SVG diagrams larger and more readable */
+.mermaid svg {
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 500px;
+    display: inline-block;
+}
+
+/* Larger diagrams on big screens */
+@media (min-width: 1200px) {
+    .mermaid svg {
+        min-height: 700px;
+    }
+}
+
+/* Extra large diagrams on very large screens */
+@media (min-width: 1600px) {
+    .mermaid svg {
+        min-height: 800px;
+    }
 }
 
 /* Status badges */

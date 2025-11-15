@@ -498,7 +498,7 @@ tools = [
 
 - [Data Models](data-models.md) - Detailed schema documentation
 - [API Design](api-design.md) - API architecture details
-- [Development Guide](../development/contributing.md) - Contributing guidelines
+- [Testing Guide](../testing/testing.md) - Testing and development workflow
 
 ---
 

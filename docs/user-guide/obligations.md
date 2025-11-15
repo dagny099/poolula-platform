@@ -837,9 +837,6 @@ Future enhancement will support CSV export for calendar integration.
 ## Related Documentation
 
 - [Database Models](../architecture/data-models.md) - Obligations table schema
-
 - [API Reference](../api/obligations.md) - Full API documentation
-
-- [Seed Script](../../scripts/seed_obligations.py) - Common obligations creator
-
+- Seed script: `scripts/seed_obligations.py`
 - [Data Import](../workflows/data-import.md) - General data import guide

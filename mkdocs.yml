@@ -140,6 +140,9 @@ nav:
       - System Design: architecture/system-design.md
       - Data Models: architecture/data-models.md
       - API Design: architecture/api-design.md
+      - Business Objects: architecture/business-objects.md
+      - Platform Interfaces: architecture/platform-interfaces.md
+      - Quick Reference: architecture/quick-reference.md
   - API Reference:
       - Overview: api/overview.md
       - Chat Endpoints: api/chat.md
@@ -158,4 +161,15 @@ nav:
       - Testing Guide: testing/testing.md
       - Database Migrations: testing/migrations.md
       - Deployment: testing/deployment.md
+  - Workflows:
+      - Data Import: workflows/data-import.md
+      - API Usage: workflows/api-usage.md
+      - Testing: workflows/testing.md
+      - Airbnb Import: workflows/airbnb-import.md
+  - Reference:
+      - Sample Questions: sample-questions.md
+      - Week 4 Summary: phase2-week4-summary.md
+  - Planning:
+      - Implementation Plan (2025-11-13): planning/2025-11-13-revised-implementation-plan.md
+      - Implementation Plan (2024-11-14): planning/implementation-plan-2024-11-14.md
   - FAQ: faq.md

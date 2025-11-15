@@ -564,8 +564,8 @@ uv run pytest tests/chatbot/ --cov=apps/chatbot --cov-report=term-missing
 
 ## Next Steps
 
-- **API Usage**: See [api-usage.md](api-usage.md) for manual testing
-- **Data Import**: See [data-import.md](data-import.md) for seeding test data
+- **API Usage**: See [API Usage Guide](../workflows/api-usage.md) for manual testing
+- **Data Import**: See [Data Import Guide](../workflows/data-import.md) for seeding test data
 - **Phase 2**: Complete chatbot SQL query tool, run evaluation harness
 - **Phase 3**: Add tests for Transaction, Document, Obligation models
 

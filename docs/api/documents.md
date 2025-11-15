@@ -151,9 +151,7 @@ curl -X POST http://localhost:8082/api/v1/chat/query \
 ## Related Documentation
 
 - [Document Management](../user-guide/document-management.md) - Complete document guide
-
-- [Ingestion Script](../../scripts/ingest_documents.py) - Document ingestion tool
-
+- Document ingestion: `scripts/ingest_documents.py`
 - [Chatbot Document Queries](../user-guide/chatbot.md#document-questions) - Querying documents
 
 ---

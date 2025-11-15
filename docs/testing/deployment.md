@@ -864,11 +864,8 @@ pip cache purge
 ## Related Documentation
 
 - [Migrations Guide](migrations.md) - Database migrations
-
 - [Testing Guide](testing.md) - Pre-deployment testing
-
-- [Backup Script](../../scripts/backup.py) - Database backup tool
-
+- Backup tool: `scripts/backup.py`
 - [Architecture Overview](../architecture/system-design.md) - System architecture
 
 ## External Resources

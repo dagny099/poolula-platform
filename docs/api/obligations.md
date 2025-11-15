@@ -183,15 +183,13 @@ uv run python scripts/seed_obligations.py --clear --year 2025
 
 - Property inspections
 
-**See:** [Seed Obligations Script](../../scripts/seed_obligations.py)
+**See:** `scripts/seed_obligations.py` for common obligation templates
 
 ## Related Documentation
 
 - [Managing Obligations](../user-guide/obligations.md) - Complete obligations guide
-
 - [RRULE Format Explained](../user-guide/obligations.md#rrule-format-explained) - Recurrence patterns
-
-- [Seed Script](../../scripts/seed_obligations.py) - Common obligations creator
+- Seed script: `scripts/seed_obligations.py`
 
 ---
 

@@ -333,12 +333,12 @@ open htmlcov/index.html
 
 ### How do I contribute?
 
-See [Development Guide](development/contributing.md) for:
+This is a solo-developer project for Poolula LLC. For development workflow:
 
-- Code style guidelines
-- Testing requirements
-- Pull request process
-- Documentation standards
+- Code style: Follow `ruff` linting (run `uv run ruff check`)
+- Testing: Maintain ≥80% coverage (see [Testing Guide](testing/testing.md))
+- Documentation: Update relevant docs in `docs/` directory
+- Standards: Type hints throughout, Pydantic validation
 
 ## Advanced Questions
 

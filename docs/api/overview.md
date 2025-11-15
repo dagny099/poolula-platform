@@ -311,7 +311,7 @@ openapi-generator-cli generate -i openapi.json \
 - [Chatbot API Details](chat.md) - Query endpoints and response format
 - [Property API Details](properties.md) - Property management endpoints
 - [Transaction API Details](transactions.md) - Transaction endpoints
-- [Development Guide](../development/contributing.md) - Contribute to the API
+- [API Design](../architecture/api-design.md) - API architecture and patterns
 
 ## API Design Philosophy
 

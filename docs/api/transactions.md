@@ -108,10 +108,8 @@ curl -X POST http://localhost:8082/api/v1/transactions \
 ## Related Documentation
 
 - [Transaction Categories](../architecture/data-models.md#transaction-categories) - Full category list
-
 - [Chatbot Queries](../user-guide/chatbot.md#financial-questions) - Query transactions via AI
-
-- [Sample Questions](../sample-questions.md#bookkeeper-persona) - Transaction query examples
+- [Sample Questions](../sample-questions.md#2-bookkeeper-financial-records-accounting) - Transaction query examples
 
 ---
 

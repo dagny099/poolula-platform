@@ -80,11 +80,22 @@ rag = [
     # AI & RAG (Phase 2)
     # Note: macOS Intel x86_64 with Python 3.13 has limited torch support
     # Consider using Python 3.12 or ARM Mac for full functionality
-    "anthropic>=0.58.2",  # Claude API
+    "anthropic>=0.58.2",  # Claude API (default LLM provider)
     "chromadb>=1.0.15",  # Vector database
     # Skip sentence-transformers for now - ChromaDB has built-in embedding functions
     # "sentence-transformers>=5.0.0",  # Requires torch with macOS Intel + Python 3.13 support
     "pytesseract>=0.3.10",  # OCR (requires system tesseract)
+]
+
+openai = [
+    # OpenAI LLM provider (optional alternative to Anthropic)
+    "openai>=1.50.0",  # OpenAI API client
+]
+
+local = [
+    # Local model support via Ollama (optional, privacy-focused)
+    # Note: Requires Ollama installed separately (https://ollama.ai)
+    # requests is already in base dependencies
 ]
 
 [build-system]

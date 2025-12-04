@@ -57,6 +57,7 @@ class RAGSystem:
 
         Raises:
             ValueError: If provider is unknown or configuration is invalid
+            ImportError: If provider dependencies are not installed
         """
         provider_type = config.LLM_PROVIDER.lower()
 
@@ -67,25 +68,42 @@ class RAGSystem:
                 api_key=config.ANTHROPIC_API_KEY,
                 model=config.ANTHROPIC_MODEL
             )
-        # Future providers:
-        # elif provider_type == "openai":
-        #     from .llm_providers.openai_provider import OpenAIProvider
-        #     if not config.OPENAI_API_KEY:
-        #         raise ValueError("OPENAI_API_KEY is required for OpenAI provider")
-        #     return OpenAIProvider(
-        #         api_key=config.OPENAI_API_KEY,
-        #         model=config.OPENAI_MODEL
-        #     )
-        # elif provider_type == "ollama":
-        #     from .llm_providers.ollama_provider import OllamaProvider
-        #     return OllamaProvider(
-        #         model=config.LOCAL_MODEL_PATH,
-        #         base_url=config.LOCAL_MODEL_URL
-        #     )
+
+        elif provider_type == "openai":
+            from .llm_providers import OpenAIProvider
+            if OpenAIProvider is None:
+                raise ImportError(
+                    "OpenAI provider requires the 'openai' package. "
+                    "Install with: uv sync --group openai"
+                )
+            if not config.OPENAI_API_KEY:
+                raise ValueError("OPENAI_API_KEY is required for OpenAI provider")
+            return OpenAIProvider(
+                api_key=config.OPENAI_API_KEY,
+                model=config.OPENAI_MODEL
+            )
+
+        elif provider_type == "ollama":
+            from .llm_providers import OllamaProvider
+            if OllamaProvider is None:
+                raise ImportError(
+                    "Ollama provider requires the 'requests' package. "
+                    "Install with: uv sync --group local"
+                )
+            if not config.LOCAL_MODEL_PATH:
+                raise ValueError(
+                    "LOCAL_MODEL_PATH is required for Ollama provider. "
+                    "Example: llama3.1:8b-instruct-q4_K_M"
+                )
+            return OllamaProvider(
+                model=config.LOCAL_MODEL_PATH,
+                base_url=config.LOCAL_MODEL_URL
+            )
+
         else:
             raise ValueError(
                 f"Unknown LLM provider: {config.LLM_PROVIDER}. "
-                f"Supported providers: anthropic"
+                f"Supported providers: anthropic, openai, ollama"
             )
 
     def add_business_document(self, file_path: str) -> Tuple[BusinessDocument, int]:

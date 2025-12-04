@@ -11,6 +11,8 @@ from .metadata_manager import MetadataManager
 from .cache_manager import QueryResultCache
 from .audit_logger import ChatbotAuditLogger
 from .models import BusinessDocument, DocumentChunk
+from .llm_providers.base import LLMProvider
+from .llm_providers.anthropic_provider import AnthropicProvider
 
 class RAGSystem:
     """Main orchestrator for the Retrieval-Augmented Generation system"""
@@ -18,16 +20,20 @@ class RAGSystem:
     def __init__(self, config):
         self.config = config
         self.logger = logging.getLogger(__name__)
-        
+
         # Initialize core components
         self.document_processor = DocumentProcessor(config.CHUNK_SIZE, config.CHUNK_OVERLAP)
         self.vector_store = VectorStore(config.CHROMA_PATH, config.EMBEDDING_MODEL, config.MAX_RESULTS)
-        self.ai_generator = AIGenerator(config.ANTHROPIC_API_KEY, config.ANTHROPIC_MODEL)
+
+        # Create LLM provider based on configuration
+        provider = self._create_llm_provider(config)
+        self.ai_generator = AIGenerator(provider)
+
         self.session_manager = SessionManager(config.MAX_HISTORY)
         self.metadata_manager = MetadataManager(config.METADATA_CSV_PATH)
         self.query_cache = QueryResultCache(config.CACHE_TTL_MINUTES)
         self.audit_logger = ChatbotAuditLogger()
-        
+
         # Initialize search tools with cache support
         self.tool_manager = ToolManager()
         self.document_search_tool = DocumentSearchTool(self.vector_store, self.query_cache)
@@ -36,9 +42,52 @@ class RAGSystem:
         self.tool_manager.register_tool(self.document_search_tool)
         self.tool_manager.register_tool(self.document_list_tool)
         self.tool_manager.register_tool(self.database_tool)
-        
-        self.logger.info(f"RAG System initialized - Vector store: {config.CHROMA_PATH}, Model: {config.ANTHROPIC_MODEL}")
-    
+
+        self.logger.info(f"RAG System initialized - Vector store: {config.CHROMA_PATH}, Provider: {provider.provider_name}")
+
+    def _create_llm_provider(self, config) -> LLMProvider:
+        """
+        Factory method for creating LLM providers based on configuration
+
+        Args:
+            config: Configuration object with provider settings
+
+        Returns:
+            LLMProvider instance
+
+        Raises:
+            ValueError: If provider is unknown or configuration is invalid
+        """
+        provider_type = config.LLM_PROVIDER.lower()
+
+        if provider_type == "anthropic":
+            if not config.ANTHROPIC_API_KEY:
+                raise ValueError("ANTHROPIC_API_KEY is required for Anthropic provider")
+            return AnthropicProvider(
+                api_key=config.ANTHROPIC_API_KEY,
+                model=config.ANTHROPIC_MODEL
+            )
+        # Future providers:
+        # elif provider_type == "openai":
+        #     from .llm_providers.openai_provider import OpenAIProvider
+        #     if not config.OPENAI_API_KEY:
+        #         raise ValueError("OPENAI_API_KEY is required for OpenAI provider")
+        #     return OpenAIProvider(
+        #         api_key=config.OPENAI_API_KEY,
+        #         model=config.OPENAI_MODEL
+        #     )
+        # elif provider_type == "ollama":
+        #     from .llm_providers.ollama_provider import OllamaProvider
+        #     return OllamaProvider(
+        #         model=config.LOCAL_MODEL_PATH,
+        #         base_url=config.LOCAL_MODEL_URL
+        #     )
+        else:
+            raise ValueError(
+                f"Unknown LLM provider: {config.LLM_PROVIDER}. "
+                f"Supported providers: anthropic"
+            )
+
     def add_business_document(self, file_path: str) -> Tuple[BusinessDocument, int]:
         """
         Add a single business document to the knowledge base with metadata support.

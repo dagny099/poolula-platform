@@ -31,11 +31,22 @@ This document provides context for Claude Code (AI coding assistant) working on 
 
 ### AI & RAG (Phase 2)
 
-- **Anthropic Claude** - AI generation (via anthropic>=0.58.2)
+- **LLM Provider Architecture** - Provider-agnostic abstraction layer for multiple LLM backends
+  - **Anthropic Claude** (default) - Primary AI generation (via anthropic>=0.58.2)
+  - **OpenAI** (optional) - Alternative provider support
+  - **Local Models** (optional) - Ollama integration for offline/privacy use
 - **ChromaDB** - Vector database (chromadb>=1.0.15)
 - **ONNX Embeddings** - ChromaDB's built-in ONNXMiniLM_L6_V2 (no torch required)
 
 **Important**: We use ChromaDB's built-in ONNX embedding function instead of sentence-transformers to avoid PyTorch dependency issues on macOS Intel x86_64 with Python 3.13. This provides excellent performance without torch compatibility headaches.
+
+**LLM Provider Abstraction**: The chatbot uses a provider-agnostic architecture that allows switching between different LLM backends (Anthropic, OpenAI, local models) via configuration. This enables:
+- Easy experimentation with different models
+- Cost optimization and provider comparison
+- Privacy-focused local model usage for sensitive data
+- Educational exploration of various LLM capabilities
+
+See `docs/planning/2025-12-03-llm-agnosticism-plan.md` for implementation details.
 
 Note: AI/RAG dependencies are in optional `rag` dependency group. Install with `uv sync --group rag`.
 
@@ -60,8 +71,13 @@ poolula-platform/
 │   │   └── routes/            # API endpoints
 │   │       └── properties.py  # Property CRUD
 │   └── chatbot/               # RAG Chatbot (Phase 2)
-│       ├── rag_system.py      # Main orchestrator
-│       ├── ai_generator.py    # Claude API integration
+│       ├── llm_providers/     # LLM provider abstraction layer
+│       │   ├── base.py        # Provider interface (LLMProvider, LLMMessage, LLMResponse)
+│       │   ├── anthropic_provider.py  # Anthropic Claude adapter
+│       │   ├── openai_provider.py     # OpenAI adapter (Stage 2)
+│       │   └── ollama_provider.py     # Local model adapter (Stage 2)
+│       ├── rag_system.py      # Main orchestrator with provider factory
+│       ├── ai_generator.py    # Provider-agnostic AI generation
 │       ├── vector_store.py    # ChromaDB interface (ONNX embeddings)
 │       ├── document_processor.py  # Text chunking
 │       ├── search_tools.py    # Search tool definitions
@@ -69,7 +85,7 @@ poolula-platform/
 │       ├── cache_manager.py   # Query result caching
 │       ├── metadata_manager.py # Document metadata
 │       ├── models.py          # Business document models
-│       ├── config.py          # Chatbot configuration
+│       ├── config.py          # Chatbot configuration (LLM_PROVIDER setting)
 │       ├── app.py             # FastAPI endpoints (legacy, being integrated)
 │       ├── health_check.py    # Health monitoring
 │       └── performance_monitor.py # Performance tracking
@@ -81,10 +97,10 @@ poolula-platform/
 │   ├── test_models.py         # Model tests
 │   ├── test_api_properties.py # API tests
 │   └── chatbot/               # Chatbot tests (Phase 2)
-│       ├── conftest.py        # Chatbot fixtures
-│       ├── test_rag_system.py # RAG integration tests (31/37 passing)
+│       ├── conftest.py        # Chatbot fixtures (with LLM provider mocks)
+│       ├── test_rag_system.py # RAG integration tests
 │       ├── test_session_manager.py # Session tests (10/10 passing)
-│       └── test_ai_generator_integration.py # AI tests (22/22 passing)
+│       └── test_ai_generator_integration.py # AI tests (12/12 passing)
 ├── docs/                      # Documentation
 │   ├── architecture/          # Architecture documentation
 │   │   ├── business-objects.md   # Object reference

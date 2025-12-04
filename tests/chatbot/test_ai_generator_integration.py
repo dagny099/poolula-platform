@@ -2,40 +2,68 @@ import unittest
 from unittest.mock import Mock, MagicMock, patch
 
 from apps.chatbot.ai_generator import AIGenerator
+from apps.chatbot.llm_providers.anthropic_provider import AnthropicProvider
 from apps.chatbot.search_tools import CourseSearchTool, CourseOutlineTool, ToolManager
 from apps.chatbot.vector_store import VectorStore
 
 
 class TestAIGeneratorIntegration(unittest.TestCase):
     """Test suite for AI generator integration with CourseSearchTool"""
-    
+
     def setUp(self):
         """Set up test fixtures"""
         # Mock the Anthropic client
         self.mock_client = Mock()
-        
-        # Create AI generator and patch the client
+
+        # Create Anthropic provider with mocked client
         with patch('anthropic.Anthropic') as mock_anthropic:
             mock_anthropic.return_value = self.mock_client
-            self.ai_generator = AIGenerator("fake-api-key", "claude-3-sonnet")
-        
+            self.provider = AnthropicProvider("fake-api-key", "claude-3-sonnet")
+
+        # Create AI generator with the provider
+        self.ai_generator = AIGenerator(self.provider)
+
         # Create mock vector store and tools
         self.mock_vector_store = Mock(spec=VectorStore)
         self.search_tool = CourseSearchTool(self.mock_vector_store)
         self.outline_tool = CourseOutlineTool(self.mock_vector_store)
-        
+
         # Create tool manager with both tools
         self.tool_manager = ToolManager()
         self.tool_manager.register_tool(self.search_tool)
         self.tool_manager.register_tool(self.outline_tool)
+
+    def _create_text_response(self, text, stop_reason="end_turn"):
+        """Helper to create a properly structured text response"""
+        response = Mock()
+        response.stop_reason = stop_reason
+        content_block = Mock()
+        content_block.type = "text"
+        content_block.text = text
+        response.content = [content_block]
+        return response
+
+    def _create_tool_use_response(self, tool_name, tool_id, tool_input):
+        """Helper to create a properly structured tool use response"""
+        response = Mock()
+        response.stop_reason = "tool_use"
+        content_block = Mock()
+        content_block.type = "tool_use"
+        content_block.name = tool_name
+        content_block.id = tool_id
+        content_block.input = tool_input
+        response.content = [content_block]
+        return response
     
     def test_generate_response_without_tools(self):
         """Test response generation without tool usage"""
         # Mock Claude response without tool use
         mock_response = Mock()
         mock_response.stop_reason = "end_turn"
-        mock_response.content = [Mock()]
-        mock_response.content[0].text = "This is a general knowledge response."
+        mock_content_block = Mock()
+        mock_content_block.type = "text"
+        mock_content_block.text = "This is a general knowledge response."
+        mock_response.content = [mock_content_block]
         
         self.mock_client.messages.create.return_value = mock_response
         
@@ -60,21 +88,17 @@ class TestAIGeneratorIntegration(unittest.TestCase):
     def test_generate_response_with_tool_usage(self):
         """Test response generation with tool usage"""
         # Mock initial response with tool use
-        initial_response = Mock()
-        initial_response.stop_reason = "tool_use"
-        initial_response.content = [Mock()]
-        initial_response.content[0].type = "tool_use"
-        initial_response.content[0].name = "search_course_content"
-        initial_response.content[0].id = "tool_use_123"
-        initial_response.content[0].input = {
-            "query": "machine learning basics",
-            "course_name": "Introduction to AI"
-        }
-        
+        initial_response = self._create_tool_use_response(
+            tool_name="search_course_content",
+            tool_id="tool_use_123",
+            tool_input={
+                "query": "machine learning basics",
+                "course_name": "Introduction to AI"
+            }
+        )
+
         # Mock final response after tool execution
-        final_response = Mock()
-        final_response.content = [Mock()]
-        final_response.content[0].text = "Based on the course content, machine learning is..."
+        final_response = self._create_text_response("Based on the course content, machine learning is...")
         
         self.mock_client.messages.create.side_effect = [initial_response, final_response]
         
@@ -120,27 +144,24 @@ class TestAIGeneratorIntegration(unittest.TestCase):
         # Mock response with multiple tool uses
         initial_response = Mock()
         initial_response.stop_reason = "tool_use"
-        initial_response.content = [
-            Mock(),  # First tool use
-            Mock()   # Second tool use
-        ]
-        
-        # Configure first tool use
-        initial_response.content[0].type = "tool_use"
-        initial_response.content[0].name = "search_course_content"
-        initial_response.content[0].id = "tool_use_1"
-        initial_response.content[0].input = {"query": "python basics"}
-        
-        # Configure second tool use
-        initial_response.content[1].type = "tool_use"
-        initial_response.content[1].name = "search_course_content"
-        initial_response.content[1].id = "tool_use_2"
-        initial_response.content[1].input = {"query": "advanced python", "course_name": "Python Course"}
-        
+
+        # Create two tool use content blocks
+        tool_block_1 = Mock()
+        tool_block_1.type = "tool_use"
+        tool_block_1.name = "search_course_content"
+        tool_block_1.id = "tool_use_1"
+        tool_block_1.input = {"query": "python basics"}
+
+        tool_block_2 = Mock()
+        tool_block_2.type = "tool_use"
+        tool_block_2.name = "search_course_content"
+        tool_block_2.id = "tool_use_2"
+        tool_block_2.input = {"query": "advanced python", "course_name": "Python Course"}
+
+        initial_response.content = [tool_block_1, tool_block_2]
+
         # Mock final response
-        final_response = Mock()
-        final_response.content = [Mock()]
-        final_response.content[0].text = "Here's information from both searches..."
+        final_response = self._create_text_response("Here's information from both searches...")
         
         self.mock_client.messages.create.side_effect = [initial_response, final_response]
         
@@ -172,18 +193,14 @@ class TestAIGeneratorIntegration(unittest.TestCase):
     def test_tool_execution_error_handling(self):
         """Test handling of errors during tool execution"""
         # Mock response with tool use
-        initial_response = Mock()
-        initial_response.stop_reason = "tool_use"
-        initial_response.content = [Mock()]
-        initial_response.content[0].type = "tool_use"
-        initial_response.content[0].name = "search_course_content"
-        initial_response.content[0].id = "tool_use_123"
-        initial_response.content[0].input = {"query": "test query"}
-        
+        initial_response = self._create_tool_use_response(
+            tool_name="search_course_content",
+            tool_id="tool_use_123",
+            tool_input={"query": "test query"}
+        )
+
         # Mock final response
-        final_response = Mock()
-        final_response.content = [Mock()]
-        final_response.content[0].text = "I encountered an error while searching..."
+        final_response = self._create_text_response("I encountered an error while searching...")
         
         self.mock_client.messages.create.side_effect = [initial_response, final_response]
         
@@ -260,10 +277,7 @@ class TestAIGeneratorIntegration(unittest.TestCase):
     def test_conversation_history_integration(self):
         """Test that conversation history is properly included with tools"""
         # Mock response without tool use
-        mock_response = Mock()
-        mock_response.stop_reason = "end_turn"
-        mock_response.content = [Mock()]
-        mock_response.content[0].text = "Response with history context"
+        mock_response = self._create_text_response("Response with history context")
         
         self.mock_client.messages.create.return_value = mock_response
         
@@ -287,18 +301,14 @@ class TestAIGeneratorIntegration(unittest.TestCase):
     def test_unknown_tool_handling(self):
         """Test handling of unknown tool names"""
         # Mock response requesting unknown tool
-        initial_response = Mock()
-        initial_response.stop_reason = "tool_use"
-        initial_response.content = [Mock()]
-        initial_response.content[0].type = "tool_use"
-        initial_response.content[0].name = "unknown_tool"
-        initial_response.content[0].id = "tool_use_123"
-        initial_response.content[0].input = {"query": "test"}
-        
+        initial_response = self._create_tool_use_response(
+            tool_name="unknown_tool",
+            tool_id="tool_use_123",
+            tool_input={"query": "test"}
+        )
+
         # Mock final response
-        final_response = Mock()
-        final_response.content = [Mock()]
-        final_response.content[0].text = "I apologize for the error..."
+        final_response = self._create_text_response("I apologize for the error...")
         
         self.mock_client.messages.create.side_effect = [initial_response, final_response]
         
@@ -319,10 +329,7 @@ class TestAIGeneratorIntegration(unittest.TestCase):
     def test_system_prompt_content(self):
         """Test that system prompt contains correct tool guidance"""
         # Mock response
-        mock_response = Mock()
-        mock_response.stop_reason = "end_turn"
-        mock_response.content = [Mock()]
-        mock_response.content[0].text = "Test response"
+        mock_response = self._create_text_response("Test response")
         
         self.mock_client.messages.create.return_value = mock_response
         
@@ -337,36 +344,31 @@ class TestAIGeneratorIntegration(unittest.TestCase):
         system_content = call_args.kwargs['system']
         
         # Check for key tool usage instructions
-        self.assertIn("search_course_content", system_content)
-        self.assertIn("get_course_outline", system_content)
+        # Note: The system prompt is for Poolula business, but the test is using course tools
+        # We should check for the actual system prompt content regardless of tools registered
         self.assertIn("Up to 2 sequential tool calls per query", system_content)
-        self.assertIn("course content or course structure", system_content)
+        self.assertIn("query_database", system_content)
+        self.assertIn("search_document_content", system_content)
+        self.assertIn("list_business_documents", system_content)
 
     def test_sequential_tool_calling_two_rounds(self):
         """Test that sequential tool calling works across 2 rounds"""
         # Mock round 1 response with tool use
-        round1_response = Mock()
-        round1_response.stop_reason = "tool_use"
-        round1_response.content = [Mock()]
-        round1_response.content[0].type = "tool_use"
-        round1_response.content[0].name = "get_course_outline"
-        round1_response.content[0].id = "tool_use_1"
-        round1_response.content[0].input = {"course_title": "Machine Learning Basics"}
-        
+        round1_response = self._create_tool_use_response(
+            tool_name="get_course_outline",
+            tool_id="tool_use_1",
+            tool_input={"course_title": "Machine Learning Basics"}
+        )
+
         # Mock round 2 response with tool use
-        round2_response = Mock()
-        round2_response.stop_reason = "tool_use"
-        round2_response.content = [Mock()]
-        round2_response.content[0].type = "tool_use"
-        round2_response.content[0].name = "search_course_content"
-        round2_response.content[0].id = "tool_use_2"
-        round2_response.content[0].input = {"query": "lesson 3", "course_name": "Machine Learning Basics"}
-        
+        round2_response = self._create_tool_use_response(
+            tool_name="search_course_content",
+            tool_id="tool_use_2",
+            tool_input={"query": "lesson 3", "course_name": "Machine Learning Basics"}
+        )
+
         # Mock final response without tools
-        final_response = Mock()
-        final_response.stop_reason = "end_turn"
-        final_response.content = [Mock()]
-        final_response.content[0].text = "Lesson 3 covers supervised learning algorithms including..."
+        final_response = self._create_text_response("Lesson 3 covers supervised learning algorithms including...")
         
         self.mock_client.messages.create.side_effect = [round1_response, round2_response, final_response]
         
@@ -405,19 +407,14 @@ class TestAIGeneratorIntegration(unittest.TestCase):
     def test_sequential_tool_calling_early_termination(self):
         """Test that sequential tool calling terminates early when Claude doesn't need more tools"""
         # Mock round 1 response with tool use
-        round1_response = Mock()
-        round1_response.stop_reason = "tool_use"
-        round1_response.content = [Mock()]
-        round1_response.content[0].type = "tool_use"
-        round1_response.content[0].name = "search_course_content"
-        round1_response.content[0].id = "tool_use_1"
-        round1_response.content[0].input = {"query": "python basics"}
-        
+        round1_response = self._create_tool_use_response(
+            tool_name="search_course_content",
+            tool_id="tool_use_1",
+            tool_input={"query": "python basics"}
+        )
+
         # Mock round 2 response without tool use (early termination)
-        round2_response = Mock()
-        round2_response.stop_reason = "end_turn"
-        round2_response.content = [Mock()]
-        round2_response.content[0].text = "Python basics include variables, data types, and control structures."
+        round2_response = self._create_text_response("Python basics include variables, data types, and control structures.")
         
         self.mock_client.messages.create.side_effect = [round1_response, round2_response]
         
@@ -443,18 +440,14 @@ class TestAIGeneratorIntegration(unittest.TestCase):
     def test_sequential_tool_calling_error_handling(self):
         """Test error handling during sequential tool calling"""
         # Mock round 1 response with tool use
-        round1_response = Mock()
-        round1_response.stop_reason = "tool_use"
-        round1_response.content = [Mock()]
-        round1_response.content[0].type = "tool_use"
-        round1_response.content[0].name = "search_course_content"
-        round1_response.content[0].id = "tool_use_1"
-        round1_response.content[0].input = {"query": "test query"}
-        
+        round1_response = self._create_tool_use_response(
+            tool_name="search_course_content",
+            tool_id="tool_use_1",
+            tool_input={"query": "test query"}
+        )
+
         # Mock final response after error
-        final_response = Mock()
-        final_response.content = [Mock()]
-        final_response.content[0].text = "I encountered an error while searching."
+        final_response = self._create_text_response("I encountered an error while searching.")
         
         self.mock_client.messages.create.side_effect = [round1_response, final_response]
         
@@ -485,26 +478,20 @@ class TestAIGeneratorIntegration(unittest.TestCase):
     def test_max_rounds_limit(self):
         """Test that sequential tool calling respects max rounds limit"""
         # Mock responses for both rounds with tool use
-        round1_response = Mock()
-        round1_response.stop_reason = "tool_use"
-        round1_response.content = [Mock()]
-        round1_response.content[0].type = "tool_use"
-        round1_response.content[0].name = "search_course_content"
-        round1_response.content[0].id = "tool_use_1"
-        round1_response.content[0].input = {"query": "first search"}
-        
-        round2_response = Mock()
-        round2_response.stop_reason = "tool_use"
-        round2_response.content = [Mock()]
-        round2_response.content[0].type = "tool_use"
-        round2_response.content[0].name = "search_course_content"
-        round2_response.content[0].id = "tool_use_2"
-        round2_response.content[0].input = {"query": "second search"}
-        
+        round1_response = self._create_tool_use_response(
+            tool_name="search_course_content",
+            tool_id="tool_use_1",
+            tool_input={"query": "first search"}
+        )
+
+        round2_response = self._create_tool_use_response(
+            tool_name="search_course_content",
+            tool_id="tool_use_2",
+            tool_input={"query": "second search"}
+        )
+
         # Mock final synthesis response
-        final_response = Mock()
-        final_response.content = [Mock()]
-        final_response.content[0].text = "Based on both searches, here's the comprehensive answer..."
+        final_response = self._create_text_response("Based on both searches, here's the comprehensive answer...")
         
         self.mock_client.messages.create.side_effect = [round1_response, round2_response, final_response]
         

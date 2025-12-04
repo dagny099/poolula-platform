@@ -102,3 +102,29 @@ class QueryFilter(BaseModel):
     date_to: Optional[datetime] = None               # Filter by effective date range
     version: Optional[VersionStatus] = None          # Filter by version status
     confidentiality: Optional[ConfidentialityLevel] = None  # Filter by access level
+
+
+# Backward compatibility stubs for legacy course-related tests
+# These are deprecated and should not be used in new code
+class Lesson(BaseModel):
+    """DEPRECATED: Legacy course lesson model (for backward compatibility only)"""
+    number: int = 0
+    title: str = ""
+    content: str = ""
+    link: Optional[str] = None
+
+
+class Course(BaseModel):
+    """DEPRECATED: Legacy course model (for backward compatibility only)"""
+    title: str = ""
+    course_link: Optional[str] = None
+    instructor: Optional[str] = None
+    lessons: List[Lesson] = []
+
+
+class CourseChunk(BaseModel):
+    """DEPRECATED: Legacy course chunk model (for backward compatibility only)"""
+    content: str = ""
+    course_title: str = ""
+    lesson_number: Optional[int] = None
+    chunk_index: int = 0

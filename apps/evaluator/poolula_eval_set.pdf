@@ -1,0 +1,248 @@
+%PDF-1.4
+%
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Length 1589 >>
+stream
+BT
+/F1 12 Tf
+16 TL
+50 742 Td
+(Poolula Evaluation Set) Tj
+T*
+(Printable reference for evaluation prompts) Tj
+T*
+() Tj
+T*
+(1. Question: What properties does Poolula LLC own?) Tj
+T*
+(Type: database) Tj
+T*
+(Expected tools: query_database) Tj
+T*
+(Expected content: property, address) Tj
+T*
+(Category: property_info) Tj
+T*
+() Tj
+T*
+(2. Question: What is the depreciable basis for all properties?) Tj
+T*
+(Type: database) Tj
+T*
+(Expected tools: query_database) Tj
+T*
+(Expected content: basis, deprecia) Tj
+T*
+(Category: property_financials) Tj
+T*
+() Tj
+T*
+(3. Question: Show me all rental income transactions from 2024) Tj
+T*
+(Type: database) Tj
+T*
+(Expected tools: query_database) Tj
+T*
+(Expected content: rental, income, 2024) Tj
+T*
+(Category: transactions) Tj
+T*
+() Tj
+T*
+(4. Question: What insurance policies does Poolula have?) Tj
+T*
+(Type: document) Tj
+T*
+(Expected tools: search_document_content) Tj
+T*
+(Expected content: insurance, polic) Tj
+T*
+(Category: documents) Tj
+T*
+() Tj
+T*
+(5. Question: What is the business purpose of Poolula LLC?) Tj
+T*
+(Type: document) Tj
+T*
+(Expected tools: search_document_content) Tj
+T*
+(Expected content: business, purpose, LLC) Tj
+T*
+(Category: formation) Tj
+T*
+() Tj
+T*
+(6. Question: Show me total expenses by category for 2024) Tj
+T*
+(Type: database) Tj
+T*
+(Expected tools: query_database) Tj
+T*
+(Expected content: expense, category, total) Tj
+T*
+(Category: aggregations) Tj
+T*
+() Tj
+T*
+(7. Question: What compliance obligations are due soon?) Tj
+T*
+(Type: database) Tj
+T*
+(Expected tools: query_database) Tj
+T*
+(Expected content: obligation, due) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+6 0 obj
+<< /Length 1610 >>
+stream
+BT
+/F1 12 Tf
+16 TL
+50 742 Td
+(Category: compliance) Tj
+T*
+() Tj
+T*
+(8. Question: List all available business documents) Tj
+T*
+(Type: document) Tj
+T*
+(Expected tools: list_business_documents) Tj
+T*
+(Expected content: document, available) Tj
+T*
+(Category: document_listing) Tj
+T*
+() Tj
+T*
+(9. Question: What is the total rental income for 2024?) Tj
+T*
+(Type: database) Tj
+T*
+(Expected tools: query_database) Tj
+T*
+(Expected content: rental, income, total, 2024) Tj
+T*
+(Category: aggregations) Tj
+T*
+() Tj
+T*
+(10. Question: Who are the members of Poolula LLC according to the operating agreement?) Tj
+T*
+(Type: document) Tj
+T*
+(Expected tools: search_document_content) Tj
+T*
+(Expected content: member, LLC, operating) Tj
+T*
+(Category: governance) Tj
+T*
+() Tj
+T*
+(11. Question: Show me all utility expenses) Tj
+T*
+(Type: database) Tj
+T*
+(Expected tools: query_database) Tj
+T*
+(Expected content: utilit, expense) Tj
+T*
+(Category: transactions) Tj
+T*
+() Tj
+T*
+(12. Question: What is the address of our first property?) Tj
+T*
+(Type: database) Tj
+T*
+(Expected tools: query_database) Tj
+T*
+(Expected content: address, property) Tj
+T*
+(Category: property_info) Tj
+T*
+() Tj
+T*
+(13. Question: What documents were filed for LLC formation?) Tj
+T*
+(Type: document) Tj
+T*
+(Expected tools: search_document_content) Tj
+T*
+(Expected content: formation, LLC, filed) Tj
+T*
+(Category: formation) Tj
+T*
+() Tj
+T*
+(14. Question: What is the total basis for property acquisitions?) Tj
+T*
+(Type: database) Tj
+T*
+(Expected tools: query_database) Tj
+T*
+(Expected content: basis, total, property) Tj
+T*
+(Category: property_financials) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 6 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+8 0 obj
+<< /Length 233 >>
+stream
+BT
+/F1 12 Tf
+16 TL
+50 742 Td
+() Tj
+T*
+(15. Question: Show me revenue and expenses for the business) Tj
+T*
+(Type: hybrid) Tj
+T*
+(Expected tools: query_database) Tj
+T*
+(Expected content: revenue, expense) Tj
+T*
+(Category: hybrid) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 8 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000133 00000 n 
+0000000203 00000 n 
+0000001844 00000 n 
+0000001970 00000 n 
+0000003632 00000 n 
+0000003758 00000 n 
+0000004042 00000 n 
+trailer
+<< /Size 10 /Root 1 0 R >>
+startxref
+4168
+%%EOF

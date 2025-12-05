@@ -19,10 +19,21 @@ logging.basicConfig(
 @dataclass
 class Config:
     """Configuration settings for the RAG system"""
+    # LLM Provider settings (provider-agnostic)
+    LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "anthropic")
+
     # Anthropic API settings
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
     ANTHROPIC_MODEL: str = "claude-sonnet-4-20250514"
-    
+
+    # OpenAI settings (future)
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    OPENAI_MODEL: str = "gpt-4o"
+
+    # Local model settings (future)
+    LOCAL_MODEL_PATH: str = os.getenv("LOCAL_MODEL_PATH", "")
+    LOCAL_MODEL_URL: str = os.getenv("LOCAL_MODEL_URL", "http://localhost:11434")
+
     # Embedding model settings
     EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
     
@@ -48,5 +59,5 @@ config = Config()
 
 # Create logger for configuration
 logger = logging.getLogger(__name__)
-logger.info(f"Configuration loaded - Model: {config.ANTHROPIC_MODEL}, Chunk Size: {config.CHUNK_SIZE}")
+logger.info(f"Configuration loaded - Provider: {config.LLM_PROVIDER}, Chunk Size: {config.CHUNK_SIZE}")
 

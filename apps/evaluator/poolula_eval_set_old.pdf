@@ -4,18 +4,18 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Kids [5 0 R 7 0 R] /Count 2 >>
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R] /Count 3 >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
 4 0 obj
-<< /Length 1847 >>
+<< /Length 1589 >>
 stream
 BT
 /F1 12 Tf
-14 TL
-38 762 Td
+16 TL
+50 750 Td
 (Poolula Evaluation Set) Tj
 T*
 (Printable reference for evaluation prompts) Tj
@@ -101,7 +101,19 @@ T*
 (Expected tools: query_database) Tj
 T*
 (Expected content: obligation, due) Tj
-T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 600 800] /Contents 4 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+6 0 obj
+<< /Length 1610 >>
+stream
+BT
+/F1 12 Tf
+16 TL
+50 750 Td
 (Category: compliance) Tj
 T*
 () Tj
@@ -117,19 +129,7 @@ T*
 (Category: document_listing) Tj
 T*
 () Tj
-ET
-endstream
-endobj
-5 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 600 800] /Contents 4 0 R /Resources << /Font << /F1 3 0 R >> >> >>
-endobj
-6 0 obj
-<< /Length 1557 >>
-stream
-BT
-/F1 12 Tf
-14 TL
-38 762 Td
+T*
 (9. Question: What is the total rental income for 2024?) Tj
 T*
 (Type: database) Tj
@@ -199,7 +199,19 @@ T*
 (Expected content: basis, total, property) Tj
 T*
 (Category: property_financials) Tj
-T*
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 600 800] /Contents 6 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+endobj
+8 0 obj
+<< /Length 233 >>
+stream
+BT
+/F1 12 Tf
+16 TL
+50 750 Td
 () Tj
 T*
 (15. Question: Show me revenue and expenses for the business) Tj
@@ -214,21 +226,23 @@ T*
 ET
 endstream
 endobj
-7 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 600 800] /Contents 6 0 R /Resources << /Font << /F1 3 0 R >> >> >>
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 600 800] /Contents 8 0 R /Resources << /Font << /F1 3 0 R >> >> >>
 endobj
 xref
-0 8
+0 10
 0000000000 65535 f 
 0000000015 00000 n 
 0000000064 00000 n 
-0000000127 00000 n 
-0000000197 00000 n 
-0000002096 00000 n 
-0000002222 00000 n 
-0000003831 00000 n 
+0000000133 00000 n 
+0000000203 00000 n 
+0000001844 00000 n 
+0000001970 00000 n 
+0000003632 00000 n 
+0000003758 00000 n 
+0000004042 00000 n 
 trailer
-<< /Size 8 /Root 1 0 R >>
+<< /Size 10 /Root 1 0 R >>
 startxref
-3957
+4168
 %%EOF

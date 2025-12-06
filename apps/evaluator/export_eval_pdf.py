@@ -5,11 +5,11 @@ from pathlib import Path
 INPUT_PATH = Path(__file__).with_name("poolula_eval_set.jsonl")
 OUTPUT_PATH = Path(__file__).with_name("poolula_eval_set.pdf")
 
-PAGE_WIDTH = 612  # 8.5in * 72dpi
-PAGE_HEIGHT = 792  # 11in * 72dpi
-MARGIN = 50
+PAGE_WIDTH = 600  # 8.5in * 72dpi
+PAGE_HEIGHT = 800  # 11in * 72dpi
+MARGIN = 38
 START_Y = PAGE_HEIGHT - MARGIN
-LEADING = 16
+LEADING = 14
 MAX_LINES = int((START_Y - MARGIN) / LEADING)
 
 

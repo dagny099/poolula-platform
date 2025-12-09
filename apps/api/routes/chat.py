@@ -12,6 +12,7 @@ from pydantic import BaseModel
 
 from apps.chatbot.rag_system import RAGSystem
 from apps.chatbot.config import Config
+from apps.dspy.runtime import run_dspy_program
 from core.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -89,17 +90,19 @@ async def query_chatbot(request: QueryRequest) -> QueryResponse:
     try:
         logger.info(f"Query received: {request.query[:100]}...")
 
-        # Get RAG system
-        rag = get_rag_system()
-
         # Generate session ID if not provided
         session_id = request.session_id or str(uuid.uuid4())
 
-        # Process query - returns tuple (response_text, sources_list)
-        response_text, sources_list = rag.query(
-            query=request.query,
-            session_id=session_id
-        )
+        # Try DSPy program if feature flag is enabled and artifact loads; fallback to baseline RAG.
+        dspy_result = run_dspy_program(question=request.query, session_id=session_id)
+        if dspy_result:
+            response_text, sources_list = dspy_result
+        else:
+            rag = get_rag_system()
+            response_text, sources_list = rag.query(
+                query=request.query,
+                session_id=session_id
+            )
 
         # Format response for frontend
         return QueryResponse(

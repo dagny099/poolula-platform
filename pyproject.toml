@@ -40,6 +40,7 @@ dependencies = [
     "pydantic-settings>=2.6.0",  # Settings management
     "python-dateutil>=2.9.0",  # Date parsing
     "pytz>=2024.1",  # Timezone handling
+    "mlflow>=2.16.2",  # Experiment tracking and artifact logging for DSPy runs
 
     # CLI
     "click>=8.1.0",  # Command-line interface
@@ -82,6 +83,7 @@ rag = [
     # Consider using Python 3.12 or ARM Mac for full functionality
     "anthropic>=0.58.2",  # Claude API (default LLM provider)
     "chromadb>=1.0.15",  # Vector database
+    "dspy-ai==2.5.0",  # DSPy pinned for reproducible pipelines
     # Skip sentence-transformers for now - ChromaDB has built-in embedding functions
     # "sentence-transformers>=5.0.0",  # Requires torch with macOS Intel + Python 3.13 support
     "pytesseract>=0.3.10",  # OCR (requires system tesseract)

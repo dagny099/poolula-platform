@@ -1,3 +1,20 @@
+# DSPy + MLflow Integration Plan (Snapshot 2025-12-09)
+
+## Snapshot Notes
+- Created: dataset manifest/snapshot/sampling helper; DSPy pickled-artifact loader with API fallback; RAG-backed DSPy program and artifact builder; MLflow runner for dataset + DSPy artifacts; eval harness (baseline vs DSPy) with basic hit-rate/latency metrics; dummy artifact generator for loader smoke tests.
+- Completed: dependency pins (`dspy-ai`, `mlflow`) and lock refresh; DSPy feature-flag wiring in API with fallback; logging of dataset artifacts and DSPy artifacts into MLflow runs.
+- Not yet done: real DSPy retrieve/reason/verify pipeline; richer eval metrics (accuracy/hallucination) and failure artifacts; registry/promotion + CI smoke load; observability/PII scrubbing + promotion gates; chat interaction logging (planned separately).
+- Concerns: current DSPy artifact is just a RAG wrapper (no DSPy modules); eval metric is token hit-rate heuristic only; MLflow runs may grow if snapshots exceed limits—respect manifest guardrails.
+
+## Explicit Next Steps (why)
+1) Implement true DSPy pipeline (retriever/reasoner/verifier modules) and serialize as artifact—needed for measurable gains beyond baseline and for registry promotion.
+2) Extend eval harness to log accuracy/hallucination/latency and error bundles; compare baseline vs DSPy—needed for promotion gates and rollback decisions.
+3) Add registry/promotion workflow and CI smoke test that loads the Production artifact with fallback—ensures deploy-time safety.
+4) Add PII/secret scrubbing + structured logging parity (DSPy vs baseline) and metric thresholds for promotions—required for safe observability and compliance.
+5) (Separate branch) Instrument chat interaction logging with redaction/sampling—provides live telemetry; keep separate to avoid blocking core pipeline work.
+
+---
+
 # DSPy + MLflow Integration Plan
 
 This plan covers Option C (DSPy pipeline for Q&A with sources) and Option D (tracking DSPy optimization runs in MLflow), with a staged path that can execute DSPy alone or as a combined approach with MLflow tracking and registry support. The goal is to maximize transparency, reproducibility, and operational clarity.

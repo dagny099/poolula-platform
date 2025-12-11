@@ -59,6 +59,24 @@ htmlcov/
 .tox/
 .hypothesis/
 
+# Tool caches
+.mypy_cache/
+.ruff_cache/
+
+# MLflow experiment tracking
+mlruns/
+.mlflow_artifacts/
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# Evaluation outputs
+evaluation_results/
+*.evaluation.json
+
+# Backups
+backups/
+
 # Documentation builds
 docs/_build/
 site/
@@ -88,4 +106,3 @@ temp/
 
 # Business documents - never commit sensitive business documents
 /documents/
-site/

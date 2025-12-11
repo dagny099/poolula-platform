@@ -29,26 +29,28 @@ This document provides context for Claude Code (AI coding assistant) working on 
 - **In-memory SQLite** for test database
 - **FastAPI TestClient** for API testing
 
-### AI & RAG (Phase 2)
+### AI & RAG
 
 - **LLM Provider Architecture** - Provider-agnostic abstraction layer for multiple LLM backends
   - **Anthropic Claude** (default) - Primary AI generation (via anthropic>=0.58.2)
   - **OpenAI** (optional) - Alternative provider support
   - **Local Models** (optional) - Ollama integration for offline/privacy use
-- **ChromaDB** - Vector database (chromadb>=1.0.15)
-- **ONNX Embeddings** - ChromaDB's built-in ONNXMiniLM_L6_V2 (no torch required)
+- **ChromaDB** - Vector database with ONNX embeddings (chromadb>=1.0.15)
+- **DSPy** - Prompt optimization and pipeline framework (dspy-ai==2.5.0)
+- **MLflow** - Experiment tracking and model registry (mlflow>=2.16.2)
 
-**Important**: We use ChromaDB's built-in ONNX embedding function instead of sentence-transformers to avoid PyTorch dependency issues on macOS Intel x86_64 with Python 3.13. This provides excellent performance without torch compatibility headaches.
+**Important**: ChromaDB's built-in ONNX embeddings avoid PyTorch dependency issues on macOS Intel x86_64 with Python 3.13.
 
-**LLM Provider Abstraction**: The chatbot uses a provider-agnostic architecture that allows switching between different LLM backends (Anthropic, OpenAI, local models) via configuration. This enables:
-- Easy experimentation with different models
-- Cost optimization and provider comparison
-- Privacy-focused local model usage for sensitive data
-- Educational exploration of various LLM capabilities
+Note: AI dependencies are in optional `rag` dependency group. Install with `uv sync --group rag`.
 
-See `docs/planning/2025-12-03-llm-agnosticism-plan.md` for implementation details.
+### Evaluation & Observability
 
-Note: AI/RAG dependencies are in optional `rag` dependency group. Install with `uv sync --group rag`.
+- **pytest** - Traditional unit/integration tests
+- **Golden Question Set** - 15 representative business questions for RAG evaluation
+- **Automated Scoring** - Tool usage + content relevance + error handling metrics (target: ≥90%)
+- **Audit Logging** - All chatbot interactions logged to database
+
+See `docs/evaluation/` for details.
 
 ### Frontend (Phase 4)
 
@@ -60,60 +62,45 @@ Note: AI/RAG dependencies are in optional `rag` dependency group. Install with `
 ```
 poolula-platform/
 ├── core/                      # Core business logic
-│   ├── database/              # Database models & connection
-│   │   ├── models.py          # SQLModel models
-│   │   ├── enums.py           # Enum definitions
-│   │   └── connection.py      # DB connection management
+│   ├── database/              # Database models & connection (models.py, enums.py, connection.py)
 │   └── logging_config.py      # Structured logging
 ├── apps/                      # Applications
 │   ├── api/                   # FastAPI REST API
 │   │   ├── main.py            # FastAPI app
-│   │   └── routes/            # API endpoints
-│   │       └── properties.py  # Property CRUD
-│   └── chatbot/               # RAG Chatbot (Phase 2)
-│       ├── llm_providers/     # LLM provider abstraction layer
-│       │   ├── base.py        # Provider interface (LLMProvider, LLMMessage, LLMResponse)
-│       │   ├── anthropic_provider.py  # Anthropic Claude adapter
-│       │   ├── openai_provider.py     # OpenAI adapter (Stage 2)
-│       │   └── ollama_provider.py     # Local model adapter (Stage 2)
-│       ├── rag_system.py      # Main orchestrator with provider factory
-│       ├── ai_generator.py    # Provider-agnostic AI generation
-│       ├── vector_store.py    # ChromaDB interface (ONNX embeddings)
-│       ├── document_processor.py  # Text chunking
-│       ├── search_tools.py    # Search tool definitions
-│       ├── session_manager.py # Conversation history
-│       ├── cache_manager.py   # Query result caching
-│       ├── metadata_manager.py # Document metadata
-│       ├── models.py          # Business document models
-│       ├── config.py          # Chatbot configuration (LLM_PROVIDER setting)
-│       ├── app.py             # FastAPI endpoints (legacy, being integrated)
-│       ├── health_check.py    # Health monitoring
-│       └── performance_monitor.py # Performance tracking
-├── scripts/                   # Utility scripts
-│   ├── backup.py              # Database backup utility
-│   └── seed_database.py       # Import from poolula_facts.yml
-├── tests/                     # Test suite
-│   ├── conftest.py            # Pytest fixtures
-│   ├── test_models.py         # Model tests
-│   ├── test_api_properties.py # API tests
-│   └── chatbot/               # Chatbot tests (Phase 2)
-│       ├── conftest.py        # Chatbot fixtures (with LLM provider mocks)
-│       ├── test_rag_system.py # RAG integration tests
-│       ├── test_session_manager.py # Session tests (10/10 passing)
-│       └── test_ai_generator_integration.py # AI tests (12/12 passing)
+│   │   └── routes/            # API endpoints (properties, transactions, documents, obligations, chat)
+│   ├── chatbot/               # RAG Chatbot
+│   │   ├── llm_providers/     # LLM provider abstraction (base, anthropic, openai, ollama)
+│   │   ├── rag_system.py      # Main orchestrator with provider factory
+│   │   ├── ai_generator.py    # Provider-agnostic AI generation
+│   │   ├── vector_store.py    # ChromaDB interface
+│   │   ├── database_tool.py   # Database query tool for structured data
+│   │   ├── search_tools.py    # Document search tools
+│   │   ├── session_manager.py # Conversation history
+│   │   ├── audit_logger.py    # Q&A audit logging
+│   │   └── [other modules]    # cache, metadata, document processing, config, health
+│   ├── dspy/                  # DSPy pipeline integration
+│   │   ├── pipelines.py       # Q&A pipeline definitions
+│   │   ├── artifacts.py       # Artifact management
+│   │   └── runtime.py         # Pipeline execution
+│   └── evaluator/             # Evaluation harness components
+├── scripts/                   # Utility scripts (13 total)
+│   ├── cli.py                 # Main CLI (`poolula` command)
+│   ├── backup.py, seed_database.py, seed_obligations.py
+│   ├── import_airbnb_transactions.py, ingest_documents.py
+│   ├── evaluate_chatbot.py, evaluate_providers.py
+│   └── [dspy/mlflow scripts]  # build_dspy_artifact, dspy_mlflow_run, eval_dspy_vs_baseline
+├── tests/                     # Test suite (≥80% coverage)
+│   ├── test_models.py, test_api_properties.py, conftest.py
+│   └── chatbot/               # Chatbot tests (test_rag_system, test_session_manager, etc.)
 ├── docs/                      # Documentation
-│   ├── architecture/          # Architecture documentation
-│   │   ├── business-objects.md   # Object reference
-│   │   ├── platform-interfaces.md # Interface guide
-│   │   └── quick-reference.md    # Cheat sheet
-│   ├── planning/              # Implementation plans
-│   └── workflows/             # Workflow guides
-│       ├── data-import.md     # YAML → DB workflow
-│       ├── api-usage.md       # API endpoint guide
-│       └── testing.md         # Test execution guide
+│   ├── api/                   # API docs (properties, transactions, documents, obligations, chat)
+│   ├── architecture/          # System design, business objects, LLM providers
+│   ├── evaluation/            # Evaluation framework, scoring, provider comparison
+│   ├── user-guide/            # Chatbot, document management, importing data, obligations
+│   ├── planning/              # Implementation plans (LLM agnosticism, DSPy/MLflow)
+│   └── workflows/             # Data import, API usage, testing, LLM provider setup
 ├── alembic/                   # Database migrations
-├── pyproject.toml             # Project config & dependencies
-└── README.md                  # Getting started guide
+└── pyproject.toml             # Dependencies with groups: dev, rag, docs, openai, local
 ```
 
 ## Database Schema
@@ -141,29 +128,34 @@ poolula-platform/
 
 ## API Endpoints
 
-### Base URL: `http://localhost:8082`
+**Base URL**: `http://localhost:8082/api/v1`
 
-### Property Endpoints
+All endpoints support full CRUD operations (GET, POST, PATCH, DELETE) for:
+- **Properties** - Rental properties with acquisition and depreciation details
+- **Transactions** - Financial events (filter by date, category, property)
+- **Documents** - Document metadata and file uploads
+- **Obligations** - Compliance calendar with recurrence rules
 
-- `GET /health` - Health check + DB connection test
-- `GET /api/v1/properties` - List properties (optional status filter)
-- `POST /api/v1/properties` - Create property
-- `GET /api/v1/properties/{id}` - Get single property
-- `PATCH /api/v1/properties/{id}` - Update property (fully flexible for now)
-- `DELETE /api/v1/properties/{id}` - Soft delete (status=INACTIVE)
+Special endpoints:
+- `POST /chat/query` - Natural language chatbot queries (returns response + sources)
+- `GET /health` - Health check + database connection test
+- `GET /docs` - Interactive API documentation (Swagger UI)
+
+See `docs/api/` for detailed endpoint documentation.
 
 ### Response Format
 
-All responses include full provenance tracking:
+All responses include provenance tracking where applicable:
 
 ```json
 {
-  "id": "...",
+  "id": "uuid",
   "address": "900 S 9th St, Montrose, CO 81401",
   "provenance": {
-    "source_type": "manual_entry",
+    "source_type": "csv_import",
+    "source_id": "poolula_facts.yml",
     "confidence": 1.0,
-    "verification_status": "unverified"
+    "verification_status": "verified"
   }
 }
 ```
@@ -184,24 +176,29 @@ See: `docs/workflows/data-import.md` for complete workflow
 
 ## Workflows
 
-Detailed workflow documentation:
+Detailed workflow documentation in `docs/workflows/`:
 
-- **Data Import**: `docs/workflows/data-import.md` - YAML → DB workflow
-- **API Usage**: `docs/workflows/api-usage.md` - API endpoint examples
-- **Testing**: `docs/workflows/testing.md` - Test execution guide
+- **data-import.md** - YAML → DB workflow, handling UNKNOWN fields
+- **airbnb-import.md** - Import Airbnb transaction CSVs
+- **api-usage.md** - API endpoint examples for all resources
+- **testing.md** - Test execution guide
+- **llm-provider-setup.md** - LLM provider configuration and API key setup
 
 ## Common Commands
 
 ### Setup
 
 ```bash
-# Install dependencies
+# Install dependencies (core + dev)
 uv sync
+
+# Install with AI/RAG support
+uv sync --group rag
 
 # Run migrations
 .venv/bin/alembic upgrade head
 
-# Seed database
+# Seed database from YAML
 uv run python scripts/seed_database.py --initial
 ```
 
@@ -217,24 +214,46 @@ uv run pytest
 # Run tests with coverage
 uv run pytest --cov=core --cov=apps --cov-report=html
 
-# Create database migration
+# Create/apply database migration
 .venv/bin/alembic revision --autogenerate -m "Description"
-
-# Apply migrations
 .venv/bin/alembic upgrade head
 ```
 
-### Backup & Restore
+### Data Management
 
 ```bash
-# Create backup
+# Import Airbnb transactions
+uv run python scripts/import_airbnb_transactions.py
+
+# Ingest documents into vector store
+uv run python scripts/ingest_documents.py
+
+# Seed compliance obligations
+uv run python scripts/seed_obligations.py
+
+# Backup/restore database
 python scripts/backup.py
-
-# List backups
-python scripts/backup.py --list
-
-# Restore latest
 python scripts/backup.py --restore latest
+```
+
+### Evaluation & Testing
+
+```bash
+# Evaluate chatbot with golden question set
+uv run python scripts/evaluate_chatbot.py
+
+# Compare LLM providers (Anthropic, OpenAI, Ollama)
+uv run python scripts/evaluate_providers.py
+
+# Run DSPy vs baseline evaluation
+uv run python scripts/eval_dspy_vs_baseline.py
+```
+
+### CLI
+
+```bash
+# Use poolula CLI (must install with uv sync first)
+poolula --help
 ```
 
 ## Development Principles
@@ -259,18 +278,24 @@ Every data modification includes provenance:
 - **TODO Phase 5**: Add protection for immutable fields (acquisition_date, basis)
 - **Rationale**: Flexibility > protection at small scale
 
-## Implementation Plan
+## Implementation Status
 
-16-week roadmap (see `docs/planning/2025-11-13-revised-implementation-plan.md`):
+**Current Phase**: Phase 6-7 (DSPy/MLflow Integration)
 
-- **Phase 0** ✅ - Infrastructure (backup, logging)
-- **Phase 1** ✅ - Database schema, API, tests, seed script
-- **Phase 2** (Weeks 3-4) - Chatbot integration
-- **Phase 3** (Week 5) - Dashboard migration
-- **Phase 4** (Weeks 6-7) - Frontend unification
-- **Phase 5** (Weeks 8-16) - Feature expansion
-- **Phase 6** (Week 17) - Evaluation dashboard
-- **Phase 7+** - Neo4j integration (learning/exploration)
+Completed:
+- **Phase 0-1** ✅ - Infrastructure, database schema, REST API, tests
+- **Phase 2** ✅ - Chatbot integration with database tool, audit logging, evaluation harness
+
+In Progress:
+- **Phase 6-7** - DSPy pipeline optimization with MLflow experiment tracking
+  - See `docs/dspy-mlflow-plan.md` for detailed roadmap
+  - Provider comparison and evaluation framework operational
+
+Future:
+- **Phase 3-4** - Dashboard and frontend unification (deferred)
+- **Phase 5** - Feature expansion and production hardening
+
+See `docs/planning/` for detailed implementation plans.
 
 ## Known Technical Decisions
 
@@ -298,11 +323,11 @@ Every data modification includes provenance:
 
 Integrating three existing projects:
 
-1. **AirBnB Dashboard** (`/PROJECTS/AirBnB Dashboard/`) - Streamlit analytics
-2. **RAG Chatbot** (`/PROJECTS/ragchatbot-codebase/`) - FastAPI/ChromaDB/Claude
-3. **Evaluation Harness** - Golden Q&A sets for testing
+1. **AirBnB Dashboard** (`/PROJECTS/AirBnB Dashboard/`) - Streamlit analytics (data source)
+2. **RAG Chatbot** (`/PROJECTS/ragchatbot-codebase/`) - FastAPI/ChromaDB/Claude (✅ integrated)
+3. **Evaluation Harness** - Golden Q&A sets for testing (✅ operational)
 
-Phase 2-3 will migrate these into the unified platform.
+Phase 2 chatbot integration complete. Dashboard/frontend unification deferred to Phase 3-4.
 
 ## Contact & Support
 
@@ -314,11 +339,12 @@ Phase 2-3 will migrate these into the unified platform.
 
 ### Key Files
 
-- **API**: `apps/api/main.py`, `apps/api/routes/properties.py`
+- **API**: `apps/api/main.py`, `apps/api/routes/{properties,transactions,documents,obligations,chat}.py`
 - **Models**: `core/database/models.py`, `core/database/enums.py`
-- **Connection**: `core/database/connection.py`
-- **Seed Script**: `scripts/seed_database.py`
-- **Tests**: `tests/test_models.py`, `tests/test_api_properties.py`
+- **Chatbot**: `apps/chatbot/rag_system.py`, `apps/chatbot/database_tool.py`, `apps/chatbot/ai_generator.py`
+- **DSPy**: `apps/dspy/pipelines.py`, `apps/dspy/runtime.py`
+- **Scripts**: `scripts/cli.py`, `scripts/evaluate_chatbot.py`, `scripts/ingest_documents.py`
+- **Tests**: `tests/test_models.py`, `tests/test_api_properties.py`, `tests/chatbot/test_rag_system.py`
 
 ### Environment Variables
 
@@ -329,21 +355,29 @@ DATABASE_URL=sqlite:///./poolula.db  # or postgresql://...
 # API
 API_HOST=0.0.0.0
 API_PORT=8082
-API_RELOAD=true
 
-# Logging
-DEBUG=false
+# LLM Provider (anthropic, openai, or ollama)
+LLM_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-...
+# OPENAI_API_KEY=sk-...  # if using OpenAI
+# OLLAMA_BASE_URL=http://localhost:11434  # if using Ollama
+
+# MLflow (optional)
+MLFLOW_TRACKING_URI=mlruns/
 ```
 
-See `.env.example` for full list.
+See `.env.example` and `docs/workflows/llm-provider-setup.md` for details.
 
 ## Next Steps
 
 When continuing work:
 
-1. Check `docs/planning/2025-11-13-revised-implementation-plan.md` for current phase
-2. Review relevant workflow docs in `docs/workflows/`
-3. Run tests to ensure nothing broke: `uv run pytest`
-4. Start API server: `uv run uvicorn apps.api.main:app --reload --port 8082`
-
-For detailed implementation guidance, see the planning document and workflow guides.
+1. **Check current phase**: `docs/planning/` (currently Phase 6-7: DSPy/MLflow)
+2. **Review docs**:
+   - `docs/api/` - API endpoint documentation
+   - `docs/evaluation/` - Evaluation framework and provider comparison
+   - `docs/workflows/` - Operational workflows
+   - `docs/dspy-mlflow-plan.md` - Current integration roadmap
+3. **Run tests**: `uv run pytest` (ensure ≥80% coverage maintained)
+4. **Start API**: `uv run uvicorn apps.api.main:app --reload --port 8082`
+5. **Test chatbot**: `POST http://localhost:8082/api/v1/chat/query` or run evaluation harness

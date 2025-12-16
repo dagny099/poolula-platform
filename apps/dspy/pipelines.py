@@ -73,6 +73,61 @@ class RetrieveAndAnswerPipeline(dspy.Module):
         return prediction
 
 
+class PoolulaRAGPipeline(dspy.Module):
+    """
+    Full DSPy RAG pipeline for Poolula Platform.
+
+    Uses real retrievers (database + vector store) and generates answers
+    with Chain-of-Thought reasoning.
+    """
+
+    def __init__(self, use_hybrid: bool = True, k: int = 5):
+        """
+        Args:
+            use_hybrid: Use both database and vector retrieval (vs just database)
+            k: Number of results to retrieve
+        """
+        super().__init__()
+
+        from apps.dspy.retrievers import DatabaseRetriever, VectorStoreRetriever, HybridRetriever
+        from apps.dspy.signatures import ContextualQA
+
+        # Initialize retriever
+        if use_hybrid:
+            self.retrieve = HybridRetriever(k=k)
+        else:
+            self.retrieve = DatabaseRetriever(k=k)
+
+        # Initialize generator
+        self.generate_answer = dspy.ChainOfThought(ContextualQA)
+
+    def forward(self, question: str) -> dspy.Prediction:
+        """
+        Answer question using retrieve → generate pattern.
+
+        Args:
+            question: User's question
+
+        Returns:
+            dspy.Prediction with answer, context, and rationale
+        """
+        # Step 1: Retrieve relevant context
+        context_prediction = self.retrieve(question)
+        context = "\n\n".join(context_prediction.passages)
+
+        # Step 2: Generate answer using context
+        answer_prediction = self.generate_answer(
+            context=context,
+            question=question
+        )
+
+        # Add context to output for inspection
+        answer_prediction.context = context
+        answer_prediction.passages = context_prediction.passages
+
+        return answer_prediction
+
+
 # Keep old wrapper for backward compatibility during transition
 class RAGBackedDSPyProgram:
     """

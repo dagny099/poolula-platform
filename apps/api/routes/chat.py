@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 from apps.chatbot.rag_system import RAGSystem
 from apps.chatbot.config import Config
-from apps.dspy.runtime import run_dspy_program
+from apps.dspy.runtime import run_dspy_program, get_runtime_info
 from core.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -51,6 +51,7 @@ class QueryResponse(BaseModel):
     answer: str
     sources: list
     session_id: str
+    pipeline_used: Optional[str] = None  # "optimized_dspy" or "baseline_rag"
 
 
 class DocumentsResponse(BaseModel):
@@ -93,22 +94,28 @@ async def query_chatbot(request: QueryRequest) -> QueryResponse:
         # Generate session ID if not provided
         session_id = request.session_id or str(uuid.uuid4())
 
-        # Try DSPy program if feature flag is enabled and artifact loads; fallback to baseline RAG.
+        # Try DSPy program if USE_OPTIMIZED_DSPY is enabled; fallback to baseline RAG
         dspy_result = run_dspy_program(question=request.query, session_id=session_id)
+
         if dspy_result:
             response_text, sources_list = dspy_result
+            pipeline_used = "optimized_dspy"
+            logger.info("✅ Used optimized DSPy pipeline")
         else:
             rag = get_rag_system()
             response_text, sources_list = rag.query(
                 query=request.query,
                 session_id=session_id
             )
+            pipeline_used = "baseline_rag"
+            logger.info("Used baseline RAG pipeline (DSPy not available or disabled)")
 
         # Format response for frontend
         return QueryResponse(
             answer=response_text,
             sources=sources_list,
-            session_id=session_id
+            session_id=session_id,
+            pipeline_used=pipeline_used
         )
 
     except Exception as e:
@@ -235,6 +242,45 @@ async def process_incoming_files() -> Dict[str, Any]:
         "message": "No files to process",
         "processed_files": []
     }
+
+
+@router.get("/dspy-status")
+async def get_dspy_status() -> Dict[str, Any]:
+    """
+    Get DSPy runtime status and configuration
+
+    Returns information about optimized DSPy pipeline availability and configuration.
+
+    Returns:
+        DSPy runtime status including:
+        - optimized_dspy_enabled: Whether USE_OPTIMIZED_DSPY is set
+        - program_loaded: Whether optimized program successfully loaded
+        - artifact_path: Path to artifacts directory
+        - llm_provider: Configured LLM provider
+        - metadata: Optimization metadata if available
+
+    Example:
+        >>> GET /api/dspy-status
+        >>> {
+        >>>     "optimized_dspy_enabled": true,
+        >>>     "program_loaded": true,
+        >>>     "program_class": "PoolulaRAGPipeline",
+        >>>     "artifact_path": "artifacts/optimized_dspy_program",
+        >>>     "llm_provider": "anthropic",
+        >>>     "metadata": {
+        >>>         "optimizer": "BootstrapFewShot",
+        >>>         "timestamp": "2025-12-16T10:30:00",
+        >>>         ...
+        >>>     }
+        >>> }
+    """
+    try:
+        runtime_info = get_runtime_info()
+        return runtime_info
+
+    except Exception as e:
+        logger.error(f"Error retrieving DSPy status: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve DSPy status: {str(e)}")
 
 
 @router.post("/upload")

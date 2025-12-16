@@ -131,6 +131,7 @@ nav:
       - Overview: getting-started/overview.md
       - Installation: getting-started/installation.md
       - Quick Start: getting-started/quick-start.md
+      - DSPy + MLflow Quick Start: getting-started/dspy-mlflow-quickstart.md
   - User Guide:
       - Using the Chatbot: user-guide/chatbot.md
       - Managing Documents: user-guide/document-management.md
@@ -171,6 +172,7 @@ nav:
       - Testing: workflows/testing.md
       - Airbnb Import: workflows/airbnb-import.md
       - LLM Provider Setup: workflows/llm-provider-setup.md
+      - DSPy Pipeline Usage: workflows/dspy-usage.md
   - Reference:
       - Sample Questions: sample-questions.md
       - Week 4 Summary: phase2-week4-summary.md

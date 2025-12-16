@@ -86,8 +86,11 @@ poolula-platform/
 │   │   ├── session_manager.py # Conversation history
 │   │   ├── audit_logger.py    # Q&A audit logging
 │   │   └── [other modules]    # cache, metadata, document processing, config, health
-│   ├── dspy/                  # DSPy pipeline integration
-│   │   ├── pipelines.py       # Q&A pipeline definitions
+│   ├── dspy/                  # DSPy pipeline integration ✅ REAL DSPY MODULES (Phase 2 complete)
+│   │   ├── lm_config.py       # LLM configuration for DSPy
+│   │   ├── signatures.py      # Input/output signatures (SimpleQA, ContextualQA, ToolSelection)
+│   │   ├── retrievers.py      # DatabaseRetriever, VectorStoreRetriever, HybridRetriever
+│   │   ├── pipelines.py       # SimpleDSPyQA, RetrieveAndAnswerPipeline, PoolulaRAGPipeline
 │   │   ├── artifacts.py       # Artifact management
 │   │   └── runtime.py         # Pipeline execution
 │   └── evaluator/             # Evaluation harness components
@@ -194,6 +197,7 @@ Detailed workflow documentation in `docs/workflows/`:
 - **api-usage.md** - API endpoint examples for all resources
 - **testing.md** - Test execution guide
 - **llm-provider-setup.md** - LLM provider configuration and API key setup
+- **dspy-usage.md** - DSPy pipeline usage, testing, and optimization guide
 
 ## Common Commands
 
@@ -265,6 +269,27 @@ uv run python scripts/evaluate_providers.py
 
 # Run DSPy vs baseline evaluation
 uv run python scripts/eval_dspy_vs_baseline.py
+
+# Test DSPy pipelines
+uv run python scripts/test_dspy_basic.py         # SimpleDSPyQA, RetrieveAndAnswerPipeline
+uv run python scripts/test_dspy_tools.py         # DatabaseRetriever, VectorStoreRetriever, PoolulaRAGPipeline
+
+# Build DSPy artifacts
+uv run python scripts/build_dspy_artifact.py --pipeline-type simple
+uv run python scripts/build_dspy_artifact.py --pipeline-type poolula --k 10
+
+# Optimize DSPy pipeline with BootstrapFewShot (tracked in MLflow)
+uv run python scripts/optimize_dspy_pipeline.py                    # Default settings
+uv run python scripts/optimize_dspy_pipeline.py --verbose          # Verbose output
+uv run python scripts/optimize_dspy_pipeline.py --provider openai  # Different LLM provider
+
+# View optimization history in MLflow UI
+mlflow ui  # Open http://localhost:5000
+
+# Detect performance regressions
+uv run python scripts/detect_dspy_regression.py                    # Check for regressions
+uv run python scripts/detect_dspy_regression.py --verbose          # Detailed output
+uv run python scripts/optimize_dspy_pipeline.py --max-bootstrapped 6  # More demos
 ```
 
 ### CLI
@@ -364,16 +389,42 @@ uv run python scripts/remove_duplicate_transactions.py
 
 ## Implementation Status
 
-**Current Phase**: Phase 6-7 (DSPy/MLflow Integration)
+**Current Phase**: Phase 6-7 (DSPy/MLflow Integration) - ✅ **COMPLETE**
 
 Completed:
 - **Phase 0-1** ✅ - Infrastructure, database schema, REST API, tests
 - **Phase 2** ✅ - Chatbot integration with database tool, audit logging, evaluation harness
+- **DSPy Phase 1** ✅ - Foundation: Basic DSPy pipeline (SimpleDSPyQA, RetrieveAndAnswerPipeline)
+- **DSPy Phase 2** ✅ - Tool Integration: Real retrievers (DatabaseRetriever, VectorStoreRetriever, HybridRetriever, PoolulaRAGPipeline)
+- **DSPy Phase 3** ✅ - Optimization: BootstrapFewShot optimizer, metrics, dataset conversion
+  - `apps/evaluator/dspy_dataset.py` - Converts 20 eval questions to DSPy format
+  - `apps/evaluator/dspy_metrics.py` - Keyword matching and weighted metrics
+  - `scripts/optimize_dspy_pipeline.py` - Full optimization script with MLflow tracking
+- **DSPy Phase 4** ✅ - Production Integration: MLflow tracking and deployment
+  - `scripts/optimize_dspy_pipeline.py` - Enhanced with comprehensive MLflow experiment tracking
+  - `apps/dspy/runtime.py` - Optimized program loader with caching and graceful fallback
+  - `apps/api/routes/chat.py` - Updated with `USE_OPTIMIZED_DSPY` support and status endpoint
+  - `scripts/detect_dspy_regression.py` - Automated performance monitoring and regression detection
+  - `docs/getting-started/dspy-mlflow-quickstart.md` - User-friendly Getting Started guide
+  - `docs/workflows/dspy-usage.md` - Updated with MLflow integration and deployment docs
 
-In Progress:
-- **Phase 6-7** - DSPy pipeline optimization with MLflow experiment tracking
-  - See `docs/dspy-mlflow-plan.md` for detailed roadmap
-  - Provider comparison and evaluation framework operational
+**Quick Start with DSPy + MLflow:**
+```bash
+# 1. Optimize pipeline (tracked in MLflow)
+uv run python scripts/optimize_dspy_pipeline.py
+
+# 2. View results in MLflow UI
+mlflow ui  # Open http://localhost:5000
+
+# 3. Deploy optimized pipeline
+export USE_OPTIMIZED_DSPY=true
+uv run uvicorn apps.api.main:app --reload --port 8082
+
+# 4. Monitor performance
+uv run python scripts/detect_dspy_regression.py
+```
+
+See `docs/getting-started/dspy-mlflow-quickstart.md` for detailed walkthrough.
 
 Future:
 - **Phase 3-4** - Dashboard and frontend unification (deferred)
@@ -427,9 +478,9 @@ Phase 2 chatbot integration complete. Dashboard/frontend unification deferred to
 - **API**: `apps/api/main.py`, `apps/api/routes/{properties,transactions,documents,obligations,chat}.py`
 - **Models**: `core/database/models.py`, `core/database/enums.py`
 - **Chatbot**: `apps/chatbot/rag_system.py`, `apps/chatbot/database_tool.py`, `apps/chatbot/ai_generator.py`
-- **DSPy**: `apps/dspy/pipelines.py`, `apps/dspy/runtime.py`, `apps/dspy/artifacts.py`
-- **Evaluator**: `apps/evaluator/chatbot_evaluator.py`, `apps/evaluator/airbnb_ground_truth.py`, `apps/evaluator/numerical_validator.py`
-- **Scripts**: `scripts/cli.py`, `scripts/evaluate_chatbot.py`, `scripts/evaluate_airbnb.py`, `scripts/ingest_documents.py`
+- **DSPy**: `apps/dspy/lm_config.py`, `apps/dspy/signatures.py`, `apps/dspy/retrievers.py`, `apps/dspy/pipelines.py`, `apps/dspy/runtime.py`
+- **Evaluator**: `apps/evaluator/chatbot_evaluator.py`, `apps/evaluator/airbnb_ground_truth.py`, `apps/evaluator/numerical_validator.py`, `apps/evaluator/dspy_dataset.py`, `apps/evaluator/dspy_metrics.py`
+- **Scripts**: `scripts/cli.py`, `scripts/test_dspy_basic.py`, `scripts/test_dspy_tools.py`, `scripts/build_dspy_artifact.py`, `scripts/optimize_dspy_pipeline.py`, `scripts/evaluate_chatbot.py`, `scripts/evaluate_airbnb.py`
 - **Tests**: `tests/test_models.py`, `tests/test_api_properties.py`, `tests/chatbot/test_rag_system.py`
 
 ### Environment Variables

@@ -23,7 +23,7 @@ from uuid import UUID, uuid4
 
 from sqlmodel import SQLModel, Field, Column, Relationship
 from sqlalchemy import JSON, Text
-from pydantic import field_validator, model_validator, ConfigDict
+from pydantic import field_validator, model_validator, ConfigDict, field_serializer
 
 from .enums import (
     TransactionCategory,
@@ -127,6 +127,11 @@ class Property(SQLModel, table=True):
     transactions: List["Transaction"] = Relationship(back_populates="property_obj")
     documents: List["Document"] = Relationship(back_populates="property_obj")
     obligations: List["Obligation"] = Relationship(back_populates="property_obj")
+
+    @field_serializer('status')
+    def serialize_status(self, status: PropertyStatus, _info):
+        """Serialize status as uppercase name for API responses"""
+        return status.name if isinstance(status, PropertyStatus) else status
 
     @property
     def total_basis(self) -> Decimal:

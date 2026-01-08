@@ -13,6 +13,7 @@ class MockConfig:
         self.CHROMA_PATH = "/tmp/test_chroma"
         self.EMBEDDING_MODEL = "all-MiniLM-L6-v2"
         self.MAX_RESULTS = 5
+        self.LLM_PROVIDER = "anthropic"  # Added for provider factory
         self.ANTHROPIC_API_KEY = "test-key"
         self.ANTHROPIC_MODEL = "claude-3-sonnet"
         self.MAX_HISTORY = 10
@@ -66,8 +67,8 @@ class TestRAGSystem(unittest.TestCase):
         self.mock_ai_generator.generate_response.assert_called_once()
         call_args = self.mock_ai_generator.generate_response.call_args
         
-        # Check query formatting
-        expected_prompt = "Answer this question about course materials: What is machine learning?"
+        # Check query is passed through without modification (system prompt handles context)
+        expected_prompt = "What is machine learning?"
         self.assertEqual(call_args.kwargs['query'], expected_prompt)
         
         # Check tools were provided
@@ -200,12 +201,12 @@ class TestRAGSystem(unittest.TestCase):
         self.rag_system.tool_manager.reset_sources.assert_called_once()
     
     def test_query_prompt_formatting(self):
-        """Test that queries are properly formatted for the AI"""
+        """Test that queries are passed through without modification (prompt formatting handled by system prompt)"""
         test_cases = [
-            ("What is Python?", "Answer this question about course materials: What is Python?"),
-            ("How do I use loops?", "Answer this question about course materials: How do I use loops?"),
-            ("", "Answer this question about course materials: "),
-            ("Complex query with symbols !@#$%", "Answer this question about course materials: Complex query with symbols !@#$%")
+            ("What is Python?", "What is Python?"),
+            ("How do I use loops?", "How do I use loops?"),
+            ("", ""),
+            ("Complex query with symbols !@#$%", "Complex query with symbols !@#$%")
         ]
         
         # Mock AI response
@@ -274,14 +275,17 @@ class TestRAGSystem(unittest.TestCase):
         self.assertIsNotNone(self.rag_system.ai_generator)
         self.assertIsNotNone(self.rag_system.session_manager)
         self.assertIsNotNone(self.rag_system.tool_manager)
-        self.assertIsNotNone(self.rag_system.search_tool)
-        self.assertIsNotNone(self.rag_system.outline_tool)
-        
-        # Verify tools are registered
-        self.assertEqual(len(self.rag_system.tool_manager.tools), 2)
-        self.assertIn('search_course_content', self.rag_system.tool_manager.tools)
-        self.assertIn('get_course_outline', self.rag_system.tool_manager.tools)
+        self.assertIsNotNone(self.rag_system.document_search_tool)
+        self.assertIsNotNone(self.rag_system.document_list_tool)
+        self.assertIsNotNone(self.rag_system.database_tool)
+
+        # Verify tools are registered (now 3 tools: document_search, document_list, database)
+        self.assertEqual(len(self.rag_system.tool_manager.tools), 3)
+        self.assertIn('search_document_content', self.rag_system.tool_manager.tools)
+        self.assertIn('list_business_documents', self.rag_system.tool_manager.tools)
+        self.assertIn('query_database', self.rag_system.tool_manager.tools)
     
+    @unittest.skip("Course outline functionality not implemented - business documents only")
     def test_query_course_outline_request(self):
         """Test handling of course outline requests"""
         # Mock AI response that would use outline tool

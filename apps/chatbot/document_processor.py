@@ -59,6 +59,14 @@ class DocumentProcessor:
             logger.error(f"Error reading DOCX file {file_path}: {e}", exc_info=True)
             raise DocumentProcessingError(f"Failed to read DOCX file {file_path}: {str(e)}") from e
     
+    def read_file(self, file_path: str) -> str:
+        """
+        Read content from text file (alias for read_text_file)
+
+        Maintained for backward compatibility with tests.
+        """
+        return self.read_text_file(file_path)
+
     def read_text_file(self, file_path: str) -> str:
         """Read content from text file with UTF-8 encoding"""
         try:

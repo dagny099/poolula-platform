@@ -323,3 +323,47 @@ Important:
     def supports_native_tool_calling(self) -> bool:
         """Ollama uses prompt engineering, not native tool calling"""
         return False
+
+    def is_available(self) -> bool:
+        """
+        Check if Ollama is reachable and models are available
+
+        Pattern adopted from montrose-marathon project.
+
+        Returns:
+            True if Ollama is running and accessible, False otherwise
+        """
+        try:
+            # Quick health check - ping Ollama's tags endpoint
+            # Using a 5-second timeout for health checks
+            response = requests.get(
+                f"{self.base_url}/api/tags",
+                timeout=5.0
+            )
+            response.raise_for_status()
+            logger.info("Ollama is available")
+            return True
+        except requests.exceptions.ConnectionError as e:
+            logger.warning(f"Ollama not available (connection error): {e}")
+            return False
+        except requests.exceptions.Timeout as e:
+            logger.warning(f"Ollama not available (timeout): {e}")
+            return False
+        except requests.exceptions.HTTPError as e:
+            logger.warning(f"Ollama not available (HTTP error): {e}")
+            return False
+        except Exception as e:
+            logger.warning(f"Ollama not available: {e}")
+            return False
+
+    @property
+    def default_timeout(self) -> int:
+        """
+        Default timeout for Ollama calls
+
+        Local models can be slow on CPU, especially for first-time loads.
+
+        Returns:
+            Timeout in seconds (120s for local model flexibility)
+        """
+        return 120

@@ -37,11 +37,12 @@ Currently, the API does not require authentication (local development mode).
 
 Natural language query interface:
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/query` | POST | Query chatbot with natural language |
-| `/api/documents` | GET | List all ingested documents |
-| `/api/documents/{title}` | GET | Get document metadata by title |
+| Endpoint | Method | Description | Status |
+|----------|--------|-------------|--------|
+| `/api/v1/chat/query` | POST | Query chatbot with natural language | ✅ Available |
+| `/api/v1/chat/upload` | POST | Upload document for processing | ✅ Available |
+| `/api/v1/chat/incoming-files` | GET | List uploaded files awaiting processing | ✅ Available |
+| `/api/v1/chat/process-incoming` | POST | Process uploaded files into vector store | ✅ Available |
 
 [→ Chatbot API Details](chat.md)
 
@@ -49,13 +50,13 @@ Natural language query interface:
 
 Manage rental properties:
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/v1/properties` | GET | List all properties |
-| `/api/v1/properties/{id}` | GET | Get property by ID |
-| `/api/v1/properties` | POST | Create new property |
-| `/api/v1/properties/{id}` | PUT | Update property |
-| `/api/v1/properties/{id}` | DELETE | Soft delete property |
+| Endpoint | Method | Description | Status |
+|----------|--------|-------------|--------|
+| `/api/v1/properties` | GET | List all properties | ✅ Available |
+| `/api/v1/properties/{id}` | GET | Get property by ID | ✅ Available |
+| `/api/v1/properties` | POST | Create new property | ✅ Available |
+| `/api/v1/properties/{id}` | PATCH | Update property | ✅ Available |
+| `/api/v1/properties/{id}` | DELETE | Soft delete property | ✅ Available |
 
 [→ Property API Details](properties.md)
 
@@ -63,15 +64,18 @@ Manage rental properties:
 
 Manage financial transactions:
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/v1/transactions` | GET | List transactions with filters |
-| `/api/v1/transactions/{id}` | GET | Get transaction by ID |
-| `/api/v1/transactions` | POST | Create new transaction |
-| `/api/v1/transactions/{id}` | PUT | Update transaction |
-| `/api/v1/transactions/{id}` | DELETE | Soft delete transaction |
+| Endpoint | Method | Description | Status |
+|----------|--------|-------------|--------|
+| `/api/v1/transactions` | GET | List transactions with filters | 🚧 Planned |
+| `/api/v1/transactions/{id}` | GET | Get transaction by ID | 🚧 Planned |
+| `/api/v1/transactions` | POST | Create new transaction | 🚧 Planned |
+| `/api/v1/transactions/{id}` | PATCH | Update transaction | 🚧 Planned |
+| `/api/v1/transactions/{id}` | DELETE | Soft delete transaction | 🚧 Planned |
 
 [→ Transaction API Details](transactions.md)
+
+!!! note "Accessing Planned Endpoints"
+    Endpoints marked 🚧 Planned have database tables and models implemented, but are not yet exposed as REST API routes. You can access this data through the chatbot using natural language queries (e.g., "Show me all transactions from August 2025").
 
 ### System Endpoints
 
@@ -156,7 +160,7 @@ Accept: application/json
 curl http://localhost:8082/health
 
 # Query chatbot
-curl -X POST http://localhost:8082/api/query \
+curl -X POST http://localhost:8082/api/v1/chat/query \
   -H "Content-Type: application/json" \
   -d '{"query": "What was my rental income in August 2025?"}'
 
@@ -177,7 +181,7 @@ API_URL = "http://localhost:8082/api"
 
 # Query chatbot
 response = requests.post(
-    f"{API_URL}/query",
+    f"{API_URL}/v1/chat/query",
     json={
         "query": "What was my rental income in August 2025?",
         "session_id": None
@@ -193,7 +197,7 @@ print(data["sources"])
 
 ```javascript
 // Query chatbot
-const response = await fetch('http://localhost:8082/api/query', {
+const response = await fetch('http://localhost:8082/api/v1/chat/query', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json'

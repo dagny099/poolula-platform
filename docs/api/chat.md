@@ -28,7 +28,7 @@ Content-Type: application/json
 
 ```json
 {
-  "query": "What was my rental income in August 2024?",
+  "query": "What was my rental income in August 2025?",
   "session_id": "optional-session-uuid"
 }
 ```
@@ -48,7 +48,7 @@ Content-Type: application/json
 
 ```json
 {
-  "answer": "Your rental income in August 2024 was $16,144. This includes short-term rental revenue from your property at 900 S 9th St, Montrose, CO.",
+  "answer": "Your rental income in August 2025 was $16,144. This includes short-term rental revenue from your property at 900 S 9th St, Montrose, CO.",
   "sources": [
     {
       "type": "query_database",
@@ -82,7 +82,7 @@ The chatbot uses specialized search tools:
 
 - "What is our property address?"
 
-- "Show me transactions from August 2024"
+- "Show me transactions from August 2025"
 
 - "What is our EIN number?"
 
@@ -146,7 +146,7 @@ API_URL = "http://localhost:8082/api/v1/chat"
 response = requests.post(
     f"{API_URL}/query",
     json={
-        "query": "What was my rental income in August 2024?",
+        "query": "What was my rental income in August 2025?",
         "session_id": None
     }
 )
@@ -252,9 +252,9 @@ POST /api/v1/chat/query
 
 **Good:**
 
-- "What was my rental income in August 2024?"
+- "What was my rental income in August 2025?"
 
-- "Show me utility expenses for 2024"
+- "Show me utility expenses for 2025"
 
 **Less effective:**
 

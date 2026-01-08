@@ -2,6 +2,17 @@
 
 This guide explains how to run and interpret multi-provider evaluations for the Poolula Platform chatbot.
 
+!!! info "Multi-Provider Evaluation Status"
+    **Current State:** The evaluation framework for comparing LLM providers exists (`scripts/evaluate_providers.py`), but **only Anthropic Claude is currently integrated** into the chatbot (Phase 2).
+
+    **Status:**
+    - ✅ Evaluation script operational - Can test multiple providers
+    - ✅ Anthropic Claude - Fully integrated and operational
+    - 🚧 OpenAI provider - Evaluation-ready, not yet integrated into chatbot (Phase 6-7)
+    - 🚧 Ollama local models - Evaluation-ready, not yet integrated into chatbot (Phase 6-7)
+
+    **Note:** You can run provider comparisons using the evaluation script to test different providers, but the production chatbot currently uses only Anthropic Claude.
+
 ## Quick Start
 
 ### Running a Comparison

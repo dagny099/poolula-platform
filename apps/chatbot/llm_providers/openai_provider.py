@@ -91,12 +91,46 @@ class OpenAIProvider(LLMProvider):
             params["tools"] = [self._translate_tool_definition(t) for t in tools]
             params["tool_choice"] = "auto"
 
-        # Call OpenAI API
+        # Call OpenAI API with comprehensive error handling (from montrose-marathon pattern)
         try:
-            response = self.client.chat.completions.create(**params)
+            logger.debug(
+                f"OpenAI request: model={self.model}, "
+                f"messages={len(openai_messages)}, tools={len(tools) if tools else 0}"
+            )
+            response = self.client.chat.completions.create(**params, timeout=60.0)
             return self._translate_response(response)
+        except openai.APIConnectionError as e:
+            logger.error(f"Cannot connect to OpenAI API: {e}")
+            raise RuntimeError(
+                "Cannot connect to OpenAI API. Check your internet connection "
+                "and verify OPENAI_API_KEY is set correctly."
+            )
+        except openai.AuthenticationError as e:
+            logger.error(f"OpenAI authentication failed: {e}")
+            raise RuntimeError(
+                "OpenAI authentication failed. Verify your OPENAI_API_KEY is valid. "
+                "Get your key at: https://platform.openai.com/api-keys"
+            )
+        except openai.RateLimitError as e:
+            logger.error(f"OpenAI rate limit exceeded: {e}")
+            raise RuntimeError(
+                "OpenAI rate limit exceeded. Wait a moment and try again, "
+                "or upgrade your API plan at: https://platform.openai.com/account/billing"
+            )
+        except openai.APITimeoutError as e:
+            logger.error(f"OpenAI request timed out: {e}")
+            raise RuntimeError(
+                "OpenAI request timed out after 60s. "
+                "The model may be overloaded. Try again or use a different model."
+            )
+        except openai.BadRequestError as e:
+            logger.error(f"OpenAI bad request: {e}")
+            raise RuntimeError(
+                f"OpenAI rejected the request: {e}. "
+                "Check that your model name and parameters are valid."
+            )
         except Exception as e:
-            logger.error(f"OpenAI API error: {e}", exc_info=True)
+            logger.error(f"Unexpected OpenAI error: {e}", exc_info=True)
             raise
 
     def _translate_messages(self, messages: List[LLMMessage]) -> List[Dict]:
@@ -237,3 +271,32 @@ class OpenAIProvider(LLMProvider):
     def supports_native_tool_calling(self) -> bool:
         """OpenAI supports native tool calling (function calling)"""
         return True
+
+    def is_available(self) -> bool:
+        """
+        Check if OpenAI API is reachable
+
+        Performs a lightweight health check by listing available models.
+        Pattern adopted from montrose-marathon project.
+
+        Returns:
+            True if API is available, False otherwise
+        """
+        try:
+            # Quick health check - list models (lightweight endpoint)
+            # Using a 5-second timeout for health checks
+            self.client.models.list(timeout=5.0)
+            logger.info("OpenAI API is available")
+            return True
+        except openai.APIConnectionError as e:
+            logger.warning(f"OpenAI API not available (connection error): {e}")
+            return False
+        except openai.AuthenticationError as e:
+            logger.warning(f"OpenAI API not available (auth error): {e}")
+            return False
+        except openai.APITimeoutError as e:
+            logger.warning(f"OpenAI API not available (timeout): {e}")
+            return False
+        except Exception as e:
+            logger.warning(f"OpenAI API not available: {e}")
+            return False

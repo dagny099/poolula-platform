@@ -179,3 +179,34 @@ class AnthropicProvider(LLMProvider):
     def supports_native_tool_calling(self) -> bool:
         """Anthropic supports native tool calling"""
         return True
+
+    def is_available(self) -> bool:
+        """
+        Check if Anthropic API is reachable
+
+        Returns:
+            True if API is available, False otherwise
+        """
+        try:
+            # Quick health check - list available models (lightweight endpoint)
+            # Using a 5-second timeout for health checks
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=1,
+                messages=[{"role": "user", "content": "test"}],
+                timeout=5.0
+            )
+            logger.info("Anthropic API is available")
+            return True
+        except anthropic.APIConnectionError as e:
+            logger.warning(f"Anthropic API not available (connection error): {e}")
+            return False
+        except anthropic.AuthenticationError as e:
+            logger.warning(f"Anthropic API not available (auth error): {e}")
+            return False
+        except anthropic.APITimeoutError as e:
+            logger.warning(f"Anthropic API not available (timeout): {e}")
+            return False
+        except Exception as e:
+            logger.warning(f"Anthropic API not available: {e}")
+            return False

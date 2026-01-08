@@ -141,13 +141,24 @@ graph TD
 
 **Current Phase:** Phase 6-7 - DSPy/MLflow Integration
 
+!!! info "Current Phase Status"
+    **✅ Phase 0-2: Complete** - Infrastructure, database, REST API (properties + chat), RAG chatbot with Anthropic Claude, evaluation harnesses, vanilla JS frontend
+
+    **🚧 Phase 6-7: In Progress** - DSPy/MLflow Integration
+    - Baseline RAG implementation with feature-flag wiring ✅
+    - MLflow experiment tracking scaffolding ✅
+    - True DSPy pipeline (retriever/reasoner/verifier modules) - **Next**
+    - Cross-provider optimization and evaluation - Planned
+
+    **📝 Phase 3-5: Future** - Additional REST endpoints (transactions, documents, obligations CRUD), production hardening, advanced analytics
+
 **Completed:**
 
 ✅ Database schema (5 core tables with full provenance tracking)
 ✅ SQLModel models with migrations (Alembic)
 ✅ FastAPI REST API (properties and chat endpoints operational)
 ✅ Database query tool (SELECT-only, safe SQL generation)
-✅ RAG system with multi-provider LLM support (Anthropic/OpenAI/Ollama)
+✅ RAG chatbot with Anthropic Claude (multi-provider support planned Phase 6-7)
 ✅ Chatbot with conversation history and audit logging
 ✅ Airbnb CSV import with accrual accounting and duplicate detection
 ✅ Vanilla JavaScript frontend with 4 persona sections
@@ -158,11 +169,29 @@ graph TD
 ✅ MkDocs documentation site (46+ pages)
 ✅ 15 utility scripts for data management and evaluation
 
-**In Progress:**
+**In Progress (Phase 6-7):**
 
-- True DSPy pipeline implementation (retriever/reasoner/verifier modules)
-- MLflow experiment tracking and model registry
-- Cross-provider optimization
+!!! warning "DSPy Implementation Status"
+    **Current State:** The DSPy integration scaffolding exists (`apps/dspy/` directory) but the current implementation is a **RAG wrapper baseline**, not a true DSPy pipeline.
+
+    **What Exists:**
+    - ✅ DSPy dependency installed and configured (`dspy-ai==2.5.0`)
+    - ✅ Feature-flag wiring in API to toggle DSPy vs. baseline
+    - ✅ MLflow tracking scaffolding and artifact logging
+    - ✅ Evaluation harness for baseline vs. DSPy comparison
+    - ✅ Dataset manifest and snapshot utilities
+
+    **What's Next (True DSPy Pipeline):**
+    - Implement DSPy modules: Retriever → Reasoner → Verifier
+    - Replace RAG wrapper with actual DSPy `Program` classes
+    - Add retrieval/reasoning/verification as separate DSPy signatures
+    - Enable DSPy self-optimization and compilation
+    - Extend evaluation metrics beyond token hit-rate heuristics
+
+    **Detailed Roadmap:** See [`docs/planning/dspy-mlflow-plan-2025-12-09.md`](planning/dspy-mlflow-plan-2025-12-09.md) for complete implementation plan and architecture diagrams.
+
+- Multi-provider LLM support (OpenAI, Ollama) - Planned Phase 6-7
+- Cross-provider optimization and comparison
 
 **Next Steps:**
 

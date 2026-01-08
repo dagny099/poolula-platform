@@ -17,7 +17,7 @@ Before starting, ensure you have:
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/poolula-platform.git
+git clone https://github.com/dagny099/poolula-platform.git
 cd poolula-platform
 ```
 
@@ -340,11 +340,11 @@ export ANTHROPIC_API_KEY=sk-ant-...
 
 ## Support
 
-**Issues:** [GitHub Issues](https://github.com/yourusername/poolula-platform/issues)
+**Issues:** [GitHub Issues](https://github.com/dagny099/poolula-platform/issues)
 
 **Documentation:** This site!
 
-**Source Code:** [GitHub Repository](https://github.com/yourusername/poolula-platform)
+**Source Code:** [GitHub Repository](https://github.com/dagny099/poolula-platform)
 
 ---
 

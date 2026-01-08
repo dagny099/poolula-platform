@@ -23,7 +23,7 @@ from uuid import UUID, uuid4
 
 from sqlmodel import SQLModel, Field, Column, Relationship
 from sqlalchemy import JSON, Text
-from pydantic import field_validator
+from pydantic import field_validator, model_validator, ConfigDict
 
 from .enums import (
     TransactionCategory,
@@ -166,6 +166,8 @@ class Transaction(SQLModel, table=True):
     """
     __tablename__ = "transactions"
 
+    model_config = ConfigDict(validate_assignment=True)
+
     # Primary key
     id: UUID = Field(default_factory=uuid4, primary_key=True)
 
@@ -191,13 +193,13 @@ class Transaction(SQLModel, table=True):
     # Relationships
     property_obj: Property = Relationship(back_populates="transactions")
 
-    @field_validator("amount")
-    @classmethod
-    def validate_amount(cls, v: Decimal) -> Decimal:
-        """Ensure amount is not zero (would be meaningless)"""
-        if v == Decimal("0.00"):
+    @model_validator(mode='after')
+    def validate_transaction(self) -> 'Transaction':
+        """Validate transaction fields after model creation"""
+        # Ensure amount is not zero (would be meaningless)
+        if self.amount == Decimal("0.00"):
             raise ValueError("Transaction amount cannot be zero")
-        return v
+        return self
 
     def __repr__(self) -> str:
         return f"<Transaction {self.transaction_date} ${self.amount} {self.category}>"
@@ -228,6 +230,8 @@ class Document(SQLModel, table=True):
         extra_metadata: Flexible JSON (e.g., {"pages": 5, "ocr_done": true})
     """
     __tablename__ = "documents"
+
+    model_config = ConfigDict(validate_assignment=True)
 
     # Primary key
     id: UUID = Field(default_factory=uuid4, primary_key=True)
@@ -268,16 +272,24 @@ class Document(SQLModel, table=True):
     # Relationships
     property_obj: Optional[Property] = Relationship(back_populates="documents")
 
-    @field_validator("content_hash")
+    @field_validator("content_hash", mode='before')
     @classmethod
     def validate_hash(cls, v: str) -> str:
-        """Ensure hash is valid SHA-256 format"""
+        """Validate and normalize content_hash before assignment"""
+        if v is None:
+            return v
+
+        # Validate length
         if len(v) != 64:
             raise ValueError("content_hash must be 64-character SHA-256 hex string")
+
+        # Validate hex format
         try:
             int(v, 16)  # Verify it's hexadecimal
         except ValueError:
             raise ValueError("content_hash must be hexadecimal")
+
+        # Normalize to lowercase
         return v.lower()
 
     def __repr__(self) -> str:

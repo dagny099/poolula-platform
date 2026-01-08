@@ -110,3 +110,29 @@ class LLMProvider(ABC):
             to use prompt engineering fallback
         """
         pass
+
+    @abstractmethod
+    def is_available(self) -> bool:
+        """
+        Check if provider is reachable and healthy
+
+        This method performs a lightweight health check to verify the provider
+        can accept requests. Useful for startup diagnostics and UI status.
+
+        Returns:
+            True if provider is available, False otherwise
+        """
+        pass
+
+    @property
+    def default_timeout(self) -> int:
+        """
+        Default timeout in seconds for generate() calls
+
+        Override this property to set provider-specific timeouts.
+        API providers typically use 60s, local models may need 120s+.
+
+        Returns:
+            Timeout value in seconds (default: 60)
+        """
+        return 60

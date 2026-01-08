@@ -74,11 +74,11 @@ curl -X POST http://localhost:8082/api/v1/transactions \
   -H "Content-Type: application/json" \
   -d '{
     "property_id": "{property-uuid}",
-    "transaction_date": "2024-08-15",
+    "transaction_date": "2025-08-15",
     "amount": "16144.00",
     "category": "revenue:rental_income",
     "transaction_type": "REVENUE",
-    "description": "August 2024 rental income",
+    "description": "August 2025 rental income",
     "source_account": "Operating Account"
   }'
 ```

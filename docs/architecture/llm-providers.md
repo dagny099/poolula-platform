@@ -1,8 +1,19 @@
 # LLM Provider Architecture
 
+!!! warning "Implementation Status"
+    **Current State:** This document describes the **planned architecture** for multi-provider LLM support. The abstraction layer design is documented, but the current implementation (Phase 2) is **tightly coupled to Anthropic Claude**.
+
+    **Status:**
+    - 🚧 Provider abstraction layer - Designed (Phase 6-7)
+    - ✅ Anthropic Claude integration - Operational
+    - 🚧 OpenAI provider - Planned (Phase 6-7)
+    - 🚧 Ollama local models - Planned (Phase 6-7)
+
+    **Migration Plan:** See [`docs/planning/2025-12-03-llm-agnosticism-plan.md`](../planning/2025-12-03-llm-agnosticism-plan.md) for detailed decoupling strategy.
+
 ## Overview
 
-The Poolula Platform chatbot uses a **provider-agnostic abstraction layer** to support multiple Large Language Model (LLM) backends. This design allows seamless switching between cloud-based providers (Anthropic, OpenAI) and local models (Ollama) without changing business logic.
+The Poolula Platform chatbot is designed to use a **provider-agnostic abstraction layer** to support multiple Large Language Model (LLM) backends. This design will allow seamless switching between cloud-based providers (Anthropic, OpenAI) and local models (Ollama) without changing business logic.
 
 ## Architecture Principles
 

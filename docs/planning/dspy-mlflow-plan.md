@@ -1,5 +1,14 @@
 # DSPy + MLflow Integration Plan
 
+!!! info "Superseded by Updated Plan"
+    This document has been superseded by the **December 9, 2025 snapshot** which includes current implementation status and explicit next steps.
+
+    **See:** [`dspy-mlflow-plan-2025-12-09.md`](dspy-mlflow-plan-2025-12-09.md) for the current plan.
+
+---
+
+## Historical Version (Pre-December 2025)
+
 This plan covers Option C (DSPy pipeline for Q&A with sources) and Option D (tracking DSPy optimization runs in MLflow), with a staged path that can execute DSPy alone or as a combined approach with MLflow tracking and registry support. The goal is to maximize transparency, reproducibility, and operational clarity.
 
 ## Executive Summary

@@ -4,12 +4,14 @@ Property CRUD endpoints
 Provides REST API for property management with direct SQLModel usage
 """
 
-from datetime import datetime
-from typing import List, Optional
+from datetime import datetime, date
+from decimal import Decimal
+from typing import List, Optional, Dict, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
+from pydantic import BaseModel, field_validator
 
 from core.database.connection import get_session
 from core.database.models import Property
@@ -21,9 +23,69 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
+# =============================================================================
+# REQUEST/RESPONSE MODELS
+# =============================================================================
+
+class PropertyCreate(BaseModel):
+    """Request model for creating a property"""
+    address: str
+    acquisition_date: date
+    purchase_price_total: Decimal
+    land_basis: Decimal
+    building_basis: Decimal
+    ffe_basis: Decimal = Decimal("0.00")
+    placed_in_service: Optional[date] = None
+    status: PropertyStatus = PropertyStatus.ACTIVE
+    provenance: Dict[str, Any] = {}
+    extra_metadata: Dict[str, Any] = {}
+
+    @field_validator('status', mode='before')
+    @classmethod
+    def parse_status(cls, v):
+        """Accept both enum name (ACTIVE) and value (active)"""
+        if isinstance(v, str):
+            # Try uppercase name first (e.g., "ACTIVE")
+            try:
+                return PropertyStatus[v.upper()]
+            except KeyError:
+                # Fall back to value (e.g., "active")
+                return PropertyStatus(v.lower())
+        return v
+
+
+class PropertyUpdate(BaseModel):
+    """Request model for updating a property"""
+    address: Optional[str] = None
+    acquisition_date: Optional[date] = None
+    purchase_price_total: Optional[Decimal] = None
+    land_basis: Optional[Decimal] = None
+    building_basis: Optional[Decimal] = None
+    ffe_basis: Optional[Decimal] = None
+    placed_in_service: Optional[date] = None
+    status: Optional[PropertyStatus] = None
+    provenance: Optional[Dict[str, Any]] = None
+    extra_metadata: Optional[Dict[str, Any]] = None
+
+    @field_validator('status', mode='before')
+    @classmethod
+    def parse_status(cls, v):
+        """Accept both enum name (ACTIVE) and value (active)"""
+        if v is None:
+            return v
+        if isinstance(v, str):
+            # Try uppercase name first (e.g., "ACTIVE")
+            try:
+                return PropertyStatus[v.upper()]
+            except KeyError:
+                # Fall back to value (e.g., "active")
+                return PropertyStatus(v.lower())
+        return v
+
+
 @router.get("/properties", response_model=List[Property])
 def list_properties(
-    status: Optional[PropertyStatus] = Query(None, description="Filter by property status"),
+    status: Optional[str] = Query(None, description="Filter by property status (ACTIVE, UNDER_CONTRACT, SOLD, INACTIVE)"),
     session: Session = Depends(get_session),
 ) -> List[Property]:
     """
@@ -32,7 +94,7 @@ def list_properties(
     Optionally filter by status (ACTIVE, UNDER_CONTRACT, SOLD, INACTIVE)
 
     Args:
-        status: Optional status filter
+        status: Optional status filter (accepts both uppercase names like "ACTIVE" or lowercase values like "active")
         session: Database session (injected)
 
     Returns:
@@ -41,13 +103,25 @@ def list_properties(
     Example:
         >>> GET /api/v1/properties
         >>> GET /api/v1/properties?status=ACTIVE
+        >>> GET /api/v1/properties?status=active
     """
     logger.info(f"Listing properties with status filter: {status}")
 
     # Build query
     query = select(Property)
     if status:
-        query = query.where(Property.status == status)
+        # Parse status string to enum (accept both name and value)
+        try:
+            status_enum = PropertyStatus[status.upper()]
+        except KeyError:
+            try:
+                status_enum = PropertyStatus(status.lower())
+            except ValueError:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"Invalid status: {status}. Must be one of: ACTIVE, UNDER_CONTRACT, SOLD, INACTIVE"
+                )
+        query = query.where(Property.status == status_enum)
 
     # Execute query
     properties = session.exec(query).all()
@@ -58,7 +132,7 @@ def list_properties(
 
 @router.post("/properties", response_model=Property, status_code=201)
 def create_property(
-    property_data: Property,
+    property_data: PropertyCreate,
     session: Session = Depends(get_session),
 ) -> Property:
     """
@@ -67,7 +141,7 @@ def create_property(
     Automatically sets created_at and updated_at timestamps
 
     Args:
-        property_data: Property data
+        property_data: Property data (parsed from JSON)
         session: Database session (injected)
 
     Returns:
@@ -92,13 +166,16 @@ def create_property(
     logger.info(f"Creating property: {property_data.address}")
 
     try:
-        # Add to session and commit
-        session.add(property_data)
-        session.commit()
-        session.refresh(property_data)
+        # Convert Pydantic model to SQLModel (with proper types)
+        property_obj = Property(**property_data.model_dump())
 
-        logger.info(f"✅ Property created: {property_data.id}")
-        return property_data
+        # Add to session and commit
+        session.add(property_obj)
+        session.commit()
+        session.refresh(property_obj)
+
+        logger.info(f"✅ Property created: {property_obj.id}")
+        return property_obj
 
     except Exception as e:
         session.rollback()
@@ -142,7 +219,7 @@ def get_property(
 @router.patch("/properties/{property_id}", response_model=Property)
 def update_property(
     property_id: UUID,
-    property_update: dict,
+    property_update: PropertyUpdate,
     session: Session = Depends(get_session),
 ) -> Property:
     """
@@ -155,7 +232,7 @@ def update_property(
 
     Args:
         property_id: Property UUID
-        property_update: Dictionary of fields to update
+        property_update: Fields to update (parsed from JSON)
         session: Database session (injected)
 
     Returns:
@@ -180,10 +257,10 @@ def update_property(
         raise HTTPException(status_code=404, detail=f"Property not found: {property_id}")
 
     try:
-        # Update fields
-        for field, value in property_update.items():
-            if hasattr(property_obj, field):
-                setattr(property_obj, field, value)
+        # Update fields (only non-None values from PropertyUpdate)
+        update_data = property_update.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(property_obj, field, value)
 
         # Update timestamp
         property_obj.updated_at = datetime.utcnow()

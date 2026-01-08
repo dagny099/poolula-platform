@@ -201,7 +201,7 @@ sudo apt install -y python3.13 python3-pip git sqlite3 nginx
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/poolula-platform.git
+git clone https://github.com/dagny099/poolula-platform.git
 cd poolula-platform
 
 # Install uv

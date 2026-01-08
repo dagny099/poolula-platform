@@ -92,8 +92,8 @@ curl http://localhost:8082/api/v1/documents/{document-uuid}
 curl -X POST http://localhost:8082/api/v1/documents \
   -F "file=@/path/to/document.pdf" \
   -F "doc_type=accounting:bank_statement" \
-  -F "title=Bank Statement August 2024" \
-  -F "doc_date=2024-08-31"
+  -F "title=Bank Statement August 2025" \
+  -F "doc_date=2025-08-31"
 ```
 
 ## Document Schema
@@ -158,4 +158,7 @@ curl -X POST http://localhost:8082/api/v1/chat/query \
 
 **Status:** 🚧 Planned for Phase 3
 
-**Current:** Document ingestion works via script, API endpoints coming in Phase 3.
+**Current State:**
+- ✅ Document upload endpoints available (`/api/v1/chat/upload`, `/api/v1/chat/incoming-files`, `/api/v1/chat/process-incoming`)
+- ✅ Document ingestion script operational (`scripts/ingest_documents.py`)
+- 🚧 Document metadata CRUD endpoints (list, get, update, delete) planned for Phase 3

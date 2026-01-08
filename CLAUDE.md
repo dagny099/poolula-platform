@@ -46,11 +46,19 @@ Note: AI dependencies are in optional `rag` dependency group. Install with `uv s
 ### Evaluation & Observability
 
 - **pytest** - Traditional unit/integration tests
-- **Golden Question Set** - 15 representative business questions for RAG evaluation
-- **Automated Scoring** - Tool usage + content relevance + error handling metrics (target: ≥90%)
+- **Evaluation Harnesses** - Two specialized evaluation systems:
+  - **General Evaluator** (`evaluate_chatbot.py`) - 5 cross-domain business questions
+  - **Airbnb Evaluator** (`evaluate_airbnb.py`) - 15 rental income questions with CSV ground truth validation
+- **Automated Scoring** - Multi-dimensional scoring:
+  - Tool usage correctness (40%)
+  - Content relevance (40%)
+  - Numerical accuracy (50% for Airbnb evaluator - validates against source CSV data with 1% tolerance)
+  - Completeness (10%)
+  - Target: ≥90% overall score
+- **Ground Truth Validation** - Airbnb evaluator compares chatbot responses against CSV calculations (accrual accounting with checkout date revenue recognition)
 - **Audit Logging** - All chatbot interactions logged to database
 
-See `docs/evaluation/` for details.
+See `docs/evaluation/` for framework details.
 
 ### Frontend (Phase 4)
 
@@ -83,22 +91,25 @@ poolula-platform/
 │   │   ├── artifacts.py       # Artifact management
 │   │   └── runtime.py         # Pipeline execution
 │   └── evaluator/             # Evaluation harness components
-├── scripts/                   # Utility scripts (13 total)
+├── scripts/                   # Utility scripts (15 total)
 │   ├── cli.py                 # Main CLI (`poolula` command)
 │   ├── backup.py, seed_database.py, seed_obligations.py
 │   ├── import_airbnb_transactions.py, ingest_documents.py
-│   ├── evaluate_chatbot.py, evaluate_providers.py
-│   └── [dspy/mlflow scripts]  # build_dspy_artifact, dspy_mlflow_run, eval_dspy_vs_baseline
+│   ├── evaluate_chatbot.py, evaluate_airbnb.py, evaluate_providers.py
+│   ├── verify_airbnb_import.py, remove_duplicate_transactions.py
+│   └── [dspy/mlflow scripts]  # build_dspy_artifact, dspy_mlflow_run, eval_dspy_vs_baseline, make_dummy_dspy_artifact
 ├── tests/                     # Test suite (≥80% coverage)
 │   ├── test_models.py, test_api_properties.py, conftest.py
 │   └── chatbot/               # Chatbot tests (test_rag_system, test_session_manager, etc.)
-├── docs/                      # Documentation
-│   ├── api/                   # API docs (properties, transactions, documents, obligations, chat)
-│   ├── architecture/          # System design, business objects, LLM providers
-│   ├── evaluation/            # Evaluation framework, scoring, provider comparison
-│   ├── user-guide/            # Chatbot, document management, importing data, obligations
-│   ├── planning/              # Implementation plans (LLM agnosticism, DSPy/MLflow)
-│   └── workflows/             # Data import, API usage, testing, LLM provider setup
+├── docs/                      # Documentation (46 files - see MkDocs)
+│   ├── api/                   # API docs (6 files: properties, transactions, documents, obligations, chat, overview)
+│   ├── architecture/          # System design, data models, LLM providers (7 files)
+│   ├── evaluation/            # Evaluation framework, scoring, provider comparison (9 files)
+│   ├── getting-started/       # Installation, overview, quick start (3 files)
+│   ├── user-guide/            # Chatbot, document management, importing data, obligations (4 files)
+│   ├── planning/              # Implementation plans - LLM agnosticism, DSPy/MLflow (6 files)
+│   ├── testing/               # Testing guide, migrations, deployment (3 files)
+│   └── workflows/             # Data import, API usage, testing, Airbnb import, LLM provider setup (5 files)
 ├── alembic/                   # Database migrations
 └── pyproject.toml             # Dependencies with groups: dev, rag, docs, openai, local
 ```
@@ -162,7 +173,7 @@ All responses include provenance tracking where applicable:
 
 ## Data Source of Truth
 
-**File**: `/Users/barbaraihidalgo-sotelo/PROJECTS/AirBnB Dashboard/poolula_facts.yml`
+**File**: `/Users/bhs/PROJECTS/poolula-platform/poolula_facts.yml`
 
 This YAML file is the **single source of truth** for property and LLC data.
 
@@ -239,8 +250,15 @@ python scripts/backup.py --restore latest
 ### Evaluation & Testing
 
 ```bash
-# Evaluate chatbot with golden question set
+# Evaluate chatbot with general business questions (5 questions)
 uv run python scripts/evaluate_chatbot.py
+
+# Evaluate Airbnb rental income accuracy with ground truth (15 questions)
+uv run python scripts/evaluate_airbnb.py
+uv run python scripts/evaluate_airbnb.py --verbose
+
+# Verify Airbnb CSV import integrity
+uv run python scripts/verify_airbnb_import.py
 
 # Compare LLM providers (Anthropic, OpenAI, Ollama)
 uv run python scripts/evaluate_providers.py
@@ -256,12 +274,28 @@ uv run python scripts/eval_dspy_vs_baseline.py
 poolula --help
 ```
 
+### Documentation
+
+```bash
+# Install documentation dependencies
+uv sync --group docs
+
+# Build documentation site
+uv run mkdocs build
+
+# Serve documentation locally (http://127.0.0.1:8000)
+uv run mkdocs serve
+
+# Deploy to GitHub Pages (if configured)
+uv run mkdocs gh-deploy
+```
+
 ## Development Principles
 
 ### Simplicity Over Enterprise Patterns
 
 - **Direct SQLModel usage** - No repository layer (KISS principle)
-- **Inline documentation** - MkDocs deferred to Phase 4
+- **Comprehensive documentation** - MkDocs operational with 46+ pages covering API, architecture, workflows, and evaluation
 - **Small scale** - Optimized for 1-few users, not millions
 
 ### Provenance Tracking
@@ -277,6 +311,56 @@ Every data modification includes provenance:
 - **PATCH allows all fields** - Fully flexible for now (trustee is sole user)
 - **TODO Phase 5**: Add protection for immutable fields (acquisition_date, basis)
 - **Rationale**: Flexibility > protection at small scale
+
+### Duplicate Detection & Prevention
+
+The platform includes robust duplicate detection to ensure data integrity:
+
+#### Airbnb Transaction Imports
+**Implementation:** `scripts/import_airbnb_transactions.py` (lines 81-131)
+
+Prevents duplicate transactions using composite detection:
+- **Primary method:** Airbnb confirmation code + transaction date + type + property
+- **Fallback method:** Date + amount + category + type + property (for non-Airbnb transactions)
+
+**Usage:**
+```bash
+# Re-running imports is safe - duplicates are automatically skipped
+uv run python scripts/import_airbnb_transactions.py
+```
+
+**Output:** Import summary includes `duplicates_skipped` and `new_count` metrics.
+
+#### Document Ingestion
+**Implementation:** `scripts/ingest_documents.py`, `apps/chatbot/vector_store.py`
+
+Prevents duplicate documents using SHA-256 content hashing:
+- Computes hash **before** expensive chunking (performance optimization)
+- Checks ChromaDB vector store for existing documents
+- Skips re-ingestion if document already exists
+
+**Usage:**
+```bash
+# Re-running ingestion is safe - duplicates are automatically skipped
+uv run python scripts/ingest_documents.py
+```
+
+#### Cleanup Utility
+**Tool:** `scripts/remove_duplicate_transactions.py`
+
+One-time cleanup script for existing database duplicates:
+- Identifies duplicate groups (same date + description + amount + category)
+- Keeps oldest transaction (by `created_at` timestamp)
+- Removes newer duplicates
+
+**Usage:**
+```bash
+# Preview duplicates without deleting
+uv run python scripts/remove_duplicate_transactions.py --dry-run
+
+# Actually remove duplicates
+uv run python scripts/remove_duplicate_transactions.py
+```
 
 ## Implementation Status
 
@@ -334,6 +418,7 @@ Phase 2 chatbot integration complete. Dashboard/frontend unification deferred to
 - **Project Owner**: Poolula LLC (Hidalgo-Sotelo Living Trust)
 - **Development**: Solo developer (trustee)
 - **Questions**: Refer to workflow docs in `docs/workflows/`
+- **Executive Overview**: See `EXECUTIVE_SUMMARY.md` for business-friendly platform overview (designed for CPAs, advisors, future collaborators)
 
 ## Quick Reference
 
@@ -342,8 +427,9 @@ Phase 2 chatbot integration complete. Dashboard/frontend unification deferred to
 - **API**: `apps/api/main.py`, `apps/api/routes/{properties,transactions,documents,obligations,chat}.py`
 - **Models**: `core/database/models.py`, `core/database/enums.py`
 - **Chatbot**: `apps/chatbot/rag_system.py`, `apps/chatbot/database_tool.py`, `apps/chatbot/ai_generator.py`
-- **DSPy**: `apps/dspy/pipelines.py`, `apps/dspy/runtime.py`
-- **Scripts**: `scripts/cli.py`, `scripts/evaluate_chatbot.py`, `scripts/ingest_documents.py`
+- **DSPy**: `apps/dspy/pipelines.py`, `apps/dspy/runtime.py`, `apps/dspy/artifacts.py`
+- **Evaluator**: `apps/evaluator/chatbot_evaluator.py`, `apps/evaluator/airbnb_ground_truth.py`, `apps/evaluator/numerical_validator.py`
+- **Scripts**: `scripts/cli.py`, `scripts/evaluate_chatbot.py`, `scripts/evaluate_airbnb.py`, `scripts/ingest_documents.py`
 - **Tests**: `tests/test_models.py`, `tests/test_api_properties.py`, `tests/chatbot/test_rag_system.py`
 
 ### Environment Variables

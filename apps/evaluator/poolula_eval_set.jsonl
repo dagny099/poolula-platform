@@ -13,3 +13,8 @@
 {"question": "What documents were filed for LLC formation?", "type": "document", "expected_tools": ["search_document_content"], "expected_content": ["formation", "LLC", "filed"], "category": "formation"}
 {"question": "What is the total basis for property acquisitions?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["basis", "total", "property"], "category": "property_financials"}
 {"question": "Show me revenue and expenses for the business", "type": "hybrid", "expected_tools": ["query_database"], "expected_content": ["revenue", "expense"], "category": "hybrid"}
+{"question": "What was my rental income in July 2025?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["July", "2025", "3960", "rental"], "category": "airbnb_monthly"}
+{"question": "How many Airbnb reservations did we have in August 2025?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["August", "2025", "5", "reservation"], "category": "airbnb_count"}
+{"question": "What was the total rental income from May 1 to July 31, 2025?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["May", "July", "2025", "9209", "rental"], "category": "airbnb_range"}
+{"question": "What was the total gross rental income for Q3 2025?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["Q3", "2025", "9913", "rental"], "category": "airbnb_quarterly"}
+{"question": "List all Airbnb reservations in October 2025 with guest names", "type": "database", "expected_tools": ["query_database"], "expected_content": ["October", "2025", "reservation"], "category": "airbnb_details"}

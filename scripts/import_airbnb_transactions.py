@@ -78,6 +78,58 @@ def parse_airbnb_amount(amount_str: str) -> Decimal:
     return Decimal(cleaned)
 
 
+def transaction_exists(session: Session, transaction: Transaction) -> bool:
+    """
+    Check if transaction already exists in database
+
+    Uses a composite check based on:
+    - Airbnb confirmation code (from extra_metadata)
+    - Transaction date
+    - Transaction type (REVENUE vs EXPENSE)
+
+    This prevents duplicates when reimporting CSVs with overlapping data.
+
+    Args:
+        session: Database session
+        transaction: Transaction to check
+
+    Returns:
+        True if duplicate exists, False if new
+    """
+    # Extract confirmation code from metadata
+    confirmation = transaction.extra_metadata.get('airbnb_confirmation')
+    if not confirmation:
+        # No confirmation code (shouldn't happen for Airbnb imports, but be safe)
+        # Fall back to checking by date + amount + category + type
+        query = select(Transaction).where(
+            Transaction.transaction_date == transaction.transaction_date,
+            Transaction.amount == transaction.amount,
+            Transaction.category == transaction.category,
+            Transaction.transaction_type == transaction.transaction_type,
+            Transaction.property_id == transaction.property_id
+        )
+        existing = session.exec(query).first()
+        return existing is not None
+
+    # Check for existing transaction with same confirmation, date, and type
+    # This handles both REVENUE and EXPENSE transactions for same reservation
+    query = select(Transaction).where(
+        Transaction.transaction_date == transaction.transaction_date,
+        Transaction.transaction_type == transaction.transaction_type,
+        Transaction.property_id == transaction.property_id
+    )
+
+    existing_transactions = session.exec(query).all()
+
+    # Check if any existing transaction has matching confirmation code
+    for existing in existing_transactions:
+        existing_confirmation = existing.extra_metadata.get('airbnb_confirmation')
+        if existing_confirmation == confirmation:
+            return True
+
+    return False
+
+
 def import_airbnb_csv(
     csv_path: str,
     property_id: UUID,
@@ -170,18 +222,39 @@ def import_airbnb_csv(
             "revenue_total": sum(t.amount for t in revenue_transactions),
             "expense_total": sum(t.amount for t in expense_transactions),
             "date_min": min(t.transaction_date for t in transactions),
-            "date_max": max(t.transaction_date for t in transactions)
+            "date_max": max(t.transaction_date for t in transactions),
+            "duplicates_skipped": 0,
+            "new_count": len(transactions)
         }
 
     # Save to database if not dry run
     if not dry_run:
         engine = get_engine()
         with Session(engine) as session:
+            # Check for duplicates and only add new transactions
+            new_transactions = []
+            duplicate_count = 0
+
             for transaction in transactions:
-                session.add(transaction)
+                if not transaction_exists(session, transaction):
+                    session.add(transaction)
+                    new_transactions.append(transaction)
+                else:
+                    duplicate_count += 1
+                    logger.debug(
+                        f"Skipping duplicate: {transaction.extra_metadata.get('airbnb_confirmation')} "
+                        f"on {transaction.transaction_date} ({transaction.transaction_type})"
+                    )
 
             session.commit()
-            logger.info(f"✅ Saved {len(transactions)} transactions to database")
+
+            # Update summary with actual duplicate count
+            summary["duplicates_skipped"] = duplicate_count
+            summary["new_count"] = len(new_transactions)
+
+            if duplicate_count > 0:
+                logger.info(f"⚠️  Skipped {duplicate_count} duplicate transactions (already in database)")
+            logger.info(f"✅ Saved {len(new_transactions)} new transactions to database")
     else:
         logger.info("🔍 DRY RUN - No changes saved to database")
 
@@ -469,6 +542,14 @@ Metadata Tracked:
         print(f"Transactions: {summary.get('total_count', 0)}")
 
         if summary:
+            # Show duplicate detection stats
+            duplicates = summary.get('duplicates_skipped', 0)
+            new_count = summary.get('new_count', summary.get('total_count', 0))
+
+            if duplicates > 0:
+                print(f"  New: {new_count}")
+                print(f"  Duplicates skipped: {duplicates} ⚠️")
+
             print(f"\nRevenue Transactions: {summary['revenue_count']}")
             print(f"  Total Revenue: ${summary['revenue_total']:,.2f}")
             print(f"\nExpense Transactions: {summary['expense_count']}")
@@ -481,7 +562,11 @@ Metadata Tracked:
             print("\n🔍 DRY RUN - No changes saved")
             print("Remove --dry-run to save to database")
         else:
-            print("\n✅ Import completed successfully")
+            if summary.get('duplicates_skipped', 0) > 0:
+                print(f"\n✅ Import completed successfully")
+                print(f"   Added {summary.get('new_count', 0)} new transactions, skipped {summary.get('duplicates_skipped', 0)} duplicates")
+            else:
+                print("\n✅ Import completed successfully")
 
         print("=" * 60)
 

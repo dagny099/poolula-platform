@@ -66,6 +66,7 @@ htmlcov/
 # MLflow experiment tracking
 mlruns/
 .mlflow_artifacts/
+artifacts/
 
 # Jupyter notebooks
 .ipynb_checkpoints/

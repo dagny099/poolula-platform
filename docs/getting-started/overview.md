@@ -79,15 +79,14 @@ graph LR
 ### 1. Import Data
 
 ```bash
-# Import Airbnb transactions
-uv run python scripts/import_airbnb_transactions.py \
-    --csv data/airbnb_export.csv \
-    --property-id <uuid>
+# Seed database from YAML (properties and LLC data)
+uv run python scripts/seed_database.py --initial
 
-# Import expenses
-uv run python scripts/import_expenses.py \
-    --csv data/expenses.csv \
-    --property-id <uuid>
+# Import Airbnb transactions from CSV
+uv run python scripts/import_airbnb_transactions.py
+
+# Seed compliance obligations
+uv run python scripts/seed_obligations.py --year 2025
 ```
 
 ### 2. Ingest Documents

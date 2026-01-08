@@ -358,7 +358,7 @@ def main():
     )
     parser.add_argument(
         "--csv",
-        default="documents/airbnb_12_2024-11_2025.csv",
+        default="data/airbnb_12_2024-11_2025.csv",
         help="Path to Airbnb CSV for ground truth"
     )
     parser.add_argument(

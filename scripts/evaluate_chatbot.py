@@ -274,12 +274,12 @@ def main():
     parser = argparse.ArgumentParser(description="Evaluate chatbot performance")
     parser.add_argument(
         "--eval-set",
-        default="data/poolula_eval_set.jsonl",
+        default="apps/evaluator/poolula_eval_set.jsonl",
         help="Path to evaluation question set (JSONL)"
     )
     parser.add_argument(
         "--output",
-        default="data/eval_report.json",
+        default="apps/evaluator/eval_report.json",
         help="Path to save evaluation report (JSON)"
     )
     parser.add_argument(

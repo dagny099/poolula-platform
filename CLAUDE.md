@@ -60,10 +60,12 @@ Note: AI dependencies are in optional `rag` dependency group. Install with `uv s
 
 See `docs/evaluation/` for framework details.
 
-### Frontend (Phase 4)
+### Frontend
 
-- Vue 3 + TypeScript
-- Integration with existing ragchatbot-codebase
+- **Vanilla JavaScript** - Clean, framework-free web interface
+- HTML5 + CSS3
+- Marked.js for markdown rendering
+- 4 persona-based help sections (LLC Owner, Bookkeeper, Property Manager, Compliance Officer)
 
 ## Project Structure
 
@@ -141,16 +143,21 @@ poolula-platform/
 
 **Base URL**: `http://localhost:8082/api/v1`
 
-All endpoints support full CRUD operations (GET, POST, PATCH, DELETE) for:
-- **Properties** - Rental properties with acquisition and depreciation details
+### Implemented Endpoints
+
+- **Properties** (`/api/v1/properties`) - Full CRUD operations for rental properties
+- **Chat** (`/api/chat/query`) - Natural language chatbot queries (returns response + sources)
+- **Health** (`/health`) - Health check + database connection test
+- **Docs** (`/docs`) - Interactive API documentation (Swagger UI)
+
+### Planned Endpoints (Database Tables Exist)
+
+The following endpoints are designed but not yet exposed via API routes:
 - **Transactions** - Financial events (filter by date, category, property)
 - **Documents** - Document metadata and file uploads
 - **Obligations** - Compliance calendar with recurrence rules
 
-Special endpoints:
-- `POST /chat/query` - Natural language chatbot queries (returns response + sources)
-- `GET /health` - Health check + database connection test
-- `GET /docs` - Interactive API documentation (Swagger UI)
+**Workaround:** Access this data directly via the chatbot using natural language queries (e.g., "Show me all transactions from August 2025") or via database tool in RAG system.
 
 See `docs/api/` for detailed endpoint documentation.
 
@@ -173,7 +180,7 @@ All responses include provenance tracking where applicable:
 
 ## Data Source of Truth
 
-**File**: `/Users/bhs/PROJECTS/poolula-platform/poolula_facts.yml`
+**File**: `poolula_facts.yml` (project root)
 
 This YAML file is the **single source of truth** for property and LLC data.
 
@@ -367,17 +374,20 @@ uv run python scripts/remove_duplicate_transactions.py
 **Current Phase**: Phase 6-7 (DSPy/MLflow Integration)
 
 Completed:
-- **Phase 0-1** ✅ - Infrastructure, database schema, REST API, tests
+- **Phase 0-1** ✅ - Infrastructure, database schema, REST API (properties + chat endpoints), tests
 - **Phase 2** ✅ - Chatbot integration with database tool, audit logging, evaluation harness
+- **Phase 3** ✅ - Vanilla JavaScript frontend with 4 persona-based sections
 
 In Progress:
 - **Phase 6-7** - DSPy pipeline optimization with MLflow experiment tracking
-  - See `docs/dspy-mlflow-plan.md` for detailed roadmap
+  - **Current Status**: Scaffolding exists (`apps/dspy/`) but current implementation is a RAG wrapper
+  - **Planned**: True DSPy pipeline with retriever/reasoner/verifier modules (Phase 1 of plan)
+  - See `docs/planning/dspy-mlflow-plan-2025-12-09.md` for detailed roadmap
   - Provider comparison and evaluation framework operational
 
 Future:
-- **Phase 3-4** - Dashboard and frontend unification (deferred)
-- **Phase 5** - Feature expansion and production hardening
+- **Phase 4** - Additional API endpoints (transactions, documents, obligations REST routes)
+- **Phase 5** - Feature expansion and production hardening (immutable field protection, advanced analytics)
 
 See `docs/planning/` for detailed implementation plans.
 

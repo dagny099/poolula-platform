@@ -43,11 +43,13 @@ Never miss a deadline:
 - Recurring obligation support (yearly, quarterly, monthly)
 
 ### 🔍 Evaluation & Quality Assurance
-Verify AI accuracy:
+Verify AI accuracy with dual specialized evaluators:
 
-- Golden question set with expected answers
-- Multi-dimensional scoring (tool usage, content relevance, numerical accuracy)
-- Target: ≥90% accuracy
+- **General evaluator**: 5 cross-domain business questions
+- **Airbnb evaluator**: 15 rental income questions with CSV ground truth validation
+- Multi-dimensional scoring (tool usage, content relevance, numerical accuracy within 1% tolerance)
+- Multi-provider comparison (Anthropic, OpenAI, Ollama)
+- Target: ≥90% overall accuracy
 
 ## Quick Links
 
@@ -137,28 +139,36 @@ graph TD
 
 ## Project Status
 
-**Current Phase:** Week 1.5 - MkDocs Pilot
+**Current Phase:** Phase 6-7 - DSPy/MLflow Integration
 
 **Completed:**
 
-✅ Database schema (5 core tables)
-✅ SQLModel models with provenance tracking
-✅ FastAPI REST API (properties, transactions, documents, obligations, chat endpoints)
-✅ Database query tool (SELECT-only, safe queries)
-✅ RAG system integration (database + document search)
-✅ Chatbot CLI with source citations
-✅ Airbnb CSV import with accrual accounting
-✅ Vanilla JS frontend with 4 persona sections
-✅ Document ingestion script
-✅ Sample questions document (133 questions)
-✅ Obligations seeding script
+✅ Database schema (5 core tables with full provenance tracking)
+✅ SQLModel models with migrations (Alembic)
+✅ FastAPI REST API (properties and chat endpoints operational)
+✅ Database query tool (SELECT-only, safe SQL generation)
+✅ RAG system with multi-provider LLM support (Anthropic/OpenAI/Ollama)
+✅ Chatbot with conversation history and audit logging
+✅ Airbnb CSV import with accrual accounting and duplicate detection
+✅ Vanilla JavaScript frontend with 4 persona sections
+✅ Document ingestion with ChromaDB vector store
+✅ Dual evaluation harnesses:
+  - General business evaluator (5 questions)
+  - Airbnb income evaluator (15 questions with CSV ground truth)
+✅ MkDocs documentation site (46+ pages)
+✅ 15 utility scripts for data management and evaluation
+
+**In Progress:**
+
+- True DSPy pipeline implementation (retriever/reasoner/verifier modules)
+- MLflow experiment tracking and model registry
+- Cross-provider optimization
 
 **Next Steps:**
 
-- Expand evaluation set (15 → 40 questions)
-- Improve evaluation metrics
-- Build evaluation reporting dashboard
-- Achieve ≥90% evaluation score
+- Complete remaining API endpoints (transactions, documents, obligations)
+- Expand test coverage (≥80% target)
+- Production hardening (authentication, field validation)
 
 ## Getting Help
 
@@ -169,6 +179,6 @@ graph TD
 
 ---
 
-**Last Updated:** 2024-11-14
-**Version:** 0.1.0
-**Status:** Active Development
+**Last Updated:** 2026-01-07
+**Version:** 0.2.0
+**Status:** Active Development (Phase 6-7: DSPy/MLflow Integration)

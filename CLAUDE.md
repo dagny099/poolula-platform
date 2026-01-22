@@ -1,6 +1,6 @@
 # Poolula Platform - Claude Code Guide
 
-This document provides context for Claude Code (AI coding assistant) working on Poolula Platform.
+This document provides essential context for Claude Code (AI coding assistant) working on Poolula Platform.
 
 ## Project Overview
 
@@ -13,214 +13,39 @@ This document provides context for Claude Code (AI coding assistant) working on 
 **Scale**: Small deployment (1-few users, not enterprise)
 **Principles**: UNDERSTANDING, TRANSPARENCY, USER FRIENDLINESS
 
-## Technology Stack
+## Technology Stack (Summary)
 
-### Core
+**Core**: Python 3.13+, FastAPI, SQLModel, SQLite → PostgreSQL, Alembic migrations
+**AI/RAG**: LLM Provider abstraction (Anthropic Claude default, OpenAI/Ollama optional), ChromaDB, DSPy, MLflow
+**Testing**: pytest (≥80% coverage target), in-memory SQLite test DB
+**Frontend**: Vanilla JavaScript, HTML5/CSS3, Marked.js
 
-- **Python 3.13+** with `uv` package manager
-- **FastAPI** - REST API framework
-- **SQLModel** - Type-safe ORM (SQLAlchemy + Pydantic)
-- **SQLite** (development) → PostgreSQL (production scaling)
-- **Alembic** - Database migrations
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed tech stack and design decisions.
 
-### Testing
+## Quick Start
 
-- **pytest** with ≥80% coverage target
-- **In-memory SQLite** for test database
-- **FastAPI TestClient** for API testing
-
-### AI & RAG
-
-- **LLM Provider Architecture** - Provider-agnostic abstraction layer for multiple LLM backends
-  - **Anthropic Claude** (default) - Primary AI generation (via anthropic>=0.58.2)
-  - **OpenAI** (optional) - Alternative provider support
-  - **Local Models** (optional) - Ollama integration for offline/privacy use
-- **ChromaDB** - Vector database with ONNX embeddings (chromadb>=1.0.15)
-- **DSPy** - Prompt optimization and pipeline framework (dspy-ai==2.5.0)
-- **MLflow** - Experiment tracking and model registry (mlflow>=2.16.2)
-
-**Important**: ChromaDB's built-in ONNX embeddings avoid PyTorch dependency issues on macOS Intel x86_64 with Python 3.13.
-
-Note: AI dependencies are in optional `rag` dependency group. Install with `uv sync --group rag`.
-
-### Evaluation & Observability
-
-- **pytest** - Traditional unit/integration tests
-- **Evaluation Harnesses** - Two specialized evaluation systems:
-  - **General Evaluator** (`evaluate_chatbot.py`) - 5 cross-domain business questions
-  - **Airbnb Evaluator** (`evaluate_airbnb.py`) - 15 rental income questions with CSV ground truth validation
-- **Automated Scoring** - Multi-dimensional scoring:
-  - Tool usage correctness (40%)
-  - Content relevance (40%)
-  - Numerical accuracy (50% for Airbnb evaluator - validates against source CSV data with 1% tolerance)
-  - Completeness (10%)
-  - Target: ≥90% overall score
-- **Ground Truth Validation** - Airbnb evaluator compares chatbot responses against CSV calculations (accrual accounting with checkout date revenue recognition)
-- **Audit Logging** - All chatbot interactions logged to database
-
-See `docs/evaluation/` for framework details.
-
-### Frontend
-
-- **Vanilla JavaScript** - Clean, framework-free web interface
-- HTML5 + CSS3
-- Marked.js for markdown rendering
-- 4 persona-based help sections (LLC Owner, Bookkeeper, Property Manager, Compliance Officer)
-
-## Project Structure
-
-```
-poolula-platform/
-├── core/                      # Core business logic
-│   ├── database/              # Database models & connection (models.py, enums.py, connection.py)
-│   └── logging_config.py      # Structured logging
-├── apps/                      # Applications
-│   ├── api/                   # FastAPI REST API
-│   │   ├── main.py            # FastAPI app
-│   │   └── routes/            # API endpoints (properties, transactions, documents, obligations, chat)
-│   ├── chatbot/               # RAG Chatbot
-│   │   ├── llm_providers/     # LLM provider abstraction (base, anthropic, openai, ollama)
-│   │   ├── rag_system.py      # Main orchestrator with provider factory
-│   │   ├── ai_generator.py    # Provider-agnostic AI generation
-│   │   ├── vector_store.py    # ChromaDB interface
-│   │   ├── database_tool.py   # Database query tool for structured data
-│   │   ├── search_tools.py    # Document search tools
-│   │   ├── session_manager.py # Conversation history
-│   │   ├── audit_logger.py    # Q&A audit logging
-│   │   └── [other modules]    # cache, metadata, document processing, config, health
-│   ├── dspy/                  # DSPy pipeline integration
-│   │   ├── pipelines.py       # Q&A pipeline definitions
-│   │   ├── artifacts.py       # Artifact management
-│   │   └── runtime.py         # Pipeline execution
-│   └── evaluator/             # Evaluation harness components
-├── scripts/                   # Utility scripts (15 total)
-│   ├── cli.py                 # Main CLI (`poolula` command)
-│   ├── backup.py, seed_database.py, seed_obligations.py
-│   ├── import_airbnb_transactions.py, ingest_documents.py
-│   ├── evaluate_chatbot.py, evaluate_airbnb.py, evaluate_providers.py
-│   ├── verify_airbnb_import.py, remove_duplicate_transactions.py
-│   └── [dspy/mlflow scripts]  # build_dspy_artifact, dspy_mlflow_run, eval_dspy_vs_baseline, make_dummy_dspy_artifact
-├── tests/                     # Test suite (≥80% coverage)
-│   ├── test_models.py, test_api_properties.py, conftest.py
-│   └── chatbot/               # Chatbot tests (test_rag_system, test_session_manager, etc.)
-├── docs/                      # Documentation (46 files - see MkDocs)
-│   ├── api/                   # API docs (6 files: properties, transactions, documents, obligations, chat, overview)
-│   ├── architecture/          # System design, data models, LLM providers (7 files)
-│   ├── evaluation/            # Evaluation framework, scoring, provider comparison (9 files)
-│   ├── getting-started/       # Installation, overview, quick start (3 files)
-│   ├── user-guide/            # Chatbot, document management, importing data, obligations (4 files)
-│   ├── planning/              # Implementation plans - LLM agnosticism, DSPy/MLflow (6 files)
-│   ├── testing/               # Testing guide, migrations, deployment (3 files)
-│   └── workflows/             # Data import, API usage, testing, Airbnb import, LLM provider setup (5 files)
-├── alembic/                   # Database migrations
-└── pyproject.toml             # Dependencies with groups: dev, rag, docs, openai, local
-```
-
-## Database Schema
-
-### 5 Core Tables
-
-1. **properties** - Rental properties (acquisition, basis, depreciation)
-2. **transactions** - Financial events (30+ category chart of accounts)
-3. **documents** - Document metadata (PDFs, contracts, statements)
-4. **obligations** - Compliance calendar (RRULE recurrence)
-5. **audit_log** - Immutable change tracking
-
-### Key Design Decisions
-
-- **UUID primary keys** for all entities
-- **Embedded provenance** tracking (JSON column, not separate table)
-- **Timestamps** (created_at, updated_at) on all mutable tables
-- **Soft deletes** (status=INACTIVE, not hard delete)
-- **Direct SQLModel usage** (no repository pattern for simplicity)
-
-### Important Field Naming
-
-- **`extra_metadata`** (not `metadata` - SQLAlchemy reserved word)
-- **`property_obj`** (not `property` - avoid shadowing @property decorator)
-
-## API Endpoints
-
-**Base URL**: `http://localhost:8082/api/v1`
-
-### Implemented Endpoints
-
-- **Properties** (`/api/v1/properties`) - Full CRUD operations for rental properties
-- **Chat** (`/api/chat/query`) - Natural language chatbot queries (returns response + sources)
-- **Health** (`/health`) - Health check + database connection test
-- **Docs** (`/docs`) - Interactive API documentation (Swagger UI)
-
-### Planned Endpoints (Database Tables Exist)
-
-The following endpoints are designed but not yet exposed via API routes:
-- **Transactions** - Financial events (filter by date, category, property)
-- **Documents** - Document metadata and file uploads
-- **Obligations** - Compliance calendar with recurrence rules
-
-**Workaround:** Access this data directly via the chatbot using natural language queries (e.g., "Show me all transactions from August 2025") or via database tool in RAG system.
-
-See `docs/api/` for detailed endpoint documentation.
-
-### Response Format
-
-All responses include provenance tracking where applicable:
-
-```json
-{
-  "id": "uuid",
-  "address": "900 S 9th St, Montrose, CO 81401",
-  "provenance": {
-    "source_type": "csv_import",
-    "source_id": "poolula_facts.yml",
-    "confidence": 1.0,
-    "verification_status": "verified"
-  }
-}
-```
-
-## Data Source of Truth
-
-**File**: `poolula_facts.yml` (project root)
-
-This YAML file is the **single source of truth** for property and LLC data.
-
-### UNKNOWN Field Handling
-
-- Fields marked `"UNKNOWN"` in YAML → `NULL` in database
-- Query incomplete data: `SELECT * FROM properties WHERE placed_in_service IS NULL`
-- Update workflow: Edit YAML → run `uv run python scripts/seed_database.py --update`
-
-See: `docs/workflows/data-import.md` for complete workflow
-
-## Workflows
-
-Detailed workflow documentation in `docs/workflows/`:
-
-- **data-import.md** - YAML → DB workflow, handling UNKNOWN fields
-- **airbnb-import.md** - Import Airbnb transaction CSVs
-- **api-usage.md** - API endpoint examples for all resources
-- **testing.md** - Test execution guide
-- **llm-provider-setup.md** - LLM provider configuration and API key setup
-
-## Common Commands
-
-### Setup
+### First-Time Setup
 
 ```bash
-# Install dependencies (core + dev)
-uv sync
-
-# Install with AI/RAG support
+# 1. Install dependencies
 uv sync --group rag
 
-# Run migrations
-.venv/bin/alembic upgrade head
+# 2. Set up environment
+cp .env.example .env
+# Edit .env with ANTHROPIC_API_KEY, DATABASE_URL, etc.
 
-# Seed database from YAML
+# 3. Run migrations & seed data
+.venv/bin/alembic upgrade head
 uv run python scripts/seed_database.py --initial
+uv run python scripts/seed_obligations.py
+
+# 4. Verify setup
+uv run pytest
 ```
 
-### Development
+See `docs/workflows/` for detailed workflows (data import, Airbnb CSV import, LLM provider setup).
+
+### Development Commands
 
 ```bash
 # Start API server
@@ -228,252 +53,169 @@ uv run uvicorn apps.api.main:app --reload --port 8082
 
 # Run tests
 uv run pytest
-
-# Run tests with coverage
 uv run pytest --cov=core --cov=apps --cov-report=html
 
-# Create/apply database migration
-.venv/bin/alembic revision --autogenerate -m "Description"
-.venv/bin/alembic upgrade head
-```
-
-### Data Management
-
-```bash
-# Import Airbnb transactions
-uv run python scripts/import_airbnb_transactions.py
-
-# Ingest documents into vector store
-uv run python scripts/ingest_documents.py
-
-# Seed compliance obligations
-uv run python scripts/seed_obligations.py
-
-# Backup/restore database
-python scripts/backup.py
-python scripts/backup.py --restore latest
-```
-
-### Evaluation & Testing
-
-```bash
-# Evaluate chatbot with general business questions (5 questions)
+# Evaluate chatbot
 uv run python scripts/evaluate_chatbot.py
-
-# Evaluate Airbnb rental income accuracy with ground truth (15 questions)
-uv run python scripts/evaluate_airbnb.py
 uv run python scripts/evaluate_airbnb.py --verbose
 
-# Verify Airbnb CSV import integrity
-uv run python scripts/verify_airbnb_import.py
-
-# Compare LLM providers (Anthropic, OpenAI, Ollama)
-uv run python scripts/evaluate_providers.py
-
-# Run DSPy vs baseline evaluation
-uv run python scripts/eval_dspy_vs_baseline.py
-```
-
-### CLI
-
-```bash
-# Use poolula CLI (must install with uv sync first)
-poolula --help
-```
-
-### Documentation
-
-```bash
-# Install documentation dependencies
-uv sync --group docs
-
-# Build documentation site
-uv run mkdocs build
-
-# Serve documentation locally (http://127.0.0.1:8000)
-uv run mkdocs serve
-
-# Deploy to GitHub Pages (if configured)
-uv run mkdocs gh-deploy
-```
-
-## Development Principles
-
-### Simplicity Over Enterprise Patterns
-
-- **Direct SQLModel usage** - No repository layer (KISS principle)
-- **Comprehensive documentation** - MkDocs operational with 46+ pages covering API, architecture, workflows, and evaluation
-- **Small scale** - Optimized for 1-few users, not millions
-
-### Provenance Tracking
-
-Every data modification includes provenance:
-- `source_type`: How was data created (manual_entry, csv_import, etc.)
-- `source_id`: Which file/document (e.g., "poolula_facts.yml")
-- `confidence`: 0.0-1.0 confidence level
-- `verification_status`: Has this been verified?
-
-### Validation Strategy
-
-- **PATCH allows all fields** - Fully flexible for now (trustee is sole user)
-- **TODO Phase 5**: Add protection for immutable fields (acquisition_date, basis)
-- **Rationale**: Flexibility > protection at small scale
-
-### Duplicate Detection & Prevention
-
-The platform includes robust duplicate detection to ensure data integrity:
-
-#### Airbnb Transaction Imports
-**Implementation:** `scripts/import_airbnb_transactions.py` (lines 81-131)
-
-Prevents duplicate transactions using composite detection:
-- **Primary method:** Airbnb confirmation code + transaction date + type + property
-- **Fallback method:** Date + amount + category + type + property (for non-Airbnb transactions)
-
-**Usage:**
-```bash
-# Re-running imports is safe - duplicates are automatically skipped
+# Import data
 uv run python scripts/import_airbnb_transactions.py
-```
-
-**Output:** Import summary includes `duplicates_skipped` and `new_count` metrics.
-
-#### Document Ingestion
-**Implementation:** `scripts/ingest_documents.py`, `apps/chatbot/vector_store.py`
-
-Prevents duplicate documents using SHA-256 content hashing:
-- Computes hash **before** expensive chunking (performance optimization)
-- Checks ChromaDB vector store for existing documents
-- Skips re-ingestion if document already exists
-
-**Usage:**
-```bash
-# Re-running ingestion is safe - duplicates are automatically skipped
 uv run python scripts/ingest_documents.py
 ```
 
-#### Cleanup Utility
-**Tool:** `scripts/remove_duplicate_transactions.py`
+## API Endpoints (Quick Reference)
 
-One-time cleanup script for existing database duplicates:
-- Identifies duplicate groups (same date + description + amount + category)
-- Keeps oldest transaction (by `created_at` timestamp)
-- Removes newer duplicates
+**Base URL**: `http://localhost:8082`
 
-**Usage:**
+**Note**: API versioning is inconsistent - properties use `/api/v1/`, chat uses `/api/`.
+
+- **Properties**: `/api/v1/properties` - Full CRUD operations
+- **Chat**: `/api/query` - Natural language queries
+- **Documents**: `/api/documents`, `/api/upload`, `/api/incoming-files`, `/api/process-incoming`
+- **Health**: `/health` - Health check
+- **Docs**: `/docs` - Swagger UI
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md#api-endpoints) for complete endpoint documentation.
+
+## Common Issues & Quick Fixes
+
+### Database
 ```bash
-# Preview duplicates without deleting
-uv run python scripts/remove_duplicate_transactions.py --dry-run
+# Migration not applied
+.venv/bin/alembic upgrade head
 
-# Actually remove duplicates
-uv run python scripts/remove_duplicate_transactions.py
+# Database locked during tests
+# → Check conftest.py fixtures, ensure sessions are closed
 ```
 
-## Implementation Status
+### API
+```bash
+# 404 on /api/v1/chat/query
+# → Chat is at /api/query (not /api/v1/chat/query)
 
-**Current Phase**: Phase 6-7 (DSPy/MLflow Integration)
+# Port already in use
+lsof -ti:8082 | xargs kill -9
+```
 
-Completed:
-- **Phase 0-1** ✅ - Infrastructure, database schema, REST API (properties + chat endpoints), tests
-- **Phase 2** ✅ - Chatbot integration with database tool, audit logging, evaluation harness
-- **Phase 3** ✅ - Vanilla JavaScript frontend with 4 persona-based sections
+### AI/RAG
+```bash
+# Missing API key
+echo "ANTHROPIC_API_KEY=sk-ant-..." >> .env
 
-In Progress:
-- **Phase 6-7** - DSPy pipeline optimization with MLflow experiment tracking
-  - **Current Status**: Scaffolding exists (`apps/dspy/`) but current implementation is a RAG wrapper
-  - **Planned**: True DSPy pipeline with retriever/reasoner/verifier modules (Phase 1 of plan)
-  - See `docs/planning/dspy-mlflow-plan-2025-12-09.md` for detailed roadmap
-  - Provider comparison and evaluation framework operational
+# No documents in vector store
+uv run python scripts/ingest_documents.py
 
-Future:
-- **Phase 4** - Additional API endpoints (transactions, documents, obligations REST routes)
-- **Phase 5** - Feature expansion and production hardening (immutable field protection, advanced analytics)
+# Missing dependencies
+uv sync --group rag
+```
 
-See `docs/planning/` for detailed implementation plans.
+### Data Import
+```bash
+# Duplicate transactions
+uv run python scripts/remove_duplicate_transactions.py --dry-run
+# → Import script has built-in duplicate detection (safe to re-run)
 
-## Known Technical Decisions
+# UNKNOWN fields in YAML
+# → Expected behavior: UNKNOWN → NULL in database
+# → Edit poolula_facts.yml and re-run: uv run python scripts/seed_database.py --update
+```
 
-### Why SQLite Not PostgreSQL?
+See [ARCHITECTURE.md](./ARCHITECTURE.md#troubleshooting) for complete troubleshooting guide.
 
-- SQLite perfect for 1-few users
-- Can migrate to PostgreSQL later with Alembic
-- Simpler setup and maintenance
+## Key Files
 
-### Why No Repository Pattern?
-
-- Adds complexity without benefit at this scale
-- SQLModel already provides clean abstraction
-- Direct usage is more transparent
-- Can refactor to repositories in Phase 5 if needed
-
-### Why Embedded Provenance?
-
-- Performance (one less JOIN)
-- Simpler queries
-- Appropriate for scale
-- Still provides full data lineage
-
-## Migration Context
-
-Integrating three existing projects:
-
-1. **AirBnB Dashboard** (`/PROJECTS/AirBnB Dashboard/`) - Streamlit analytics (data source)
-2. **RAG Chatbot** (`/PROJECTS/ragchatbot-codebase/`) - FastAPI/ChromaDB/Claude (✅ integrated)
-3. **Evaluation Harness** - Golden Q&A sets for testing (✅ operational)
-
-Phase 2 chatbot integration complete. Dashboard/frontend unification deferred to Phase 3-4.
-
-## Contact & Support
-
-- **Project Owner**: Poolula LLC (Hidalgo-Sotelo Living Trust)
-- **Development**: Solo developer (trustee)
-- **Questions**: Refer to workflow docs in `docs/workflows/`
-- **Executive Overview**: See `EXECUTIVE_SUMMARY.md` for business-friendly platform overview (designed for CPAs, advisors, future collaborators)
-
-## Quick Reference
-
-### Key Files
-
-- **API**: `apps/api/main.py`, `apps/api/routes/{properties,transactions,documents,obligations,chat}.py`
+- **API**: `apps/api/main.py`, `apps/api/routes/{properties,chat}.py`
 - **Models**: `core/database/models.py`, `core/database/enums.py`
 - **Chatbot**: `apps/chatbot/rag_system.py`, `apps/chatbot/database_tool.py`, `apps/chatbot/ai_generator.py`
-- **DSPy**: `apps/dspy/pipelines.py`, `apps/dspy/runtime.py`, `apps/dspy/artifacts.py`
-- **Evaluator**: `apps/evaluator/chatbot_evaluator.py`, `apps/evaluator/airbnb_ground_truth.py`, `apps/evaluator/numerical_validator.py`
-- **Scripts**: `scripts/cli.py`, `scripts/evaluate_chatbot.py`, `scripts/evaluate_airbnb.py`, `scripts/ingest_documents.py`
+- **LLM Providers**: `apps/chatbot/llm_providers/{base,anthropic,openai,ollama}.py`
+- **Evaluator**: `apps/evaluator/chatbot_evaluator.py`, `apps/evaluator/airbnb_ground_truth.py`
+- **Scripts**: `scripts/cli.py`, `scripts/evaluate_{chatbot,airbnb,providers}.py`
 - **Tests**: `tests/test_models.py`, `tests/test_api_properties.py`, `tests/chatbot/test_rag_system.py`
+- **Docs**: `docs/{api,architecture,workflows,evaluation}/` (46 files via MkDocs)
 
-### Environment Variables
+## Environment Variables
 
 ```env
-# Database
-DATABASE_URL=sqlite:///./poolula.db  # or postgresql://...
+# Required
+DATABASE_URL=sqlite:///./poolula.db
+LLM_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-...
 
-# API
+# Optional
 API_HOST=0.0.0.0
 API_PORT=8082
-
-# LLM Provider (anthropic, openai, or ollama)
-LLM_PROVIDER=anthropic
-ANTHROPIC_API_KEY=sk-...
-# OPENAI_API_KEY=sk-...  # if using OpenAI
-# OLLAMA_BASE_URL=http://localhost:11434  # if using Ollama
-
-# MLflow (optional)
+OPENAI_API_KEY=sk-...          # if using OpenAI
+OLLAMA_BASE_URL=http://localhost:11434  # if using Ollama
 MLFLOW_TRACKING_URI=mlruns/
 ```
 
 See `.env.example` and `docs/workflows/llm-provider-setup.md` for details.
 
+## Development Principles
+
+### Simplicity Over Enterprise Patterns
+- **Direct SQLModel usage** - No repository layer (KISS principle)
+- **Small scale** - Optimized for 1-few users, not millions
+- **Comprehensive docs** - MkDocs with 46+ pages
+
+### Important Conventions
+- **UUID primary keys** for all entities
+- **Soft deletes** (status=INACTIVE, not hard delete)
+- **Embedded provenance** (JSON column, not separate table)
+- **Field naming**: Use `property_obj` (not `property`), `extra_metadata` (not `metadata`)
+
+### Data Source of Truth
+- **File**: `poolula_facts.yml` (project root)
+- Workflow: Edit YAML → run `uv run python scripts/seed_database.py --update`
+- UNKNOWN fields → NULL in database
+
+### Testing Requirements
+- **Coverage**: ≥80% across `core/` and `apps/`
+- **Isolation**: Each test gets fresh in-memory SQLite DB
+- **Mocking**: RAG tests mock LLM providers and ChromaDB
+
+## Current Implementation Status
+
+**Phase 6-7** (In Progress): DSPy/MLflow Integration
+- ✅ **Phase 0-1**: Infrastructure, database, REST API (properties + chat), tests
+- ✅ **Phase 2**: Chatbot with database tool, audit logging, evaluation harness
+- ✅ **Phase 3**: Vanilla JS frontend with 4 persona sections
+- 🔄 **Phase 6-7**: DSPy pipeline optimization (scaffolding exists, true pipeline in progress)
+- 📋 **Phase 4**: Additional REST endpoints (transactions, obligations)
+- 📋 **Phase 5**: Production hardening
+
+See `docs/planning/dspy-mlflow-plan-2025-12-09.md` for detailed roadmap.
+
 ## Next Steps
 
 When continuing work:
 
-1. **Check current phase**: `docs/planning/` (currently Phase 6-7: DSPy/MLflow)
-2. **Review docs**:
+1. **Check current phase**: `docs/planning/` (Phase 6-7: DSPy/MLflow)
+2. **Review relevant docs**:
+   - [ARCHITECTURE.md](./ARCHITECTURE.md) - Technical details, database schema, API design
    - `docs/api/` - API endpoint documentation
-   - `docs/evaluation/` - Evaluation framework and provider comparison
    - `docs/workflows/` - Operational workflows
-   - `docs/dspy-mlflow-plan.md` - Current integration roadmap
-3. **Run tests**: `uv run pytest` (ensure ≥80% coverage maintained)
+   - `docs/evaluation/` - Evaluation framework
+3. **Run tests**: `uv run pytest` (maintain ≥80% coverage)
 4. **Start API**: `uv run uvicorn apps.api.main:app --reload --port 8082`
-5. **Test chatbot**: `POST http://localhost:8082/api/v1/chat/query` or run evaluation harness
+5. **Test chatbot**: `POST http://localhost:8082/api/query` or `uv run python scripts/evaluate_chatbot.py`
+
+## Additional Documentation
+
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Detailed tech stack, database schema, API endpoints, project structure
+- **[EXECUTIVE_SUMMARY.md](./EXECUTIVE_SUMMARY.md)** - Business-friendly platform overview (for CPAs, advisors)
+- **`docs/`** - Complete documentation (46 files):
+  - `docs/api/` - API reference (6 files)
+  - `docs/architecture/` - System design (7 files)
+  - `docs/workflows/` - How-to guides (5 files)
+  - `docs/evaluation/` - Testing & evaluation (9 files)
+  - `docs/getting-started/` - Installation & quick start (3 files)
+
+Build docs: `uv run mkdocs build` | Serve: `uv run mkdocs serve`
+
+## Contact & Support
+
+- **Questions**: Refer to `docs/workflows/` or [ARCHITECTURE.md](./ARCHITECTURE.md)
+- **Help**: `/help` command for Claude Code features
+- **Feedback**: https://github.com/anthropics/claude-code/issues

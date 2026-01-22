@@ -1,0 +1,1373 @@
+{
+  "timestamp": "2026-01-07T19:18:41.652890",
+  "eval_set": "apps/evaluator/poolula_eval_set.jsonl",
+  "total_questions": 20,
+  "average_score": 0.8443333333333334,
+  "average_score_pct": 84.43333333333334,
+  "passed": 15,
+  "warned": 5,
+  "failed": 0,
+  "results": [
+    {
+      "question": "What properties does Poolula LLC own?",
+      "response": "Poolula LLC owns one property:\n\n**900 S 9th St, Montrose, CO 81401**\n- Acquired: April 15, 2024\n- Purchase Price: $442,300\n- Total Basis: $452,300\n- Placed in Service: February 1, 2025\n- Status: Active\n\nThe property has a depreciable basis of $374,100, with the land valued at $78,200 and building at $364,100.",
+      "sources": [
+        {
+          "text": "Database Query: properties",
+          "query_type": "properties",
+          "filters": {}
+        }
+      ],
+      "expected": {
+        "question": "What properties does Poolula LLC own?",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "property",
+          "address"
+        ],
+        "category": "property_info"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "property",
+            "address"
+          ],
+          "keywords_found": 1,
+          "total_keywords": 2,
+          "score": 0.5
+        },
+        "completeness": {
+          "response_length": 310,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 0.5,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 0.8
+    },
+    {
+      "question": "What is the depreciable basis for all properties?",
+      "response": "The depreciable basis for all properties is **$374,100**.\n\nThis consists of:\n- Building basis: $364,100\n- Furniture, fixtures & equipment (FFE) basis: $10,000\n\nThe land basis of $78,200 is not depreciable, which is why the total depreciable basis ($374,100) is less than the total property basis ($452,300).",
+      "sources": [
+        {
+          "text": "Database Query: properties",
+          "query_type": "properties",
+          "filters": {}
+        }
+      ],
+      "expected": {
+        "question": "What is the depreciable basis for all properties?",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "basis",
+          "deprecia"
+        ],
+        "category": "property_financials"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "basis",
+            "deprecia"
+          ],
+          "keywords_found": 2,
+          "total_keywords": 2,
+          "score": 1.0
+        },
+        "completeness": {
+          "response_length": 307,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 1.0
+    },
+    {
+      "question": "Show me all rental income transactions from 2024",
+      "response": "There are no rental income transactions recorded for 2024 in the database.",
+      "sources": [
+        {
+          "text": "Database Query: transactions",
+          "query_type": "transactions",
+          "filters": {
+            "category": "RENTAL_INCOME",
+            "transaction_type": "REVENUE",
+            "start_date": "2024-01-01",
+            "end_date": "2024-12-31"
+          }
+        }
+      ],
+      "expected": {
+        "question": "Show me all rental income transactions from 2024",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "rental",
+          "income",
+          "2024"
+        ],
+        "category": "transactions"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "rental",
+            "income",
+            "2024"
+          ],
+          "keywords_found": 3,
+          "total_keywords": 3,
+          "score": 1.0
+        },
+        "completeness": {
+          "response_length": 74,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 1.0
+    },
+    {
+      "question": "What insurance policies does Poolula have?",
+      "response": "No insurance policy documents are currently available in the system for Poolula LLC.",
+      "sources": [],
+      "expected": {
+        "question": "What insurance policies does Poolula have?",
+        "type": "document",
+        "expected_tools": [
+          "search_document_content"
+        ],
+        "expected_content": [
+          "insurance",
+          "polic"
+        ],
+        "category": "documents"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "search_document_content"
+          ],
+          "actual": [],
+          "correct": false,
+          "score": 0.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "insurance",
+            "polic"
+          ],
+          "keywords_found": 2,
+          "total_keywords": 2,
+          "score": 1.0
+        },
+        "completeness": {
+          "response_length": 84,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 0.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 0.6000000000000001
+    },
+    {
+      "question": "What is the business purpose of Poolula LLC?",
+      "response": "Based on the available information, Poolula LLC operates as a rental property business that manages real estate investments and rental operations. The company handles property acquisitions, tenant relationships, financial transactions, and compliance obligations related to rental property management.",
+      "sources": [],
+      "expected": {
+        "question": "What is the business purpose of Poolula LLC?",
+        "type": "document",
+        "expected_tools": [
+          "search_document_content"
+        ],
+        "expected_content": [
+          "business",
+          "purpose",
+          "LLC"
+        ],
+        "category": "formation"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "search_document_content"
+          ],
+          "actual": [],
+          "correct": false,
+          "score": 0.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "business",
+            "purpose",
+            "LLC"
+          ],
+          "keywords_found": 2,
+          "total_keywords": 3,
+          "score": 0.6666666666666666
+        },
+        "completeness": {
+          "response_length": 301,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 0.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 0.6666666666666666,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 0.4666666666666667
+    },
+    {
+      "question": "Show me total expenses by category for 2024",
+      "response": "No expense transactions were recorded for 2024. The database shows zero expense entries for the year.",
+      "sources": [
+        {
+          "text": "Database Query: aggregate_transactions",
+          "query_type": "aggregate_transactions",
+          "filters": {
+            "transaction_type": "EXPENSE",
+            "start_date": "2024-01-01",
+            "end_date": "2024-12-31",
+            "group_by": "category"
+          }
+        }
+      ],
+      "expected": {
+        "question": "Show me total expenses by category for 2024",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "expense",
+          "category",
+          "total"
+        ],
+        "category": "aggregations"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "expense",
+            "category",
+            "total"
+          ],
+          "keywords_found": 1,
+          "total_keywords": 3,
+          "score": 0.3333333333333333
+        },
+        "completeness": {
+          "response_length": 101,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 0.3333333333333333,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 0.7333333333333334
+    },
+    {
+      "question": "What compliance obligations are due soon?",
+      "response": "There are currently no compliance obligations due soon in the system.",
+      "sources": [
+        {
+          "text": "Database Query: obligations",
+          "query_type": "obligations",
+          "filters": {}
+        }
+      ],
+      "expected": {
+        "question": "What compliance obligations are due soon?",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "obligation",
+          "due"
+        ],
+        "category": "compliance"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "obligation",
+            "due"
+          ],
+          "keywords_found": 2,
+          "total_keywords": 2,
+          "score": 1.0
+        },
+        "completeness": {
+          "response_length": 69,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 1.0
+    },
+    {
+      "question": "List all available business documents",
+      "response": "There are currently no business documents available in the system.",
+      "sources": [],
+      "expected": {
+        "question": "List all available business documents",
+        "type": "document",
+        "expected_tools": [
+          "list_business_documents"
+        ],
+        "expected_content": [
+          "document",
+          "available"
+        ],
+        "category": "document_listing"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "list_business_documents"
+          ],
+          "actual": [],
+          "correct": false,
+          "score": 0.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "document",
+            "available"
+          ],
+          "keywords_found": 2,
+          "total_keywords": 2,
+          "score": 1.0
+        },
+        "completeness": {
+          "response_length": 66,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 0.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 0.6000000000000001
+    },
+    {
+      "question": "What is the total rental income for 2024?",
+      "response": "There is no rental income recorded for 2024 in the database.",
+      "sources": [
+        {
+          "text": "Database Query: aggregate_transactions",
+          "query_type": "aggregate_transactions",
+          "filters": {
+            "category": "RENTAL_INCOME",
+            "transaction_type": "REVENUE",
+            "start_date": "2024-01-01",
+            "end_date": "2024-12-31"
+          }
+        }
+      ],
+      "expected": {
+        "question": "What is the total rental income for 2024?",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "rental",
+          "income",
+          "total",
+          "2024"
+        ],
+        "category": "aggregations"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "rental",
+            "income",
+            "total",
+            "2024"
+          ],
+          "keywords_found": 3,
+          "total_keywords": 4,
+          "score": 0.75
+        },
+        "completeness": {
+          "response_length": 60,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 0.75,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 0.9000000000000001
+    },
+    {
+      "question": "Who are the members of Poolula LLC according to the operating agreement?",
+      "response": "I cannot find information about the members of Poolula LLC in the available documents. The operating agreement or formation documents containing member information are not accessible in the current document database.",
+      "sources": [],
+      "expected": {
+        "question": "Who are the members of Poolula LLC according to the operating agreement?",
+        "type": "document",
+        "expected_tools": [
+          "search_document_content"
+        ],
+        "expected_content": [
+          "member",
+          "LLC",
+          "operating"
+        ],
+        "category": "governance"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "search_document_content"
+          ],
+          "actual": [],
+          "correct": false,
+          "score": 0.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "member",
+            "LLC",
+            "operating"
+          ],
+          "keywords_found": 3,
+          "total_keywords": 3,
+          "score": 1.0
+        },
+        "completeness": {
+          "response_length": 216,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 0.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 0.6000000000000001
+    },
+    {
+      "question": "Show me all utility expenses",
+      "response": "There are no utility expenses recorded in the system. In fact, there are no expense transactions of any type currently in the database.",
+      "sources": [
+        {
+          "text": "Database Query: transactions",
+          "query_type": "transactions",
+          "filters": {
+            "transaction_type": "EXPENSE"
+          }
+        }
+      ],
+      "expected": {
+        "question": "Show me all utility expenses",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "utilit",
+          "expense"
+        ],
+        "category": "transactions"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "utilit",
+            "expense"
+          ],
+          "keywords_found": 2,
+          "total_keywords": 2,
+          "score": 1.0
+        },
+        "completeness": {
+          "response_length": 135,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 1.0
+    },
+    {
+      "question": "What is the address of our first property?",
+      "response": "The address of our first property is **900 S 9th St, Montrose, CO 81401**. This property was acquired on April 15, 2024.",
+      "sources": [
+        {
+          "text": "Database Query: properties",
+          "query_type": "properties",
+          "filters": {}
+        }
+      ],
+      "expected": {
+        "question": "What is the address of our first property?",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "address",
+          "property"
+        ],
+        "category": "property_info"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "address",
+            "property"
+          ],
+          "keywords_found": 2,
+          "total_keywords": 2,
+          "score": 1.0
+        },
+        "completeness": {
+          "response_length": 120,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 1.0
+    },
+    {
+      "question": "What documents were filed for LLC formation?",
+      "response": "No LLC formation documents are currently available in the system.",
+      "sources": [],
+      "expected": {
+        "question": "What documents were filed for LLC formation?",
+        "type": "document",
+        "expected_tools": [
+          "search_document_content"
+        ],
+        "expected_content": [
+          "formation",
+          "LLC",
+          "filed"
+        ],
+        "category": "formation"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "search_document_content"
+          ],
+          "actual": [],
+          "correct": false,
+          "score": 0.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "formation",
+            "LLC",
+            "filed"
+          ],
+          "keywords_found": 2,
+          "total_keywords": 3,
+          "score": 0.6666666666666666
+        },
+        "completeness": {
+          "response_length": 65,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 0.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 0.6666666666666666,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 0.4666666666666667
+    },
+    {
+      "question": "What is the total basis for property acquisitions?",
+      "response": "The total basis for property acquisitions is $452,300. This includes:\n\n- Land basis: $78,200\n- Building basis: $364,100  \n- Furniture, fixtures & equipment basis: $10,000\n\nThe property at 900 S 9th St, Montrose, CO was acquired on April 15, 2024 with a purchase price of $442,300 and total basis of $452,300.",
+      "sources": [
+        {
+          "text": "Database Query: properties",
+          "query_type": "properties",
+          "filters": {}
+        }
+      ],
+      "expected": {
+        "question": "What is the total basis for property acquisitions?",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "basis",
+          "total",
+          "property"
+        ],
+        "category": "property_financials"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "basis",
+            "total",
+            "property"
+          ],
+          "keywords_found": 3,
+          "total_keywords": 3,
+          "score": 1.0
+        },
+        "completeness": {
+          "response_length": 308,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 1.0
+    },
+    {
+      "question": "Show me revenue and expenses for the business",
+      "response": "There are currently no revenue or expense transactions recorded in the business database. The system shows zero transactions for both revenue and expenses.",
+      "sources": [
+        {
+          "text": "Database Query: aggregate_transactions",
+          "query_type": "aggregate_transactions",
+          "filters": {
+            "transaction_type": "EXPENSE",
+            "group_by": "type"
+          }
+        }
+      ],
+      "expected": {
+        "question": "Show me revenue and expenses for the business",
+        "type": "hybrid",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "revenue",
+          "expense"
+        ],
+        "category": "hybrid"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "revenue",
+            "expense"
+          ],
+          "keywords_found": 2,
+          "total_keywords": 2,
+          "score": 1.0
+        },
+        "completeness": {
+          "response_length": 155,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 1.0
+    },
+    {
+      "question": "What was my rental income in July 2025?",
+      "response": "There were no rental income transactions recorded for July 2025. The total rental income for that month was $0.",
+      "sources": [
+        {
+          "text": "Database Query: transactions",
+          "query_type": "transactions",
+          "filters": {
+            "category": "RENTAL_INCOME",
+            "transaction_type": "REVENUE",
+            "start_date": "2025-07-01",
+            "end_date": "2025-07-31"
+          }
+        }
+      ],
+      "expected": {
+        "question": "What was my rental income in July 2025?",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "July",
+          "2025",
+          "3960",
+          "rental"
+        ],
+        "category": "airbnb_monthly"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "July",
+            "2025",
+            "3960",
+            "rental"
+          ],
+          "keywords_found": 3,
+          "total_keywords": 4,
+          "score": 0.75
+        },
+        "completeness": {
+          "response_length": 111,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 0.75,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 0.9000000000000001
+    },
+    {
+      "question": "How many Airbnb reservations did we have in August 2025?",
+      "response": "There were no Airbnb reservations recorded for August 2025. The database shows zero rental income transactions for that month.",
+      "sources": [
+        {
+          "text": "Database Query: transactions",
+          "query_type": "transactions",
+          "filters": {
+            "category": "RENTAL_INCOME",
+            "transaction_type": "REVENUE",
+            "start_date": "2025-08-01",
+            "end_date": "2025-08-31"
+          }
+        }
+      ],
+      "expected": {
+        "question": "How many Airbnb reservations did we have in August 2025?",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "August",
+          "2025",
+          "5",
+          "reservation"
+        ],
+        "category": "airbnb_count"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "August",
+            "2025",
+            "5",
+            "reservation"
+          ],
+          "keywords_found": 4,
+          "total_keywords": 4,
+          "score": 1.0
+        },
+        "completeness": {
+          "response_length": 126,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 1.0
+    },
+    {
+      "question": "What was the total rental income from May 1 to July 31, 2025?",
+      "response": "There was no rental income recorded for the period from May 1 to July 31, 2025. The total rental income for that timeframe is $0.",
+      "sources": [
+        {
+          "text": "Database Query: aggregate_transactions",
+          "query_type": "aggregate_transactions",
+          "filters": {
+            "category": "RENTAL_INCOME",
+            "transaction_type": "REVENUE",
+            "start_date": "2025-05-01",
+            "end_date": "2025-07-31"
+          }
+        }
+      ],
+      "expected": {
+        "question": "What was the total rental income from May 1 to July 31, 2025?",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "May",
+          "July",
+          "2025",
+          "9209",
+          "rental"
+        ],
+        "category": "airbnb_range"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "May",
+            "July",
+            "2025",
+            "9209",
+            "rental"
+          ],
+          "keywords_found": 4,
+          "total_keywords": 5,
+          "score": 0.8
+        },
+        "completeness": {
+          "response_length": 129,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 0.8,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 0.9200000000000002
+    },
+    {
+      "question": "What was the total gross rental income for Q3 2025?",
+      "response": "There was no rental income recorded for Q3 2025 (July-September 2025). The total gross rental income for that period is $0.",
+      "sources": [
+        {
+          "text": "Database Query: aggregate_transactions",
+          "query_type": "aggregate_transactions",
+          "filters": {
+            "category": "RENTAL_INCOME",
+            "transaction_type": "REVENUE",
+            "start_date": "2025-07-01",
+            "end_date": "2025-09-30"
+          }
+        }
+      ],
+      "expected": {
+        "question": "What was the total gross rental income for Q3 2025?",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "Q3",
+          "2025",
+          "9913",
+          "rental"
+        ],
+        "category": "airbnb_quarterly"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "Q3",
+            "2025",
+            "9913",
+            "rental"
+          ],
+          "keywords_found": 3,
+          "total_keywords": 4,
+          "score": 0.75
+        },
+        "completeness": {
+          "response_length": 123,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 0.75,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 0.9000000000000001
+    },
+    {
+      "question": "List all Airbnb reservations in October 2025 with guest names",
+      "response": "There are no Airbnb reservations recorded for October 2025. The database shows zero rental income transactions for that month.",
+      "sources": [
+        {
+          "text": "Database Query: transactions",
+          "query_type": "transactions",
+          "filters": {
+            "category": "RENTAL_INCOME",
+            "transaction_type": "REVENUE",
+            "start_date": "2025-10-01",
+            "end_date": "2025-10-31"
+          }
+        }
+      ],
+      "expected": {
+        "question": "List all Airbnb reservations in October 2025 with guest names",
+        "type": "database",
+        "expected_tools": [
+          "query_database"
+        ],
+        "expected_content": [
+          "October",
+          "2025",
+          "reservation"
+        ],
+        "category": "airbnb_details"
+      },
+      "checks": {
+        "tool_usage": {
+          "expected": [
+            "query_database"
+          ],
+          "actual": [
+            "query_database"
+          ],
+          "correct": true,
+          "score": 1.0
+        },
+        "content_relevance": {
+          "expected_keywords": [
+            "October",
+            "2025",
+            "reservation"
+          ],
+          "keywords_found": 3,
+          "total_keywords": 3,
+          "score": 1.0
+        },
+        "completeness": {
+          "response_length": 126,
+          "score": 1.0
+        }
+      },
+      "score_components": [
+        {
+          "component": "tool_usage",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "content_relevance",
+          "score": 1.0,
+          "weight": 0.4
+        },
+        {
+          "component": "completeness",
+          "score": 1.0,
+          "weight": 0.2
+        }
+      ],
+      "total_score": 1.0
+    }
+  ]
+}

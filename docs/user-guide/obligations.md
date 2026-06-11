@@ -38,7 +38,7 @@ The obligations system helps you track time-sensitive tasks for your LLC and pro
 
 **Reduce stress:**
 
-- Advance reminders before due dates
+- Configurable lead-time tracking (`reminder_days_before`) to surface upcoming deadlines; automated notification dispatch (email/SMS) is planned in Phase 5
 
 - Clear status tracking (pending, completed, overdue)
 

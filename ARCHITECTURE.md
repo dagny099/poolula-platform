@@ -97,7 +97,7 @@ uv run pytest -s
 - **Automated Scoring** - Multi-dimensional scoring:
   - Tool usage correctness (40%)
   - Content relevance (40%)
-  - Numerical accuracy (50% for Airbnb evaluator - validates against source CSV data with 1% tolerance)
+  - Numerical accuracy (50% for Airbnb evaluator - validates against source CSV data)
   - Completeness (10%)
   - Target: ≥90% overall score
 - **Ground Truth Validation** - Airbnb evaluator compares chatbot responses against CSV calculations (accrual accounting with checkout date revenue recognition)

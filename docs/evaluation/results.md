@@ -130,6 +130,9 @@ Current evaluation metrics and performance baselines for the Poolula Platform ch
 
 ## Trends Over Time
 
+!!! warning "Example Data"
+    The historical table below is example/illustrative data, not recorded evaluation runs.
+
 ### Historical Performance
 
 | Date | Overall | Tool Usage | Quality | Errors |
@@ -138,9 +141,9 @@ Current evaluation metrics and performance baselines for the Poolula Platform ch
 | 2024-11-14 | 85.1% | 90.0% | 84.4% | 2.2% |
 | 2024-11-13 | 82.7% | 86.7% | 82.2% | 4.4% |
 
-**Improvement:** +4.6% over 2 days
+**Improvement:** +4.6% over 2 days (example)
 
-**Key changes:**
+**Key changes (illustrative):**
 
 - Improved system prompt clarity
 - Added database aggregate functions
@@ -214,9 +217,9 @@ Current evaluation metrics and performance baselines for the Poolula Platform ch
 - Error rate < 2%
 - All categories ≥ 70%
 
-**Current Status:** ✅ Ready for production (compliance category borderline)
+**Current Status:** ⚠️ Not yet evaluated against production — scores above are example data. Run `uv run python scripts/evaluate_chatbot.py` to generate real baselines.
 
-**Recommendation:** Address compliance question issue before deploy.
+**Recommendation:** Address compliance question issue before considering production readiness.
 
 ## Performance by Question Length
 
@@ -241,27 +244,22 @@ Current evaluation metrics and performance baselines for the Poolula Platform ch
 
 ## Comparison to Benchmarks
 
+!!! warning "Example Data"
+    The comparisons below use the example scores above, not real measured results. Run the evaluation harness to get actual numbers before drawing conclusions.
+
 ### Industry Baselines
 
-**Typical RAG system performance (from literature):**
+**Typical RAG system performance (rough figures from literature — not rigorously sourced):**
 
 - Tool selection accuracy: 70-85%
 - Response quality: 60-75%
 - Overall user satisfaction: 65-80%
 
-**Poolula Platform:**
+**Poolula Platform target scores (example):**
 
-- Tool selection: 93.3% (above benchmark ✓)
-- Response quality: 86.7% (above benchmark ✓)
-- Overall score: 87.3% (above benchmark ✓)
-
-### Competitive Positioning
-
-**Simple Q&A bots:** 60-70% accuracy
-
-**Enterprise RAG systems:** 75-85% accuracy
-
-**Poolula Platform:** 87.3% accuracy (competitive with enterprise solutions)
+- Tool selection: 93.3%
+- Response quality: 86.7%
+- Overall score: 87.3%
 
 ## Next Steps
 

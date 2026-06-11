@@ -21,11 +21,11 @@ Natural language interface for querying business data and documents:
 - 4 persona-based help sections (LLC Owner, Bookkeeper, Property Manager, Compliance Officer)
 
 ### 📊 Transaction Management
-Comprehensive financial tracking:
+Financial tracking:
 
-- Import transactions from Airbnb, bank statements, and expense receipts
-- Automated categorization with 30+ expense categories
-- Accrual accounting support
+- Import transactions from Airbnb CSV exports; bank statement and receipt import planned
+- 30+ predefined expense categories (manual selection; auto-categorization not yet implemented)
+- Accrual accounting support for Airbnb transactions
 - Full provenance tracking (data lineage for all transactions)
 
 ### 📝 Document Management
@@ -36,10 +36,10 @@ Organized document storage and semantic search:
 - Metadata tracking (doc_type, effective_date, version, confidentiality)
 
 ### ✅ Compliance Tracking
-Never miss a deadline:
+Track your compliance deadlines:
 
 - Track LLC compliance obligations (Colorado periodic report, tax deadlines, insurance renewal)
-- Automated reminders
+- Configurable lead-time field (`reminder_days_before`) for advance notice; automated notification dispatch is planned (Phase 5)
 - Recurring obligation support (yearly, quarterly, monthly)
 
 ### 🔍 Evaluation & Quality Assurance
@@ -47,9 +47,9 @@ Verify AI accuracy with dual specialized evaluators:
 
 - **General evaluator**: 5 cross-domain business questions
 - **Airbnb evaluator**: 15 rental income questions with CSV ground truth validation
-- Multi-dimensional scoring (tool usage, content relevance, numerical accuracy within 1% tolerance)
+- Multi-dimensional scoring (tool usage, content relevance, numerical accuracy checks)
 - Multi-provider comparison (Anthropic, OpenAI, Ollama)
-- Target: ≥90% overall accuracy
+- Target: ≥90% overall accuracy (not yet measured against production; see [Results](evaluation/results.md))
 
 ## Quick Links
 

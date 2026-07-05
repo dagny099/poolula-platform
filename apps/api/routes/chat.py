@@ -31,12 +31,9 @@ def get_rag_system() -> RAGSystem:
     """Get or create RAG system instance"""
     global _rag_system
     if _rag_system is None:
-        # Create config (reads ANTHROPIC_API_KEY from environment)
-        config = Config()
-        if not config.ANTHROPIC_API_KEY:
-            raise RuntimeError("ANTHROPIC_API_KEY environment variable not set")
-
-        _rag_system = RAGSystem(config=config)
+        # Provider-specific credential checks (ANTHROPIC_API_KEY, etc.) happen
+        # inside RAGSystem's provider factory, keyed off LLM_PROVIDER.
+        _rag_system = RAGSystem(config=Config())
         logger.info("RAG system initialized")
 
     return _rag_system

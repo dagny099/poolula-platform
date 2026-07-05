@@ -61,8 +61,9 @@ def main():
     )
     parser.add_argument(
         "--output",
-        default="apps/evaluator/eval_report.json",
-        help="Path to save evaluation report (JSON)",
+        default="output/eval_report.json",
+        help="Path to save evaluation report (JSON; default is gitignored so "
+        "live responses with real business data don't land in version control)",
     )
     parser.add_argument(
         "--markdown",

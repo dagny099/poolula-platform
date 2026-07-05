@@ -227,8 +227,14 @@ def update_document(
     try:
         for field, value in update_data.items():
             setattr(document, field, value)
-        document.updated_at = datetime.utcnow()
+    except ValueError as e:
+        # Model-level validation (validate_assignment), e.g. filename too long
+        session.rollback()
+        raise HTTPException(status_code=422, detail=str(e))
 
+    document.updated_at = datetime.utcnow()
+
+    try:
         session.add(document)
         record_audit(session, "UPDATE", document, reason="Updated via REST API", old_value=old_value)
         session.commit()

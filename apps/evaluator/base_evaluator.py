@@ -312,9 +312,10 @@ class BaseEvaluator:
         if expected.get("gold_answer"):
             record["gold_answer"] = expected["gold_answer"]
         if numerical:
-            record["expected_value"] = (
-                numerical.get("expected_amount") or numerical.get("expected_count")
-            )
+            expected_value = numerical.get("expected_amount")
+            if expected_value is None:
+                expected_value = numerical.get("expected_count")
+            record["expected_value"] = expected_value
             record["extracted_value"] = validation.get("extracted")
         return record
 

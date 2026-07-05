@@ -276,3 +276,20 @@ def test_archive_document(client, session_test):
 def test_archive_document_not_found(client):
     response = client.delete(f"/api/v1/documents/{uuid4()}")
     assert response.status_code == 404
+
+
+def test_update_document_invalid_filename_returns_422(client, session_test):
+    """Model-level validation failures on update surface as 422, not 500"""
+    doc = make_document()
+    session_test.add(doc)
+    session_test.commit()
+
+    response = client.patch(
+        f"/api/v1/documents/{doc.id}",
+        json={"filename": "x" * 300},  # exceeds 255-char limit
+    )
+    assert response.status_code == 422
+
+    # Document unchanged
+    session_test.refresh(doc)
+    assert doc.filename == "articles_of_organization.pdf"

@@ -308,3 +308,27 @@ def test_archive_transaction(client, session_test, property_obj):
 def test_archive_transaction_not_found(client):
     response = client.delete(f"/api/v1/transactions/{uuid4()}")
     assert response.status_code == 404
+
+
+def test_list_transactions_limit_applied_after_archive_filter(client, session_test, property_obj):
+    """Archived rows must not consume the limit budget for default listings"""
+    newest = make_transaction(property_obj.id, transaction_date=date(2025, 8, 20))
+    middle = make_transaction(property_obj.id, transaction_date=date(2025, 8, 10))
+    oldest = make_transaction(property_obj.id, transaction_date=date(2025, 8, 1))
+    session_test.add_all([newest, middle, oldest])
+    session_test.commit()
+
+    # Archive the newest transaction
+    response = client.delete(f"/api/v1/transactions/{newest.id}")
+    assert response.status_code == 204
+
+    # limit=2 should return both remaining live transactions, not just one
+    response = client.get("/api/v1/transactions?limit=2")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 2
+    assert {t["id"] for t in data} == {str(middle.id), str(oldest.id)}
+
+    # include_archived still honors the limit in SQL (newest first)
+    response = client.get("/api/v1/transactions?include_archived=true&limit=2")
+    assert {t["id"] for t in response.json()} == {str(newest.id), str(middle.id)}

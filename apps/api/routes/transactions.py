@@ -132,14 +132,17 @@ def list_transactions(
         query = query.where(
             Transaction.transaction_type == parse_enum(TransactionType, transaction_type, "transaction_type")
         )
-    query = query.order_by(Transaction.transaction_date.desc()).limit(limit)
+    query = query.order_by(Transaction.transaction_date.desc())
+    if include_archived:
+        query = query.limit(limit)
 
     transactions = session.exec(query).all()
 
     # Archived flag lives in the JSON extra_metadata column; filter in Python
-    # (small-scale deployment, avoids dialect-specific JSON queries)
+    # (small-scale deployment, avoids dialect-specific JSON queries). Limit is
+    # applied after filtering so archived rows don't consume the result budget.
     if not include_archived:
-        transactions = [t for t in transactions if not _is_archived(t)]
+        transactions = [t for t in transactions if not _is_archived(t)][:limit]
 
     logger.info(f"Found {len(transactions)} transactions")
     return transactions

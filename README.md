@@ -246,8 +246,12 @@ See `docs/planning/dspy-mlflow-plan-2025-12-09.md` for detailed roadmap.
 - MLflow experiment tracking and model registry
 - Cross-provider optimization and comparison
 
-**Next (Phase 4-5)**
-- Complete API routes (transactions, documents, obligations REST endpoints)
+**Done (Phase 4)**
+- ✅ Complete API routes (transactions, documents, obligations REST endpoints)
+- ✅ Document upload/processing pipeline (`/api/upload` → `/api/process-incoming`)
+- ✅ Diagnostic evaluation reports with offline fixture mode
+
+**Next (Phase 5)**
 - Expand evaluation datasets (40+ questions)
 - Improve test coverage (≥80% target)
 - Production hardening (authentication, field protection, PostgreSQL migration)

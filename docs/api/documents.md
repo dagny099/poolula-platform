@@ -1,152 +1,150 @@
 # Documents API Reference
 
-*Coming soon*
-
 API endpoints for managing business documents and metadata.
 
 ## Overview
 
-The Documents API allows you to manage document metadata, track document versions, and integrate with the document ingestion pipeline.
+Documents live in **two** places, served by two sets of endpoints:
 
-**Base URL:** `/api/v1/documents`
+1. **Document registry (database)** — `/api/v1/documents`: system-of-record metadata rows (`documents` table) with content hash, provenance, and audit trail.
+2. **Vector store (ChromaDB)** — `/api/documents` (chat router): titles/metadata of documents ingested for semantic search.
 
-## Endpoints
+The upload → process pipeline (below) populates **both** automatically.
+
+## Upload & Processing Pipeline
 
 | Method | Endpoint | Description | Status |
 |--------|----------|-------------|--------|
-| GET | `/api/v1/documents` | List all documents | 🚧 Planned |
-| GET | `/api/v1/documents/{id}` | Get document metadata | 🚧 Planned |
-| POST | `/api/v1/documents` | Upload document | 🚧 Planned |
-| PATCH | `/api/v1/documents/{id}` | Update metadata | 🚧 Planned |
-| DELETE | `/api/v1/documents/{id}` | Soft delete document | 🚧 Planned |
+| POST | `/api/upload` | Upload a file (multipart) to the incoming folder | ✅ Implemented |
+| GET | `/api/incoming-files` | List files waiting to be processed | ✅ Implemented |
+| POST | `/api/process-incoming` | Chunk + embed pending files, register metadata, dedupe | ✅ Implemented |
+
+```bash
+# 1. Upload a file (pdf, docx, txt, md, xlsx, xls, csv; max 50 MB)
+curl -X POST http://localhost:8082/api/upload -F "file=@/path/to/document.pdf"
+
+# 2. See what's pending
+curl http://localhost:8082/api/incoming-files
+
+# 3. Process everything pending
+curl -X POST http://localhost:8082/api/process-incoming
+```
+
+Processing behavior:
+
+- Files are chunked and embedded into the ChromaDB vector store (no LLM call needed).
+- A `Document` row is registered in the database with SHA-256 `content_hash`, provenance, and an audit log entry.
+- Duplicate content (same hash) is skipped and reported in `skipped_files`.
+- Successfully processed files move from `documents/incoming/` to `documents/processed/`; failures stay in incoming for retry and are reported in `failed_files`.
+- Folders are configurable via `POOLULA_INCOMING_DIR` / `POOLULA_PROCESSED_DIR`.
+
+## Document Registry Endpoints (database)
+
+**Base URL:** `/api/v1/documents`
+
+| Method | Endpoint | Description | Status |
+|--------|----------|-------------|--------|
+| GET | `/api/v1/documents` | List documents with filters | ✅ Implemented |
+| GET | `/api/v1/documents/{id}` | Get document metadata by UUID | ✅ Implemented |
+| POST | `/api/v1/documents` | Register document metadata | ✅ Implemented |
+| PATCH | `/api/v1/documents/{id}` | Update metadata | ✅ Implemented |
+| DELETE | `/api/v1/documents/{id}` | Soft delete (sets version=archived) | ✅ Implemented |
+
+### Query Parameters (GET list)
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `property_id` | UUID | Filter by property |
+| `doc_type` | string | Type name or value (`INSURANCE_POLICY` or `insurance:policy`) |
+| `search` | string | Case-insensitive substring match on filename |
+| `confidentiality` | string | `public`, `internal`, `restricted` |
+| `include_archived` | bool | Include archived documents (default false) |
 
 ## Document Types
 
-**Formation:**
+From `core/database/enums.py::DocumentType`:
 
-- `formation:articles` - Articles of Organization
+- **Formation & governance:** `formation`, `authority`, `operating_agreement`, `minutes`, `consent`
+- **Property:** `deed`, `closing`
+- **Financial:** `bank_statement`, `credit_card_statement`, `invoice`, `receipt`
+- **Insurance:** `insurance:policy`, `insurance:declaration`, `insurance:claim`
+- **Compliance:** `tax:return`, `tax:extension`, `tax:notice`, `compliance:periodic_report`
+- **Contracts:** `lease`, `vendor:contract`
+- **Other:** `correspondence`, `other`
 
-- `formation:operating_agreement` - Operating Agreement
-
-- `formation:ein_letter` - IRS EIN confirmation
-
-**Authority:**
-
-- `authority:resolution` - Board resolutions
-
-- `authority:meeting_minutes` - Meeting minutes
-
-- `authority:signature_card` - Bank signature cards
-
-**Accounting:**
-
-- `accounting:bank_statement` - Monthly bank statements
-
-- `accounting:tax_return` - Annual tax returns
-
-- `accounting:invoice` - Invoices and receipts
-
-**Property:**
-
-- `property:deed` - Property deed
-
-- `property:title` - Title documents
-
-- `property:appraisal` - Property appraisal
-
-- `property:inspection` - Inspection reports
-
-**Insurance:**
-
-- `insurance:policy` - Insurance policies
-
-- `insurance:claim` - Insurance claims
-
-**Other:**
-
-- `index` - Reference documents, guides
-
-- `other` - Miscellaneous documents
+Note: the chatbot ingestion pipeline classifies with its own vocabulary (`apps/chatbot/models.py::DocumentType`); the processor maps it to this core enum when registering documents (see `apps/api/ingestion.py::CHATBOT_TO_CORE_DOC_TYPE`).
 
 ## Quick Examples
 
 ### List Documents
 
 ```bash
-# All documents
+# All registered documents
 curl http://localhost:8082/api/v1/documents
 
 # Filter by type
-curl http://localhost:8082/api/v1/documents?doc_type=formation:articles
+curl "http://localhost:8082/api/v1/documents?doc_type=formation"
+
+# Search filenames
+curl "http://localhost:8082/api/v1/documents?search=insurance"
 ```
 
-### Get Document Metadata
-
-```bash
-curl http://localhost:8082/api/v1/documents/{document-uuid}
-```
-
-### Upload Document
+### Register Metadata Manually
 
 ```bash
 curl -X POST http://localhost:8082/api/v1/documents \
-  -F "file=@/path/to/document.pdf" \
-  -F "doc_type=accounting:bank_statement" \
-  -F "title=Bank Statement August 2025" \
-  -F "doc_date=2025-08-31"
+  -H "Content-Type: application/json" \
+  -d '{
+    "filename": "operating_agreement.pdf",
+    "doc_type": "operating_agreement",
+    "content_hash": "<64-char sha256 hex>",
+    "entities": ["Poolula LLC"],
+    "effective_date": "2024-05-15"
+  }'
 ```
+
+Duplicate content hashes are rejected with HTTP 409.
 
 ## Document Schema
 
 **Key fields:**
 
 - `id` - UUID primary key
-
+- `property_id` - FK to property (nullable for LLC-wide documents)
 - `filename` - Original filename
-
-- `doc_type` - Document type (enum)
-
-- `title` - Human-readable title
-
-- `doc_date` - Document date (not upload date)
-
-- `version` - Version status (draft, final, superseded)
-
+- `doc_type` - Document type (core enum)
+- `effective_date` - When document became effective
+- `entities` - Legal entities mentioned (JSON array)
+- `version` - `draft`, `final`, `superseded`, `archived`
+- `confidentiality` - `public`, `internal`, `restricted`
 - `content_hash` - SHA-256 hash for deduplication
+- `provenance` - Data lineage tracking (JSON)
+- `extra_metadata` - Flexible JSON (title, file type, chunk count for ingested docs)
 
-- `is_searchable` - Ingested into vector store
-
-- `provenance` - Data lineage tracking
-
-- `extra_metadata` - Flexible JSON for custom fields
-
-## Document Ingestion
-
-**For bulk document ingestion, use the ingestion script:**
+## Bulk Ingestion (script)
 
 ```bash
-# Ingest all documents in documents/ directory
-uv run python scripts/ingest_documents.py --ingest
+# Ingest all documents in documents/ directory into the vector store
+uv run python scripts/ingest_documents.py
 
-# Show ingestion stats
+# List ingested documents / show stats
+uv run python scripts/ingest_documents.py --list
 uv run python scripts/ingest_documents.py --stats
 ```
 
-**See:** [Document Management Guide](../user-guide/document-management.md)
+Note: the script ingests into the vector store only; the API pipeline (`/api/process-incoming`) also registers database rows.
 
 ## Document Search
 
-**Documents are searchable via the Chatbot API:**
+Documents are searchable via the Chatbot API:
 
 ```bash
-curl -X POST http://localhost:8082/api/v1/chat/query \
+curl -X POST http://localhost:8082/api/query \
   -H "Content-Type: application/json" \
-  -d '{
-    "query": "What is our business purpose in the operating agreement?"
-  }'
+  -d '{"query": "What is our business purpose in the operating agreement?"}'
 ```
 
-**The chatbot uses semantic search to find relevant document passages.**
+The chatbot uses semantic search to find relevant document passages, and returns source attributions (document title, page/sheet/row) in the `sources` array.
 
 ## Related Documentation
 
@@ -156,9 +154,4 @@ curl -X POST http://localhost:8082/api/v1/chat/query \
 
 ---
 
-**Status:** 🚧 Planned for Phase 3
-
-**Current State:**
-- ✅ Document upload endpoints available (`/api/v1/chat/upload`, `/api/v1/chat/incoming-files`, `/api/v1/chat/process-incoming`)
-- ✅ Document ingestion script operational (`scripts/ingest_documents.py`)
-- 🚧 Document metadata CRUD endpoints (list, get, update, delete) planned for Phase 3
+**Status:** ✅ Implemented (tests: `tests/test_api_documents.py`, `tests/test_api_document_upload.py`)

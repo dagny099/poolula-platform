@@ -24,7 +24,7 @@ class Config:
 
     # Anthropic API settings
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
-    ANTHROPIC_MODEL: str = "claude-sonnet-4-20250514"
+    ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5")
 
     # OpenAI settings (future)
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")

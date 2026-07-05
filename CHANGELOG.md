@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - Phase 4: API Completion & Platform Hardening (2026-07-04)
+- REST endpoints for transactions (`/api/v1/transactions`): CRUD + filters
+  (property, date range, category, type); DELETE archives via
+  `extra_metadata.archived` and preserves state in the audit log
+- REST endpoints for obligations (`/api/v1/obligations`): CRUD + filters
+  (status, type, due range, property); DELETE sets status=cancelled
+- REST endpoints for document metadata registry (`/api/v1/documents`): CRUD +
+  filters (doc_type, filename search, confidentiality); duplicate content
+  hashes rejected with 409; DELETE sets version=archived
+- Working document pipeline: `POST /api/upload` (multipart, sanitized
+  filenames, 50 MB cap), `GET /api/incoming-files`, `POST /api/process-incoming`
+  (chunks + embeds into ChromaDB, registers DB document row with provenance,
+  hash-based dedup, moves files to processed/) — previously stubs
+- REST mutations now write to the immutable `audit_log` table
+  (`apps/api/routes/common.py::record_audit`)
+- Shared evaluation harness (`apps/evaluator/base_evaluator.py`) with
+  actionable failure records (expected vs actual tools/values, sources,
+  failure reasons), Markdown report output, and fixture backends for
+  credential-free offline evaluation (`--fixture` / `--record-fixture`)
+- 76 new tests (156 total); coverage 40% → 54%
+
+### Fixed
+- `scripts/ingest_documents.py` PDF fast path crashed on the tuple returned by
+  `read_pdf`, so PDFs always fell into the error handler
+
 ### In Progress
 - Phase 6-7: DSPy pipeline optimization with MLflow experiment tracking
 

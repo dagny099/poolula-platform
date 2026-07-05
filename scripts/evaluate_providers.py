@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from apps.chatbot.rag_system import RAGSystem
 from apps.chatbot.config import Config
-from scripts.evaluate_chatbot import ChatbotEvaluator
+from apps.evaluator.chatbot_evaluator import ChatbotEvaluator
 
 
 def run_provider_comparison(
@@ -56,8 +56,11 @@ def run_provider_comparison(
             # Initialize RAG system with this provider
             rag = RAGSystem(config)
 
-            # Run evaluation using existing ChatbotEvaluator
-            evaluator = ChatbotEvaluator(rag, verbose=verbose)
+            # Run evaluation using the shared ChatbotEvaluator
+            evaluator = ChatbotEvaluator(
+                query_fn=lambda question, _rag=rag: _rag.query(question),
+                verbose=verbose,
+            )
             report = evaluator.run_evaluation(eval_set)
 
             results[provider_name] = report

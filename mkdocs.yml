@@ -180,4 +180,5 @@ nav:
       - LLM Agnosticism Plan (2025-12-03): planning/2025-12-03-llm-agnosticism-plan.md
       - DSPy/MLflow Integration (Original): planning/dspy-mlflow-plan.md
       - DSPy/MLflow Integration (2025-12-09): planning/dspy-mlflow-plan-2025-12-09.md
+      - Platform Hardening Handoff (2026-07-04): planning/agent-handoff-platform-hardening.md
   - FAQ: faq.md

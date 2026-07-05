@@ -104,7 +104,8 @@ class DocumentIngestor:
             file_extension = file_path.suffix.lower()
 
             if file_extension == '.pdf':
-                content = self.doc_processor.read_pdf(str(file_path))
+                # read_pdf returns (full_text, page_chunks); hash only the text
+                content, _ = self.doc_processor.read_pdf(str(file_path))
             elif file_extension == '.docx':
                 content = self.doc_processor.read_docx(str(file_path))
             elif file_extension in ['.txt', '.md']:

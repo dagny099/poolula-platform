@@ -31,7 +31,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from sqlmodel import Session, select
 from core.database.connection import get_engine, check_connection
 from core.database.models import Obligation, Property
-from core.database.enums import ObligationStatus, ObligationType, RecurrencePattern
+from core.database.enums import ObligationStatus, ObligationType
 from core.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -49,14 +49,23 @@ class ObligationSeeder:
     - Lease reviews
     """
 
-    def __init__(self, year: int = 2025):
+    def __init__(
+        self,
+        year: int = 2025,
+        treasurer: str = "Montrose County Treasurer",
+        insurer: str = "Travelers Insurance",
+    ):
         """
         Initialize obligation seeder
 
         Args:
             year: Year to seed obligations for (default: 2025)
+            treasurer: County treasurer name used in property tax descriptions
+            insurer: Insurance carrier name used in renewal descriptions
         """
         self.year = year
+        self.treasurer = treasurer
+        self.insurer = insurer
         self.engine = get_engine()
 
     def get_property_id(self) -> Optional[UUID]:
@@ -109,11 +118,11 @@ class ObligationSeeder:
         # Assuming May 15 formation date (adjust as needed)
         obligations.append(Obligation(
             property_id=None,  # LLC-level, not property-specific
-            obligation_type=ObligationType.STATE_FILING,
+            obligation_type=ObligationType.PERIODIC_REPORT,
             due_date=date(self.year, 5, 15),
             status=ObligationStatus.PENDING,
             description="Colorado Periodic Report - Annual LLC filing with Colorado Secretary of State. $10 filing fee. Must be completed to maintain good standing.",
-            recurrence=RecurrencePattern.YEARLY,
+            recurrence="FREQ=YEARLY",
             reminder_days_before=30
         ))
 
@@ -148,7 +157,7 @@ class ObligationSeeder:
                 due_date=due_date,
                 status=ObligationStatus.PENDING,
                 description=f"Quarterly Estimated Tax Payment - {quarter} {self.year}. If annual tax liability exceeds $1,000, quarterly payments required to avoid penalties.",
-                recurrence=RecurrencePattern.QUARTERLY,
+                recurrence="FREQ=QUARTERLY",
                 reminder_days_before=14
             ))
 
@@ -160,7 +169,7 @@ class ObligationSeeder:
             due_date=date(self.year + 1, 3, 15),
             status=ObligationStatus.PENDING,
             description=f"Form 1065 Partnership Return - Annual federal tax return due March 15, {self.year + 1}. Can extend to September 15 with Form 7004.",
-            recurrence=RecurrencePattern.YEARLY,
+            recurrence="FREQ=YEARLY",
             reminder_days_before=60
         ))
 
@@ -171,7 +180,7 @@ class ObligationSeeder:
             due_date=date(self.year + 1, 4, 15),
             status=ObligationStatus.PENDING,
             description=f"Schedule E (Form 1040) - Individual tax return reporting rental income. Due April 15, {self.year + 1}. Can extend to October 15 with Form 4868.",
-            recurrence=RecurrencePattern.YEARLY,
+            recurrence="FREQ=YEARLY",
             reminder_days_before=60
         ))
 
@@ -198,21 +207,21 @@ class ObligationSeeder:
         # First half: February 28, Second half: June 15
         obligations.append(Obligation(
             property_id=property_id,
-            obligation_type=ObligationType.PROPERTY_TAX,
+            obligation_type=ObligationType.TAX_PAYMENT,
             due_date=date(self.year, 2, 28),
             status=ObligationStatus.PENDING,
-            description=f"Property Tax - First Half {self.year}. Payment to Montrose County Treasurer. Check county website for exact amount.",
-            recurrence=RecurrencePattern.YEARLY,
+            description=f"Property Tax - First Half {self.year}. Payment to {self.treasurer}. Check county website for exact amount.",
+            recurrence="FREQ=YEARLY",
             reminder_days_before=30
         ))
 
         obligations.append(Obligation(
             property_id=property_id,
-            obligation_type=ObligationType.PROPERTY_TAX,
+            obligation_type=ObligationType.TAX_PAYMENT,
             due_date=date(self.year, 6, 15),
             status=ObligationStatus.PENDING,
-            description=f"Property Tax - Second Half {self.year}. Payment to Montrose County Treasurer. Check county website for exact amount.",
-            recurrence=RecurrencePattern.YEARLY,
+            description=f"Property Tax - Second Half {self.year}. Payment to {self.treasurer}. Check county website for exact amount.",
+            recurrence="FREQ=YEARLY",
             reminder_days_before=30
         ))
 
@@ -241,8 +250,8 @@ class ObligationSeeder:
             obligation_type=ObligationType.INSURANCE_RENEWAL,
             due_date=date(self.year, 5, 1),
             status=ObligationStatus.PENDING,
-            description=f"Property Insurance Renewal - {self.year}. Review coverage with Travelers Insurance. Ensure adequate liability and property coverage.",
-            recurrence=RecurrencePattern.YEARLY,
+            description=f"Property Insurance Renewal - {self.year}. Review coverage with {self.insurer}. Ensure adequate liability and property coverage.",
+            recurrence="FREQ=YEARLY",
             reminder_days_before=60
         ))
 
@@ -268,32 +277,32 @@ class ObligationSeeder:
         # Annual LLC meeting
         obligations.append(Obligation(
             property_id=None,  # LLC-level
-            obligation_type=ObligationType.COMPLIANCE_CHECK,
+            obligation_type=ObligationType.OTHER,
             due_date=date(self.year, 12, 31),
             status=ObligationStatus.PENDING,
             description=f"Annual LLC Meeting - Hold annual member meeting and document meeting minutes. Review financial performance, approve budgets, and document key decisions.",
-            recurrence=RecurrencePattern.YEARLY,
+            recurrence="FREQ=YEARLY",
             reminder_days_before=30
         ))
 
         # Property inspection / maintenance review
         obligations.append(Obligation(
             property_id=property_id,
-            obligation_type=ObligationType.INSPECTION,
+            obligation_type=ObligationType.OTHER,
             due_date=date(self.year, 6, 30),
             status=ObligationStatus.PENDING,
             description=f"Semi-Annual Property Inspection - Inspect property condition, HVAC systems, plumbing, electrical. Document repairs needed. Schedule before peak season.",
-            recurrence=RecurrencePattern.YEARLY,
+            recurrence="FREQ=YEARLY",
             reminder_days_before=14
         ))
 
         obligations.append(Obligation(
             property_id=property_id,
-            obligation_type=ObligationType.INSPECTION,
+            obligation_type=ObligationType.OTHER,
             due_date=date(self.year, 12, 31),
             status=ObligationStatus.PENDING,
             description=f"Semi-Annual Property Inspection - Year-end property condition review. Check weatherization, heating systems. Document maintenance for tax purposes.",
-            recurrence=RecurrencePattern.YEARLY,
+            recurrence="FREQ=YEARLY",
             reminder_days_before=14
         ))
 
@@ -321,20 +330,20 @@ class ObligationSeeder:
         all_obligations.extend(self.seed_insurance_obligations(property_id))
         all_obligations.extend(self.seed_operational_obligations(property_id))
 
-        # Save to database
-        with Session(self.engine) as session:
-            for obligation in all_obligations:
-                session.add(obligation)
-            session.commit()
-            logger.info(f"✅ Saved {len(all_obligations)} obligations to database")
-
-        # Calculate summary by type
+        # Calculate summary by type before commit expires the instances
         summary = {}
         for obligation in all_obligations:
             ob_type = obligation.obligation_type
             if ob_type not in summary:
                 summary[ob_type] = 0
             summary[ob_type] += 1
+
+        # Save to database
+        with Session(self.engine) as session:
+            for obligation in all_obligations:
+                session.add(obligation)
+            session.commit()
+            logger.info(f"✅ Saved {len(all_obligations)} obligations to database")
 
         return summary
 
@@ -366,6 +375,10 @@ Obligation Categories:
 
     parser.add_argument('--year', type=int, default=2025, help='Year to seed obligations for')
     parser.add_argument('--clear', action='store_true', help='Clear all existing obligations before seeding')
+    parser.add_argument('--treasurer', default='Montrose County Treasurer',
+                        help='County treasurer name for property tax descriptions')
+    parser.add_argument('--insurer', default='Travelers Insurance',
+                        help='Insurance carrier name for renewal descriptions')
 
     args = parser.parse_args()
 
@@ -375,7 +388,7 @@ Obligation Categories:
         sys.exit(1)
 
     try:
-        seeder = ObligationSeeder(year=args.year)
+        seeder = ObligationSeeder(year=args.year, treasurer=args.treasurer, insurer=args.insurer)
 
         # Clear existing obligations if requested
         if args.clear:

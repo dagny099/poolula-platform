@@ -1,0 +1,115 @@
+meta:
+  org_name: "Poolula LLC"
+  prepared_for: "DEMO DATASET — all facts below are fictional. Safe to show publicly."
+  last_updated: "2025-11-30"
+  notes: >
+    This is the demo-persona twin of poolula_facts.yml. Every address, name,
+    dollar amount, and account below is invented; only the schema and the
+    company name are real. This file is the ONLY source of truth for downstream
+    generated Q&A in demo mode. If it's not in here, the model should say
+    'not documented' instead of hallucinating.
+
+entity:
+  legal_name: "Poolula LLC"
+  entity_type: "Single-member Limited Liability Company (LLC)"
+  jurisdiction_of_formation: "Colorado"
+  formation_date: "2024-05"
+  tax_classification: "Disregarded entity for tax purposes"
+  sole_member: "Bluebird Family Trust (revocable)"
+  trust_is_revocable: true
+  trustee_age_at_formation: 68
+
+governance:
+  management_structure: "Member-managed"
+  signing_authority: "Trustee of the Bluebird Family Trust, as sole member"
+  annual_meeting_requirements: >
+    Not specified. Colorado does not force an annual member meeting date by statute.
+    Follow the Operating Agreement.
+  operating_agreement_on_file: true
+  registered_agent_name: "Peakview Registered Agents LLC"
+  mailing_address_for_llc: "PO Box 218, Granite Pass, CO 81249"
+
+assets:
+  as_of_2024_12_31:
+    real_property:
+      address: "742 Juniper Bend Court"
+      city: "Granite Pass"
+      state: "CO"
+      zip: "81249"
+      acquisition_date: "2024-05-20"
+      purchase_price_total_usd: 517500.00
+      allocation:
+        land_usd: 93150.00
+        building_and_improvements_usd: 424350.00
+      notes: >
+        Land is non-depreciable. Building & Improvements depreciable under
+        residential rental rules. Listed on Airbnb as "Juniper Bend Hideaway".
+    other_assets:
+      furniture_FF&E_usd: "12000.00 (CLOSE STATEMENT LINE; confirm final)"
+      cash_and_bank_balances: "See High Mesa Credit Union checking / Summit Business Card statements as of close of period"
+  placed_in_service_date_for_depreciation: "2025-01-15"
+  capitalization_policy_threshold: "2500.00 (de minimis safe harbor election)"
+  utilities_roster:
+    gas: "Granite Pass Natural Gas"
+    water: "Town of Granite Pass Water"
+    internet: "Summit Fiber Internet"
+    electric: "Kestrel Valley Electric Co-op"
+
+banking_and_liabilities:
+  llc_accounts:
+    - name: "High Mesa Credit Union Business Checking x4410"
+      type: "Checking"
+    - name: "Summit Business Card"
+      type: "Credit Card"
+  personal_or_trust_accounts_relevant_to_funding:
+    - "Bluebird Family Trust Checking (Trust / personal)"
+    - "Bluebird Family Trust Savings (Trust / personal)"
+  autopay_and_transfers:
+    notes: >
+      Summit Business Card payments are auto-drafted from High Mesa checking.
+      Closing funds were wired from the Bluebird Family Trust checking account.
+
+accounting_policy:
+  depreciation:
+    building_and_improvements_method: "27.5-year residential rental property depreciation"
+    land_depreciable: false
+  basis_treatment:
+    capitalize_to_basis:
+      - property inspection / appraisal directly tied to purchased property
+      - title company fees
+      - escrow / closing fees
+      - document recording fees
+      - transfer / documentary / filing fees
+      - furniture & fixtures conveyed at closing (~$12,000 FF&E bucket)
+    expense_current_year:
+      - normal utilities
+      - routine repairs and maintenance below capitalization threshold
+    needs_policy_decision:
+      - travel / general search costs for properties not ultimately purchased
+      - large repairs >= capitalization_threshold_usd (e.g. HVAC replacement)
+  member_equity_rules:
+    description: >
+      If the member (the Trust / trustee) pays LLC costs personally,
+      record:
+        Dr Asset or Expense (depending on nature)
+        Cr Member Equity – Contributions
+      This also applies to funds wired in for cash-to-close.
+    prelim_documented_equity_contributions_usd: 12485.00
+    equity_contribution_window: "2024-04-01 to 2024-06-30"
+    note: >
+      This 12,485.00 figure is what we've flagged as personal-to-LLC funding
+      around closing. Final number should be reconciled to the settlement
+      statement.
+
+close_process:
+  bookkeeping_tasks:
+    - "Classify each LLC transaction (High Mesa CU, Summit Business Card) as Utilities / Repairs & Maintenance / Capital Improvements / Property Taxes / Closing Costs (Basis) / Bank Charges / etc."
+    - "Identify personal transactions that actually belong to the LLC and rebook them as Member Equity."
+    - "Tie total Member Equity to cash-to-close / settlement statement."
+    - "Generate journal entry for Basis (Land, Building & Improvements, Closing Costs, FF&E)."
+    - "Generate depreciation schedule for Building & Improvements (27.5-year)."
+    - "Export QuickBooks-ready CSV mapped to COA accounts 1500–5600."
+
+gaps_to_fill:
+  bank_signers_authorized: "UNKNOWN"
+  lodging_tax_license_number: "UNKNOWN"

@@ -165,6 +165,8 @@ nav:
       - Testing Guide: testing/testing.md
       - Database Migrations: testing/migrations.md
       - Deployment: testing/deployment.md
+  - Demo Mode:
+      - Walkthrough: demo/demo-walkthrough.md
   - Workflows:
       - Data Import: workflows/data-import.md
       - API Usage: workflows/api-usage.md

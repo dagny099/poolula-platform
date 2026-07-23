@@ -68,6 +68,26 @@ uv run python scripts/import_airbnb_transactions.py
 uv run python scripts/ingest_documents.py
 ```
 
+### Demo Mode (fictional dataset, safe to show publicly)
+
+```bash
+# Build the isolated demo environment (demo/demo.db + demo/chroma_db)
+bash scripts/setup_demo.sh            # add --reset to rebuild from scratch
+
+# Run the API against demo data (two env vars are the entire switch)
+DATABASE_URL=sqlite:///demo/demo.db POOLULA_CHROMA_PATH=demo/chroma_db \
+    uv run uvicorn apps.api.main:app --port 8082
+
+# Evaluate offline against committed fixtures (no API key)
+uv run python scripts/evaluate_chatbot.py --eval-set demo/demo_eval_set.jsonl --fixture demo/fixtures/chatbot_fixture.json
+uv run python scripts/evaluate_airbnb.py --csv demo/airbnb_demo_2024-12_2025-11.csv --fixture demo/fixtures/airbnb_fixture.json
+```
+
+All demo data is fictional (see `docs/demo/demo-walkthrough.md` and the
+hand-off page `docs/demo/handoff.html`). The synthetic Airbnb CSV is generated
+deterministically by `scripts/generate_demo_airbnb.py --seed 42`;
+`tests/test_demo_data.py` pins the committed artifacts to the generator.
+
 ## API Endpoints (Quick Reference)
 
 **Base URL**: `http://localhost:8082`
@@ -152,6 +172,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 # Optional
 API_HOST=0.0.0.0
 API_PORT=8082
+POOLULA_CHROMA_PATH=./chroma_db  # ChromaDB dir; demo mode sets demo/chroma_db
 OPENAI_API_KEY=sk-...          # if using OpenAI
 OLLAMA_BASE_URL=http://localhost:11434  # if using Ollama
 MLFLOW_TRACKING_URI=mlruns/

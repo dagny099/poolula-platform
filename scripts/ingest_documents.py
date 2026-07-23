@@ -24,6 +24,7 @@ Author: Poolula Platform
 Date: 2024-11-14
 """
 
+import os
 import sys
 from pathlib import Path
 from typing import List, Optional
@@ -42,7 +43,7 @@ logger = get_logger(__name__)
 # Configuration
 CHUNK_SIZE = 800
 CHUNK_OVERLAP = 200
-CHROMA_PATH = "chroma_db"
+CHROMA_PATH = os.getenv("POOLULA_CHROMA_PATH", "chroma_db")
 EMBEDDING_MODEL = "default"  # ChromaDB uses ONNXMiniLM_L6_V2 by default
 MAX_RESULTS = 5
 METADATA_CSV_PATH = "data/document_metadata.csv"

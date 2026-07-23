@@ -5,21 +5,31 @@ This directory contains CSV templates for importing data into Poolula Platform.
 ## Templates
 
 ### `airbnb_template.csv`
-Template for importing Airbnb transaction data from reservation exports.
+Template matching the real Airbnb earnings export format (22 columns). The
+sample rows are fictional demo data. Airbnb's own CSV export already has this
+shape — download it and import as-is.
 
 **Usage:**
 ```bash
+# CSV path is a positional argument (use --property-id <uuid> to target a
+# specific property, or --auto-property to use the first one)
 uv run python scripts/import_airbnb_transactions.py \
-    --csv your_airbnb_export.csv \
-    --property-id <property-uuid> \
+    your_airbnb_export.csv \
+    --auto-property \
     --dry-run
 ```
 
-**Columns:** Confirmation Code, Start Date, End Date, Nights, Guest, Listing, Gross Earnings, Payout, ...
+**Columns:** Date, Arriving by date, Type, Confirmation code, Booking date,
+Start date, End date, Nights, Guest, Listing, Details, Reference code,
+Currency, Amount, Paid out, Service fee, Fast pay fee, Cleaning fee, Pet fee,
+Gross earnings, Occupancy taxes, Earnings year
+
+**Row types:** `Reservation` (imported as revenue + service-fee expense),
+`Resolution Payout` (imported as revenue), `Payout` (skipped — bank transfer).
 
 **Accounting:** Uses accrual accounting:
-- Revenue recognized on checkout date (End Date)
-- Expenses recognized on payout date (Paid Out)
+- Revenue recognized on checkout date (End date)
+- Service-fee expense recognized on payout date (Date column)
 
 ### `expenses_template.csv`
 Template for importing miscellaneous expenses (utilities, repairs, etc.).

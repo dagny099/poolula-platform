@@ -1,0 +1,179 @@
+{
+  "What was my rental income in May 2025?": {
+    "response": "Your rental income in May 2025 was **$1,340.00** from 3 rental transactions.",
+    "sources": [
+      {
+        "text": "Database Query: aggregate_transactions",
+        "query_type": "aggregate_transactions",
+        "filters": {
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE",
+          "start_date": "2025-05-01",
+          "end_date": "2025-05-31"
+        }
+      }
+    ]
+  },
+  "How much did I earn from Airbnb in July 2025?": {
+    "response": "Let me refine that query:",
+    "sources": []
+  },
+  "Show me the rental income for September 2025": {
+    "response": "**September 2025 Rental Income: $2,180.00**\n\nThree Airbnb reservations:\n- Sept 7: $895.00 (Otis Xiang - 5 nights)\n- Sept 15: $390.00 (Katya Ellingson - 2 nights)\n- Sept 23: $895.00 (Ember Xiang - 5 nights)",
+    "sources": [
+      {
+        "text": "Database Query: transactions",
+        "query_type": "transactions",
+        "filters": {
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE",
+          "start_date": "2025-09-01",
+          "end_date": "2025-09-30"
+        }
+      }
+    ]
+  },
+  "What was the gross rental income in October 2025?": {
+    "response": "The gross rental income in October 2025 was **$1,888.00** from 4 rental transactions.",
+    "sources": [
+      {
+        "text": "Database Query: aggregate_transactions",
+        "query_type": "aggregate_transactions",
+        "filters": {
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE",
+          "start_date": "2025-10-01",
+          "end_date": "2025-10-31"
+        }
+      }
+    ]
+  },
+  "How many Airbnb reservations did we have in June 2025?": {
+    "response": "Let me correct that query:",
+    "sources": []
+  },
+  "How many bookings checked out in August 2025?": {
+    "response": "**5 bookings** checked out in August 2025, generating $4,128.00 in total rental income.",
+    "sources": [
+      {
+        "text": "Database Query: transactions",
+        "query_type": "transactions",
+        "filters": {
+          "start_date": "2025-08-01",
+          "end_date": "2025-08-31",
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE"
+        }
+      }
+    ]
+  },
+  "Count the number of reservations in May 2025": {
+    "response": "There are **3 reservations** in May 2025:\n\n1. **May 8** - Tamsin Thackeray (3 nights) - $533.00\n2. **May 17** - Jonas Thackeray (3 nights) - $473.00\n3. **May 25** - Bennett Grimaldi (2 nights) - $334.00\n\nTotal revenue: $1,340.00",
+    "sources": [
+      {
+        "text": "Database Query: transactions",
+        "query_type": "transactions",
+        "filters": {
+          "start_date": "2025-05-01",
+          "end_date": "2025-05-31",
+          "category": "RENTAL_INCOME"
+        }
+      }
+    ]
+  },
+  "What was the total rental income from May 1 to July 31, 2025?": {
+    "response": "The total rental income from May 1 to July 31, 2025 was **$8,401.00** (13 transactions).",
+    "sources": [
+      {
+        "text": "Database Query: aggregate_transactions",
+        "query_type": "aggregate_transactions",
+        "filters": {
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE",
+          "start_date": "2025-05-01",
+          "end_date": "2025-07-31"
+        }
+      }
+    ]
+  },
+  "Show me income from June 1 to June 30, 2025": {
+    "response": "**June 2025 Income Summary**\n\n**Total Revenue: $3,220.00**\n\n| Date | Guest | Reservation | Nights | Amount |\n|------|-------|-------------|--------|--------|\n| June 5 | Farid Quintana | HM8B25SQ8C | 2 | $426.00 |\n| June 14 | Delphine Ivanova | HMZP6LFEWV | 5 | $1,090.00 |\n| June 22 | Callum Whitlock | HMP2EX5T5P | 4 | $806.00 |\n| June 30 | Ulysses Pemberton | HMODPXNF7C | 4 | $898.00 |\n\nAll income is from Airbnb rental reservations.",
+    "sources": [
+      {
+        "text": "Database Query: transactions",
+        "query_type": "transactions",
+        "filters": {
+          "start_date": "2025-06-01",
+          "end_date": "2025-06-30",
+          "transaction_type": "REVENUE"
+        }
+      }
+    ]
+  },
+  "Calculate total Airbnb revenue from August through September 2025": {
+    "response": "Total Airbnb revenue from August through September 2025: **$6,308.00**",
+    "sources": [
+      {
+        "text": "Database Query: aggregate_transactions",
+        "query_type": "aggregate_transactions",
+        "filters": {
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE",
+          "start_date": "2025-08-01",
+          "end_date": "2025-09-30"
+        }
+      }
+    ]
+  },
+  "What was the total gross rental income for Q2 2025?": {
+    "response": "The total gross rental income for Q2 2025 was **$6,213.00** across 11 rental transactions.",
+    "sources": [
+      {
+        "text": "Database Query: aggregate_transactions",
+        "query_type": "aggregate_transactions",
+        "filters": {
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE",
+          "start_date": "2025-04-01",
+          "end_date": "2025-06-30"
+        }
+      }
+    ]
+  },
+  "Calculate Q3 2025 Airbnb revenue": {
+    "response": "Q3 2025 Airbnb revenue: **$10,149.00** (14 transactions)",
+    "sources": [
+      {
+        "text": "Database Query: aggregate_transactions",
+        "query_type": "aggregate_transactions",
+        "filters": {
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE",
+          "start_date": "2025-07-01",
+          "end_date": "2025-09-30"
+        }
+      }
+    ]
+  },
+  "List all Airbnb reservations in October 2025 with guest names": {
+    "response": "Let me correct that query:",
+    "sources": []
+  },
+  "Show me details of all bookings in May 2025": {
+    "response": "Here are all bookings in May 2025:\n\n**Booking 1: Tamsin Thackeray**\n- Reservation ID: HM8BM92H3T\n- Check-in: May 8, 2025\n- Duration: 3 nights\n- Rental Income: $533.00\n- Service Fee: $15.99\n\n**Booking 2: Jonas Thackeray**\n- Reservation ID: HM2VJ99T2D\n- Check-in: May 17, 2025\n- Duration: 3 nights\n- Rental Income: $473.00\n- Service Fee: $14.19\n\n**Booking 3: Bennett Grimaldi**\n- Reservation ID: HMILGB0S0R\n- Check-in: May 25, 2025\n- Duration: 2 nights\n- Rental Income: $334.00\n- Service Fee: $10.02\n\n**Summary:**\n- Total Bookings: 3\n- Total Rental Income: $1,340.00\n- Total Service Fees: $40.20\n- Net Revenue: $1,299.80\n\nAll bookings are from Airbnb for the same property.",
+    "sources": [
+      {
+        "text": "Database Query: transactions",
+        "query_type": "transactions",
+        "filters": {
+          "start_date": "2025-05-01",
+          "end_date": "2025-05-31"
+        }
+      }
+    ]
+  },
+  "What guest names do we have for September 2025 reservations?": {
+    "response": "I don't have access to a reservations or guest management system. The tools available to me are designed for Poolula LLC's property management, financial transactions, and business documents.\n\nTo find guest names for September 2025 reservations, you would need to check:\n- Your reservation management system (e.g., Airbnb, VRBO, booking platform)\n- Property management software\n- Reservation spreadsheets or databases\n\nIf you have reservation data stored in business documents or need help with property-related financial information, I can assist with that.",
+    "sources": []
+  }
+}

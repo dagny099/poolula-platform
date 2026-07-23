@@ -39,13 +39,12 @@ from core.logging_config import get_logger
 
 logger = get_logger(__name__)
 
-# Path to poolula_facts.yml
-YAML_PATH = Path("poolula_facts.yml")
-
-
-def load_yaml() -> dict:
+def load_yaml(yaml_path: Path) -> dict:
     """
-    Load poolula_facts.yml
+    Load a facts YAML file (poolula_facts.yml or a demo variant)
+
+    Args:
+        yaml_path: Path to the facts YAML file
 
     Returns:
         Dictionary with YAML contents
@@ -54,12 +53,12 @@ def load_yaml() -> dict:
         FileNotFoundError: If YAML file doesn't exist
         yaml.YAMLError: If YAML is invalid
     """
-    if not YAML_PATH.exists():
-        raise FileNotFoundError(f"poolula_facts.yml not found at: {YAML_PATH}")
+    if not yaml_path.exists():
+        raise FileNotFoundError(f"Facts YAML not found at: {yaml_path}")
 
-    logger.info(f"Loading YAML from: {YAML_PATH}")
+    logger.info(f"Loading YAML from: {yaml_path}")
 
-    with open(YAML_PATH, "r") as f:
+    with open(yaml_path, "r") as f:
         data = yaml.safe_load(f)
 
     logger.info("✅ YAML loaded successfully")
@@ -130,12 +129,23 @@ def create_property_from_yaml(yaml_data: dict) -> Property:
     else:
         ffe_numeric = str(ffe_raw)
 
-    # Build full address with city/state
+    # Build full address with city/state. City/state/zip come from the YAML when
+    # present; the Montrose fallback preserves behavior for the original facts
+    # file, which stores only the street address.
     address_street = real_property.get("address", "UNKNOWN")
-    address_full = f"{address_street}, Montrose, CO 81401"
+    city = real_property.get("city")
+    state = real_property.get("state")
+    zip_code = real_property.get("zip")
+    if city and state and zip_code:
+        address_full = f"{address_street}, {city}, {state} {zip_code}"
+    else:
+        address_full = f"{address_street}, Montrose, CO 81401"
 
-    # Parse placed_in_service (corrected date: 2025-02-01)
-    placed_in_service_raw = assets.get("placed_in_service_date_for_depreciation", "UNKNOWN")
+    # Parse placed_in_service (corrected date: 2025-02-01).
+    # This key is a sibling of as_of_2024_12_31 under assets, not inside it.
+    placed_in_service_raw = yaml_data.get("assets", {}).get(
+        "placed_in_service_date_for_depreciation", "UNKNOWN"
+    )
 
     # Override UNKNOWN with actual known date
     if placed_in_service_raw == "UNKNOWN":
@@ -296,6 +306,9 @@ Examples:
     # Update from YAML (fill in NULL fields)
     python scripts/seed_database.py --update
 
+    # Seed from an alternate facts file (e.g. demo mode)
+    python scripts/seed_database.py --initial --facts demo/demo_facts.yml
+
 See: docs/workflows/data-import.md for full workflow
         """,
     )
@@ -309,6 +322,11 @@ See: docs/workflows/data-import.md for full workflow
         "--update",
         action="store_true",
         help="Update mode (update existing property from YAML, preserves manual edits)",
+    )
+    parser.add_argument(
+        "--facts",
+        default="poolula_facts.yml",
+        help="Path to the facts YAML file (default: poolula_facts.yml)",
     )
 
     args = parser.parse_args()
@@ -326,7 +344,7 @@ See: docs/workflows/data-import.md for full workflow
 
     # Load YAML
     try:
-        yaml_data = load_yaml()
+        yaml_data = load_yaml(Path(args.facts))
     except Exception as e:
         logger.error(f"❌ Failed to load YAML: {e}")
         sys.exit(1)

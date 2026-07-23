@@ -46,7 +46,7 @@ class Config:
     MAX_HISTORY: int = 2         # Number of conversation messages to remember
     
     # Database paths
-    CHROMA_PATH: str = "./chroma_db"  # ChromaDB storage location
+    CHROMA_PATH: str = os.getenv("POOLULA_CHROMA_PATH", "./chroma_db")  # ChromaDB storage location
     
     # Business document settings
     METADATA_CSV_PATH: str = "./metadata.csv"  # Path to document metadata CSV

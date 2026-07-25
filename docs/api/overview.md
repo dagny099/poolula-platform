@@ -33,18 +33,19 @@ Currently, the API does not require authentication (local development mode).
 
 ## API Endpoints Overview
 
-### Chatbot Endpoints
+### Chatbot & Document Pipeline Endpoints
 
-Natural language query interface:
+Natural language query interface (note: these live under `/api/`, not `/api/v1/`):
 
 | Endpoint | Method | Description | Status |
 |----------|--------|-------------|--------|
-| `/api/v1/chat/query` | POST | Query chatbot with natural language | ✅ Available |
-| `/api/v1/chat/upload` | POST | Upload document for processing | ✅ Available |
-| `/api/v1/chat/incoming-files` | GET | List uploaded files awaiting processing | ✅ Available |
-| `/api/v1/chat/process-incoming` | POST | Process uploaded files into vector store | ✅ Available |
+| `/api/query` | POST | Query chatbot with natural language | ✅ Available |
+| `/api/documents` | GET | List documents in the vector store | ✅ Available |
+| `/api/upload` | POST | Upload document (multipart) to incoming folder | ✅ Available |
+| `/api/incoming-files` | GET | List uploaded files awaiting processing | ✅ Available |
+| `/api/process-incoming` | POST | Ingest pending files (vector store + DB registry) | ✅ Available |
 
-[→ Chatbot API Details](chat.md)
+[→ Chatbot API Details](chat.md) · [→ Documents API Details](documents.md)
 
 ### Property Endpoints
 
@@ -66,16 +67,41 @@ Manage financial transactions:
 
 | Endpoint | Method | Description | Status |
 |----------|--------|-------------|--------|
-| `/api/v1/transactions` | GET | List transactions with filters | 🚧 Planned |
-| `/api/v1/transactions/{id}` | GET | Get transaction by ID | 🚧 Planned |
-| `/api/v1/transactions` | POST | Create new transaction | 🚧 Planned |
-| `/api/v1/transactions/{id}` | PATCH | Update transaction | 🚧 Planned |
-| `/api/v1/transactions/{id}` | DELETE | Soft delete transaction | 🚧 Planned |
+| `/api/v1/transactions` | GET | List transactions with filters | ✅ Available |
+| `/api/v1/transactions/{id}` | GET | Get transaction by ID | ✅ Available |
+| `/api/v1/transactions` | POST | Create new transaction | ✅ Available |
+| `/api/v1/transactions/{id}` | PATCH | Update transaction | ✅ Available |
+| `/api/v1/transactions/{id}` | DELETE | Archive (soft delete) transaction | ✅ Available |
 
 [→ Transaction API Details](transactions.md)
 
-!!! note "Accessing Planned Endpoints"
-    Endpoints marked 🚧 Planned have database tables and models implemented, but are not yet exposed as REST API routes. You can access this data through the chatbot using natural language queries (e.g., "Show me all transactions from August 2025").
+### Obligation Endpoints
+
+Manage compliance obligations and deadlines:
+
+| Endpoint | Method | Description | Status |
+|----------|--------|-------------|--------|
+| `/api/v1/obligations` | GET | List obligations with filters | ✅ Available |
+| `/api/v1/obligations/{id}` | GET | Get obligation by ID | ✅ Available |
+| `/api/v1/obligations` | POST | Create new obligation | ✅ Available |
+| `/api/v1/obligations/{id}` | PATCH | Update obligation (e.g. mark completed) | ✅ Available |
+| `/api/v1/obligations/{id}` | DELETE | Soft delete (sets status=cancelled) | ✅ Available |
+
+[→ Obligation API Details](obligations.md)
+
+### Document Registry Endpoints
+
+Manage document metadata (system of record, database-backed):
+
+| Endpoint | Method | Description | Status |
+|----------|--------|-------------|--------|
+| `/api/v1/documents` | GET | List documents with filters | ✅ Available |
+| `/api/v1/documents/{id}` | GET | Get document metadata by UUID | ✅ Available |
+| `/api/v1/documents` | POST | Register document metadata | ✅ Available |
+| `/api/v1/documents/{id}` | PATCH | Update metadata | ✅ Available |
+| `/api/v1/documents/{id}` | DELETE | Soft delete (sets version=archived) | ✅ Available |
+
+[→ Documents API Details](documents.md)
 
 ### System Endpoints
 
@@ -107,18 +133,9 @@ Health and status:
 }
 ```
 
-### Pagination
+### List Responses
 
-For list endpoints, responses include pagination:
-
-```json
-{
-  "items": [...],
-  "total": 100,
-  "page": 1,
-  "page_size": 20
-}
-```
+List endpoints return plain JSON arrays (no pagination envelope — this is a small-scale deployment). Transactions support a `limit` query parameter (default 500).
 
 ## HTTP Status Codes
 
@@ -160,7 +177,7 @@ Accept: application/json
 curl http://localhost:8082/health
 
 # Query chatbot
-curl -X POST http://localhost:8082/api/v1/chat/query \
+curl -X POST http://localhost:8082/api/query \
   -H "Content-Type: application/json" \
   -d '{"query": "What was my rental income in August 2025?"}'
 
@@ -181,7 +198,7 @@ API_URL = "http://localhost:8082/api"
 
 # Query chatbot
 response = requests.post(
-    f"{API_URL}/v1/chat/query",
+    f"{API_URL}/query",
     json={
         "query": "What was my rental income in August 2025?",
         "session_id": None
@@ -197,7 +214,7 @@ print(data["sources"])
 
 ```javascript
 // Query chatbot
-const response = await fetch('http://localhost:8082/api/v1/chat/query', {
+const response = await fetch('http://localhost:8082/api/query', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json'

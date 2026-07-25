@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poolula Platform — Demo Mode Hand-off</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a2332; --muted: #5a6a7e; --line: #dde4ec;
+    --card: #f6f8fb; --accent: #1f6f5c; --accent-soft: #e3f1ec;
+    --warn-bg: #fdf3e3; --warn-line: #e0b25a; --code-bg: #f0f3f7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12161d; --fg: #e6ebf2; --muted: #98a5b6; --line: #2a3442;
+      --card: #1a212b; --accent: #4fbf9f; --accent-soft: #16302a;
+      --warn-bg: #2e2513; --warn-line: #a5813a; --code-bg: #1e2632;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 880px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  h1 { font-size: 1.9rem; margin: 0 0 .3rem; }
+  h2 { font-size: 1.3rem; margin: 2.4rem 0 .8rem; border-bottom: 1px solid var(--line); padding-bottom: .35rem; }
+  h3 { font-size: 1.05rem; margin: 1.4rem 0 .5rem; }
+  .subtitle { color: var(--muted); margin: 0 0 1.8rem; }
+  .safety {
+    background: var(--warn-bg); border-left: 4px solid var(--warn-line);
+    padding: .9rem 1.1rem; border-radius: 6px; margin: 1.2rem 0;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: .9rem 1.1rem; overflow-x: auto; font-size: .86rem; line-height: 1.5;
+  }
+  code { font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace; }
+  p > code, li > code, td > code {
+    background: var(--code-bg); padding: .1em .35em; border-radius: 4px; font-size: .88em;
+  }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .93rem; }
+  th, td { text-align: left; padding: .5rem .7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; }
+  .flow { display: flex; flex-wrap: wrap; gap: .6rem; align-items: stretch; margin: 1.2rem 0; }
+  .flow .stage {
+    flex: 1 1 150px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 8px; padding: .7rem .9rem; min-width: 150px;
+  }
+  .flow .stage b { display: block; color: var(--accent); font-size: .85rem; margin-bottom: .25rem; }
+  .flow .stage span { font-size: .82rem; color: var(--muted); }
+  .pill {
+    display: inline-block; background: var(--accent-soft); color: var(--accent);
+    border-radius: 999px; padding: .1rem .65rem; font-size: .78rem; font-weight: 600;
+    margin-right: .4rem;
+  }
+  .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 700px) { .twocol { grid-template-columns: 1fr; } }
+  footer { margin-top: 3rem; color: var(--muted); font-size: .85rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Poolula Platform — Demo Mode</h1>
+  <p class="subtitle">A fully fictional dataset that drives the entire platform, safe to show anyone.
+     Hand-off &amp; walkthrough reference · July 2026</p>
+
+  <div class="safety">
+    <strong>Data safety.</strong> Everything on screen in demo mode is invented — address, prices,
+    trust, banks, insurance, guests, every dollar. Only the company name is real (client-approved).
+    The demo runs on its own database (<code>demo/demo.db</code>) and vector store
+    (<code>demo/chroma_db/</code>); real data is never read or written.
+  </div>
+
+  <h2>What was built</h2>
+  <table>
+    <tr><th>Piece</th><th>Where</th><th>What it does</th></tr>
+    <tr><td>Demo facts</td><td><code>demo/demo_facts.yml</code></td>
+        <td>Fictional twin of the real source-of-truth YAML; seeds the property.</td></tr>
+    <tr><td>Synthetic bookings</td><td><code>demo/airbnb_demo_2024-12_2025-11.csv</code></td>
+        <td>58 fictional stays with Colorado ski-season seasonality, in the exact 22-column Airbnb export format. Generated deterministically by <code>scripts/generate_demo_airbnb.py --seed 42</code>.</td></tr>
+    <tr><td>Ground truth</td><td><code>demo/ground_truth.json</code></td>
+        <td>True aggregates, computed from the CSV by the evaluator's own parser — eval numbers match by construction.</td></tr>
+    <tr><td>RAG corpus</td><td><code>demo/documents/</code> (5 markdown docs)</td>
+        <td>Formation, insurance, compliance, accounting, and banking docs, all consistent with the facts YAML.</td></tr>
+    <tr><td>Eval set</td><td><code>demo/demo_eval_set.jsonl</code></td>
+        <td>20 questions mirroring the real chatbot eval set, expectations tied to the fiction.</td></tr>
+    <tr><td>Fixtures</td><td><code>demo/fixtures/</code></td>
+        <td>Recorded LLM responses — the whole eval suite replays offline with zero credentials.</td></tr>
+    <tr><td>Orchestrator</td><td><code>scripts/setup_demo.sh</code></td>
+        <td>One command builds the demo environment end-to-end; idempotent.</td></tr>
+    <tr><td>Tests</td><td><code>tests/test_demo_data.py</code></td>
+        <td>Pins generator ↔ CSV ↔ ground truth ↔ eval set to each other; guards real-data backward compatibility.</td></tr>
+  </table>
+
+  <h2>How it fits together</h2>
+  <div class="flow">
+    <div class="stage"><b>1 · Seeds</b><span>demo_facts.yml · generated Airbnb CSV · 5 markdown docs</span></div>
+    <div class="stage"><b>2 · Load</b><span>seed_database.py --facts · import_airbnb_transactions.py · ingest_documents.py</span></div>
+    <div class="stage"><b>3 · Stores</b><span>demo/demo.db (SQLite) · demo/chroma_db (vectors)</span></div>
+    <div class="stage"><b>4 · Serve</b><span>FastAPI + RAG chatbot, switched by two env vars</span></div>
+    <div class="stage"><b>5 · Prove</b><span>evaluators score answers against ground_truth.json; fixtures replay offline</span></div>
+  </div>
+  <p>The entire real↔demo switch is two environment variables — no config framework, no demo flags in business logic:</p>
+  <pre><code>DATABASE_URL=sqlite:///demo/demo.db
+POOLULA_CHROMA_PATH=demo/chroma_db</code></pre>
+
+  <h2>The fictional persona (cheat sheet)</h2>
+  <table>
+    <tr><td>Property</td><td>742 Juniper Bend Court, Granite Pass, CO 81249 — listed as “Juniper Bend Hideaway”</td></tr>
+    <tr><td>Purchase</td><td>2024-05-20 · $517,500 (land $93,150 / building $424,350) · FF&amp;E $12,000 · in service 2025-01-15</td></tr>
+    <tr><td>Sole member</td><td>Bluebird Family Trust (revocable)</td></tr>
+    <tr><td>Registered agent</td><td>Peakview Registered Agents LLC</td></tr>
+    <tr><td>Banking</td><td>High Mesa Credit Union Business Checking x4410 · Summit Business Card</td></tr>
+    <tr><td>Insurance</td><td>Summit Ridge Mutual Insurance · SRM-7741-STR · $2,340/yr · renews May 1</td></tr>
+    <tr><td>Property tax</td><td>Kestrel County Treasurer (Feb 28 / Jun 15)</td></tr>
+    <tr><td>Bookings</td><td>58 stays, Dec 2024–Nov 2025, ≈$40.4k gross · July 2025 income $3,841 · Q3 2025 $10,149</td></tr>
+  </table>
+
+  <h2>Run it</h2>
+  <h3><span class="pill">SETUP</span>Build the demo environment</h3>
+  <pre><code>bash scripts/setup_demo.sh            # create / refresh (idempotent)
+bash scripts/setup_demo.sh --reset    # wipe demo DB + vectors, rebuild</code></pre>
+
+  <h3><span class="pill">SERVE</span>API + chatbot on fictional data</h3>
+  <pre><code>DATABASE_URL=sqlite:///demo/demo.db POOLULA_CHROMA_PATH=demo/chroma_db \
+    uv run uvicorn apps.api.main:app --port 8082</code></pre>
+  <p>Good live-demo queries: <em>“Who insures the property and when does the policy renew?”</em> ·
+     <em>“What was my rental income in July 2025?”</em> ·
+     <em>“Who is the sole member of Poolula LLC?”</em></p>
+
+  <h2>Test &amp; evaluate</h2>
+  <div class="twocol">
+    <div>
+      <h3><span class="pill">OFFLINE</span>No API key needed</h3>
+      <pre><code>uv run pytest tests/test_demo_data.py
+
+uv run python scripts/evaluate_chatbot.py \
+  --eval-set demo/demo_eval_set.jsonl \
+  --fixture demo/fixtures/chatbot_fixture.json \
+  --markdown output/demo_eval_report.md
+
+uv run python scripts/evaluate_airbnb.py \
+  --csv demo/airbnb_demo_2024-12_2025-11.csv \
+  --fixture demo/fixtures/airbnb_fixture.json</code></pre>
+    </div>
+    <div>
+      <h3><span class="pill">LIVE</span>Re-record fixtures</h3>
+      <pre><code>export DATABASE_URL=sqlite:///demo/demo.db
+export POOLULA_CHROMA_PATH=demo/chroma_db
+
+uv run python scripts/evaluate_chatbot.py \
+  --eval-set demo/demo_eval_set.jsonl \
+  --record-fixture demo/fixtures/chatbot_fixture.json
+
+uv run python scripts/evaluate_airbnb.py \
+  --csv demo/airbnb_demo_2024-12_2025-11.csv \
+  --record-fixture demo/fixtures/airbnb_fixture.json</code></pre>
+    </div>
+  </div>
+
+  <h2>Talking points</h2>
+  <ul>
+    <li><strong>Accrual accounting, verified end-to-end.</strong> Revenue recognizes at guest checkout,
+        service fees at payout — importer and ground-truth calculator implement the same rule, so numeric
+        eval assertions validate the whole pipeline, not just the LLM.</li>
+    <li><strong>Ground truth by construction.</strong> The generator computes expected numbers with the
+        evaluator's own parser; a test pins CSV, ground truth, and eval set together, so eval drift fails CI.</li>
+    <li><strong>Record/replay evaluation.</strong> Clone the repo, replay the fixtures, read the diagnostic
+        failure report — zero credentials required.</li>
+    <li><strong>Deliberately simple.</strong> Two env vars switch environments; deterministic seeded
+        generation instead of a faker dependency; no repository layers (KISS, sized for a 1-user platform).</li>
+  </ul>
+
+  <footer>
+    Poolula Platform · demo mode hand-off · markdown twin at <code>docs/demo/demo-walkthrough.md</code> ·
+    repo-level scrub of real data is a separate future step (see walkthrough note).
+  </footer>
+</main>
+</body>
+</html>

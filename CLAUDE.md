@@ -55,24 +55,51 @@ uv run uvicorn apps.api.main:app --reload --port 8082
 uv run pytest
 uv run pytest --cov=core --cov=apps --cov-report=html
 
-# Evaluate chatbot
+# Evaluate chatbot (live LLM; add --markdown out.md for a failure report)
 uv run python scripts/evaluate_chatbot.py
 uv run python scripts/evaluate_airbnb.py --verbose
+
+# Evaluate offline (no credentials): record once, then replay
+uv run python scripts/evaluate_chatbot.py --record-fixture output/chatbot_fixture.json
+uv run python scripts/evaluate_chatbot.py --fixture output/chatbot_fixture.json
 
 # Import data
 uv run python scripts/import_airbnb_transactions.py
 uv run python scripts/ingest_documents.py
 ```
 
+### Demo Mode (fictional dataset, safe to show publicly)
+
+```bash
+# Build the isolated demo environment (demo/demo.db + demo/chroma_db)
+bash scripts/setup_demo.sh            # add --reset to rebuild from scratch
+
+# Run the API against demo data (two env vars are the entire switch)
+DATABASE_URL=sqlite:///demo/demo.db POOLULA_CHROMA_PATH=demo/chroma_db \
+    uv run uvicorn apps.api.main:app --port 8082
+
+# Evaluate offline against committed fixtures (no API key)
+uv run python scripts/evaluate_chatbot.py --eval-set demo/demo_eval_set.jsonl --fixture demo/fixtures/chatbot_fixture.json
+uv run python scripts/evaluate_airbnb.py --csv demo/airbnb_demo_2024-12_2025-11.csv --fixture demo/fixtures/airbnb_fixture.json
+```
+
+All demo data is fictional (see `docs/demo/demo-walkthrough.md` and the
+hand-off page `docs/demo/handoff.html`). The synthetic Airbnb CSV is generated
+deterministically by `scripts/generate_demo_airbnb.py --seed 42`;
+`tests/test_demo_data.py` pins the committed artifacts to the generator.
+
 ## API Endpoints (Quick Reference)
 
 **Base URL**: `http://localhost:8082`
 
-**Note**: API versioning is inconsistent - properties use `/api/v1/`, chat uses `/api/`.
+**Note**: API versioning is inconsistent - business resources use `/api/v1/`, chat + document pipeline use `/api/`.
 
 - **Properties**: `/api/v1/properties` - Full CRUD operations
+- **Transactions**: `/api/v1/transactions` - CRUD + filters (property, dates, category, type); DELETE archives
+- **Obligations**: `/api/v1/obligations` - CRUD + filters (status, type, due range); DELETE cancels
+- **Document registry**: `/api/v1/documents` - Metadata CRUD (DB-backed); DELETE archives
 - **Chat**: `/api/query` - Natural language queries
-- **Documents**: `/api/documents`, `/api/upload`, `/api/incoming-files`, `/api/process-incoming`
+- **Document pipeline**: `/api/documents` (vector store list), `/api/upload`, `/api/incoming-files`, `/api/process-incoming` (all working)
 - **Health**: `/health` - Health check
 - **Docs**: `/docs` - Swagger UI
 
@@ -145,6 +172,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 # Optional
 API_HOST=0.0.0.0
 API_PORT=8082
+POOLULA_CHROMA_PATH=./chroma_db  # ChromaDB dir; demo mode sets demo/chroma_db
 OPENAI_API_KEY=sk-...          # if using OpenAI
 OLLAMA_BASE_URL=http://localhost:11434  # if using Ollama
 MLFLOW_TRACKING_URI=mlruns/
@@ -181,11 +209,12 @@ See `.env.example` and `docs/workflows/llm-provider-setup.md` for details.
 - ✅ **Phase 0-1**: Infrastructure, database, REST API (properties + chat), tests
 - ✅ **Phase 2**: Chatbot with database tool, audit logging, evaluation harness
 - ✅ **Phase 3**: Vanilla JS frontend with 4 persona sections
+- ✅ **Phase 4**: REST endpoints for transactions, obligations, documents; real document upload/processing pipeline; diagnostic evaluation reports with offline fixture mode
 - 🔄 **Phase 6-7**: DSPy pipeline optimization (scaffolding exists, true pipeline in progress)
-- 📋 **Phase 4**: Additional REST endpoints (transactions, obligations)
 - 📋 **Phase 5**: Production hardening
 
-See `docs/planning/dspy-mlflow-plan-2025-12-09.md` for detailed roadmap.
+See `docs/planning/dspy-mlflow-plan-2025-12-09.md` for the DSPy roadmap and
+`docs/planning/agent-handoff-platform-hardening.md` for current state + next steps.
 
 ## Next Steps
 

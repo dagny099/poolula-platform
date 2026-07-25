@@ -1,0 +1,324 @@
+{
+  "What properties does Poolula LLC own?": {
+    "response": "Poolula LLC owns one property:\n\n**742 Juniper Bend Court, Granite Pass, CO 81249**\n\n- **Acquisition Date:** May 20, 2024\n- **Purchase Price:** $517,500\n- **Total Basis:** $529,500\n  - Land: $93,150\n  - Building: $424,350\n  - Furniture, Fixtures & Equipment: $12,000\n- **Depreciable Basis:** $436,350\n- **Placed in Service:** January 15, 2025\n- **Status:** Active",
+    "sources": [
+      {
+        "text": "Database Query: properties",
+        "query_type": "properties",
+        "filters": {}
+      }
+    ]
+  },
+  "What is the depreciable basis for all properties?": {
+    "response": "The depreciable basis for all properties is **$436,350.00**.\n\nThis consists of:\n- **Building basis**: $424,350.00\n- **Furniture, fixtures & equipment (FFE) basis**: $12,000.00\n\nThe property at 742 Juniper Bend Court, Granite Pass, CO 81249 was placed in service on January 15, 2025.",
+    "sources": [
+      {
+        "text": "Database Query: properties",
+        "query_type": "properties",
+        "filters": {}
+      }
+    ]
+  },
+  "Show me all rental income transactions from 2024": {
+    "response": "Here are all rental income transactions from 2024:\n\n| Date | Guest | Nights | Amount | Reservation ID |\n|------|-------|--------|--------|-----------------|\n| 12/30/2024 | Wendell Zielinski | 2 | $452.00 | HMY4VA13U1 |\n| 12/27/2024 | Yusuf Okafor | 3 | $665.00 | HMKOJTPV60 |\n| 12/23/2024 | Wendell Thackeray | 4 | $910.00 | HMTX63CFL0 |\n| 12/17/2024 | Priya Zielinski | 2 | $495.00 | HMQVKIZZQY |\n| 12/13/2024 | Zora Holloway | 4 | $1,026.00 | HMWV08HHXF |\n| 12/08/2024 | Ulysses Rasmussen | 2 | $574.00 | HMDIUOVW1N |\n| 12/06/2024 | Dario Castellanos | 3 | $803.00 | HMGB7R3OCW |\n\n**Total 2024 Rental Income: $4,925.00**\n\nAll transactions are Airbnb reservations from December 2024.",
+    "sources": [
+      {
+        "text": "Database Query: transactions",
+        "query_type": "transactions",
+        "filters": {
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE",
+          "start_date": "2024-01-01",
+          "end_date": "2024-12-31"
+        }
+      }
+    ]
+  },
+  "What insurance policies does Poolula have?": {
+    "response": "Poolula LLC has one primary insurance policy:\n\n**Summit Ridge Mutual Insurance Policy (SRM-7741-STR)**\n- **Property:** 742 Juniper Bend Court, Granite Pass, CO 81249\n- **Policy Period:** May 1, 2025 \u2013 May 1, 2026 (annual renewal)\n- **Annual Premium:** $2,340.00\n\n**Coverage Limits:**\n- Dwelling (replacement cost): $520,000\n- Other structures: $52,000\n- Business personal property: $25,000\n- General liability: $1,000,000 per occurrence / $2,000,000 aggregate\n- Loss of rental income: 12 months actual loss sustained\n- Deductible: $2,500 (all perils)\n\n**Special Coverage:** The policy includes a short-term rental (STR) endorsement covering guest-caused damage and liability for stays under 30 nights (Airbnb and similar platforms).\n\nThe policy renews annually on May 1, with a coverage review recommended each April.",
+    "sources": [
+      {
+        "text": "poolula-llc-insurance-policy-summary-2025.md",
+        "document_title": "poolula-llc-insurance-policy-summary-2025.md",
+        "file_type": "txt",
+        "doc_type": "insurance",
+        "page_number": null,
+        "section_title": null,
+        "sheet_name": null,
+        "cell_range": null,
+        "row_number": null
+      },
+      {
+        "text": "poolula-llc-insurance-policy-summary-2025.md",
+        "document_title": "poolula-llc-insurance-policy-summary-2025.md",
+        "file_type": "txt",
+        "doc_type": "insurance",
+        "page_number": null,
+        "section_title": null,
+        "sheet_name": null,
+        "cell_range": null,
+        "row_number": null
+      },
+      {
+        "text": "poolula-llc-insurance-policy-summary-2025.md",
+        "document_title": "poolula-llc-insurance-policy-summary-2025.md",
+        "file_type": "txt",
+        "doc_type": "insurance",
+        "page_number": null,
+        "section_title": null,
+        "sheet_name": null,
+        "cell_range": null,
+        "row_number": null
+      }
+    ]
+  },
+  "What is the business purpose of Poolula LLC?": {
+    "response": "The business purpose of Poolula LLC is to acquire, own, and operate residential real property for short-term rental use. The company was formed in May 2024 as a single-member LLC in Colorado, with its initial property being 742 Juniper Bend Court, Granite Pass, CO 81249 (listed on Airbnb as \"Juniper Bend Hideaway\").",
+    "sources": [
+      {
+        "text": "poolula-llc-articles-of-organization-summary.md",
+        "document_title": "poolula-llc-articles-of-organization-summary.md",
+        "file_type": "txt",
+        "doc_type": "formation",
+        "page_number": null,
+        "section_title": null,
+        "sheet_name": null,
+        "cell_range": null,
+        "row_number": null
+      },
+      {
+        "text": "poolula-llc-articles-of-organization-summary.md",
+        "document_title": "poolula-llc-articles-of-organization-summary.md",
+        "file_type": "txt",
+        "doc_type": "formation",
+        "page_number": null,
+        "section_title": null,
+        "sheet_name": null,
+        "cell_range": null,
+        "row_number": null
+      }
+    ]
+  },
+  "Show me total expenses by category for 2025": {
+    "response": "**2025 Total Expenses by Category:**\n\n| Category | Count | Total |\n|----------|-------|-------|\n| Property Management | 51 | $1,060.98 |\n\n**Total Expenses: $1,060.98**",
+    "sources": [
+      {
+        "text": "Database Query: aggregate_transactions",
+        "query_type": "aggregate_transactions",
+        "filters": {
+          "transaction_type": "EXPENSE",
+          "start_date": "2025-01-01",
+          "end_date": "2025-12-31",
+          "group_by": "category"
+        }
+      }
+    ]
+  },
+  "What compliance obligations are due soon?": {
+    "response": "All compliance obligations are currently overdue. Here are the most critical items that needed immediate attention:\n\n**Overdue Tax & Filing Obligations:**\n- **Property Tax - First Half 2025** (Due Feb 28, 2025) - Payment to Kestrel County Treasurer\n- **Q1 2025 Estimated Tax Payment** (Due Apr 15, 2025) - Required if annual liability exceeds $1,000\n- **Property Tax - Second Half 2025** (Due Jun 15, 2025) - Payment to Kestrel County Treasurer\n- **Q2 2025 Estimated Tax Payment** (Due Jun 15, 2025)\n- **Q3 2025 Estimated Tax Payment** (Due Sep 15, 2025)\n- **Q4 2025 Estimated Tax Payment** (Due Jan 15, 2026)\n- **Form 1065 Partnership Return** (Due Mar 15, 2026) - Can extend to Sep 15 with Form 7004\n- **Schedule E (Form 1040)** (Due Apr 15, 2026) - Can extend to Oct 15 with Form 4868\n\n**Overdue Compliance & Insurance:**\n- **Colorado Periodic Report** (Due May 15, 2025) - Annual LLC filing with $10 fee to maintain good standing\n- **Property Insurance Renewal** (Due May 1, 2025) - Review coverage with Summit Ridge Mutual Insurance\n\n**Overdue Maintenance & Meetings:**\n- **Semi-Annual Property Inspections** (Due Jun 30 & Dec 31, 2025)\n- **Annual LLC Meeting** (Due Dec 31, 2025) - Document meeting minutes and review financial performance\n\n**Immediate action needed** on all overdue items, particularly tax payments and the Colorado Periodic Report filing.",
+    "sources": [
+      {
+        "text": "Database Query: obligations",
+        "query_type": "obligations",
+        "filters": {}
+      }
+    ]
+  },
+  "List all available business documents": {
+    "response": "Here are all available business documents for Poolula LLC:\n\n1. **poolula-llc-insurance-policy-summary-2025.md** - Insurance policy documentation (1.4 KB)\n2. **poolula-llc-accounting-notes-financial-2025.md** - Financial accounting notes (2.2 KB)\n3. **poolula-llc-bank-account-summary.md** - Bank account information (1.3 KB)\n4. **poolula-llc-articles-of-organization-summary.md** - Articles of organization (1.3 KB)\n5. **poolula-llc-annual-compliance-checklist.md** - Annual compliance checklist (1.8 KB)",
+    "sources": []
+  },
+  "What is the total rental income for 2025?": {
+    "response": "The total rental income for 2025 is **$35,496.00** from 53 rental transactions.",
+    "sources": [
+      {
+        "text": "Database Query: aggregate_transactions",
+        "query_type": "aggregate_transactions",
+        "filters": {
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE",
+          "start_date": "2025-01-01",
+          "end_date": "2025-12-31"
+        }
+      }
+    ]
+  },
+  "Who is the sole member of Poolula LLC?": {
+    "response": "The sole member of Poolula LLC is the **Bluebird Family Trust** (a revocable living trust). The trustee of the Bluebird Family Trust acts as the sole member and has signing authority to bind the LLC.",
+    "sources": [
+      {
+        "text": "poolula-llc-articles-of-organization-summary.md",
+        "document_title": "poolula-llc-articles-of-organization-summary.md",
+        "file_type": "txt",
+        "doc_type": "formation",
+        "page_number": null,
+        "section_title": null,
+        "sheet_name": null,
+        "cell_range": null,
+        "row_number": null
+      },
+      {
+        "text": "poolula-llc-articles-of-organization-summary.md",
+        "document_title": "poolula-llc-articles-of-organization-summary.md",
+        "file_type": "txt",
+        "doc_type": "formation",
+        "page_number": null,
+        "section_title": null,
+        "sheet_name": null,
+        "cell_range": null,
+        "row_number": null
+      }
+    ]
+  },
+  "Which insurance carrier covers the property and when does the policy renew?": {
+    "response": "**Insurance Carrier:** Summit Ridge Mutual Insurance\n\n**Policy Number:** SRM-7741-STR\n\n**Renewal Date:** May 1, 2026 (renews annually on May 1)\n\nThe policy covers 742 Juniper Bend Court, Granite Pass, CO 81249 with an annual premium of $2,340.00. A renewal review should be conducted each April (60 days before the May 1 renewal).",
+    "sources": [
+      {
+        "text": "poolula-llc-insurance-policy-summary-2025.md",
+        "document_title": "poolula-llc-insurance-policy-summary-2025.md",
+        "file_type": "txt",
+        "doc_type": "insurance",
+        "page_number": null,
+        "section_title": null,
+        "sheet_name": null,
+        "cell_range": null,
+        "row_number": null
+      },
+      {
+        "text": "poolula-llc-insurance-policy-summary-2025.md",
+        "document_title": "poolula-llc-insurance-policy-summary-2025.md",
+        "file_type": "txt",
+        "doc_type": "insurance",
+        "page_number": null,
+        "section_title": null,
+        "sheet_name": null,
+        "cell_range": null,
+        "row_number": null
+      },
+      {
+        "text": "poolula-llc-insurance-policy-summary-2025.md",
+        "document_title": "poolula-llc-insurance-policy-summary-2025.md",
+        "file_type": "txt",
+        "doc_type": "insurance",
+        "page_number": null,
+        "section_title": null,
+        "sheet_name": null,
+        "cell_range": null,
+        "row_number": null
+      }
+    ]
+  },
+  "What is the address of our first property?": {
+    "response": "The address of your first property is **742 Juniper Bend Court, Granite Pass, CO 81249**.",
+    "sources": [
+      {
+        "text": "Database Query: properties",
+        "query_type": "properties",
+        "filters": {}
+      }
+    ]
+  },
+  "Who is the registered agent for Poolula LLC?": {
+    "response": "The registered agent for Poolula LLC is **Peakview Registered Agents LLC**, located at PO Box 218, Granite Pass, CO 81249.",
+    "sources": [
+      {
+        "text": "poolula-llc-articles-of-organization-summary.md",
+        "document_title": "poolula-llc-articles-of-organization-summary.md",
+        "file_type": "txt",
+        "doc_type": "formation",
+        "page_number": null,
+        "section_title": null,
+        "sheet_name": null,
+        "cell_range": null,
+        "row_number": null
+      },
+      {
+        "text": "poolula-llc-articles-of-organization-summary.md",
+        "document_title": "poolula-llc-articles-of-organization-summary.md",
+        "file_type": "txt",
+        "doc_type": "formation",
+        "page_number": null,
+        "section_title": null,
+        "sheet_name": null,
+        "cell_range": null,
+        "row_number": null
+      }
+    ]
+  },
+  "What is the total basis for property acquisitions?": {
+    "response": "The total basis for property acquisitions is **$529,500.00**.\n\nThis consists of:\n- **Land basis**: $93,150.00\n- **Building basis**: $424,350.00\n- **Furniture, Fixtures & Equipment (FFE) basis**: $12,000.00\n\nThe property at 742 Juniper Bend Court, Granite Pass, CO 81249 was acquired on May 20, 2024, with a purchase price of $517,500.00.",
+    "sources": [
+      {
+        "text": "Database Query: properties",
+        "query_type": "properties",
+        "filters": {}
+      }
+    ]
+  },
+  "Show me revenue and expenses for the business": {
+    "response": "**Revenue and Expenses Summary**\n\n**Revenue:**\n- Rental Income: $40,421.00 (60 transactions)\n\n**Expenses:**\n- Property Management: $1,208.73 (58 transactions)\n\n**Net Income: $39,212.27**",
+    "sources": [
+      {
+        "text": "Database Query: aggregate_transactions",
+        "query_type": "aggregate_transactions",
+        "filters": {
+          "transaction_type": "EXPENSE",
+          "group_by": "category"
+        }
+      }
+    ]
+  },
+  "What was my rental income in July 2025?": {
+    "response": "Your rental income in July 2025 was **$3,841.00** from 6 rental transactions.",
+    "sources": [
+      {
+        "text": "Database Query: aggregate_transactions",
+        "query_type": "aggregate_transactions",
+        "filters": {
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE",
+          "start_date": "2025-07-01",
+          "end_date": "2025-07-31"
+        }
+      }
+    ]
+  },
+  "How many Airbnb reservations did we have in August 2025?": {
+    "response": "Let me correct that query:",
+    "sources": []
+  },
+  "What was the total rental income from May 1 to July 31, 2025?": {
+    "response": "The total rental income from May 1 to July 31, 2025 was **$8,401.00** (13 transactions).",
+    "sources": [
+      {
+        "text": "Database Query: aggregate_transactions",
+        "query_type": "aggregate_transactions",
+        "filters": {
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE",
+          "start_date": "2025-05-01",
+          "end_date": "2025-07-31"
+        }
+      }
+    ]
+  },
+  "What was the total gross rental income for Q3 2025?": {
+    "response": "The total gross rental income for Q3 2025 was **$10,149.00** across 14 transactions.",
+    "sources": [
+      {
+        "text": "Database Query: aggregate_transactions",
+        "query_type": "aggregate_transactions",
+        "filters": {
+          "category": "RENTAL_INCOME",
+          "transaction_type": "REVENUE",
+          "start_date": "2025-07-01",
+          "end_date": "2025-09-30"
+        }
+      }
+    ]
+  },
+  "List all Airbnb reservations in October 2025 with guest names": {
+    "response": "Let me correct that query:",
+    "sources": []
+  }
+}

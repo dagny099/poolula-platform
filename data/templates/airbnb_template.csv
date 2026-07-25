@@ -1,5 +1,7 @@
-Date,Type,Confirmation Code,Amount,Notes
-2024-11-01,Reservation,HM123ABC,150.00,November booking
-2024-11-15,Reservation,HM456DEF,200.00,Mid-month booking
-2024-11-20,Service Fee,HM456DEF,-18.00,Airbnb service fee
-2024-11-30,Payout,PAYOUT_123,332.00,Monthly payout
+Date,Arriving by date,Type,Confirmation code,Booking date,Start date,End date,Nights,Guest,Listing,Details,Reference code,Currency,Amount,Paid out,Service fee,Fast pay fee,Cleaning fee,Pet fee,Gross earnings,Occupancy taxes,Earnings year
+11/23/2025,11/27/2025,Payout,,,,,,,,"Transfer to Poolula LLC, Checking 4410 (USD)",253153722023713,USD,,537.38,,,,,,,
+11/23/2025,,Reservation,HMQTL3Q4N8,10/17/2025,11/19/2025,11/22/2025,3,Jonas Xiang,Juniper Bend Hideaway,,,USD,537.38,,16.62,,50.00,0.00,554.00,83.54,2025
+11/10/2025,11/14/2025,Payout,,,,,,,,"Transfer to Poolula LLC, Checking 4410 (USD)",607302066593674,USD,,631.47,,,,,,,
+11/10/2025,,Reservation,HMGYW6ZBNZ,10/03/2025,11/05/2025,11/09/2025,4,Ember Dvorak,Juniper Bend Hideaway,,,USD,631.47,,19.53,,50.00,25.00,651.00,98.17,2025
+11/02/2025,11/06/2025,Payout,,,,,,,,"Transfer to Poolula LLC, Checking 4410 (USD)",021889255865377,USD,,490.82,,,,,,,
+11/02/2025,,Reservation,HMEC4D145B,10/03/2025,10/29/2025,11/01/2025,3,Jonas Castellanos,Juniper Bend Hideaway,,,USD,490.82,,15.18,,50.00,0.00,506.00,76.30,2025

@@ -1,12 +1,10 @@
 # Transactions API Reference
 
-*Coming soon*
-
 API endpoints for managing financial transactions.
 
 ## Overview
 
-The Transactions API allows you to create, read, update, and delete transaction records for rental income, expenses, and other financial activity.
+The Transactions API allows you to create, read, update, and archive transaction records for rental income, expenses, and other financial activity. All mutations are recorded in the audit log.
 
 **Base URL:** `/api/v1/transactions`
 
@@ -14,43 +12,51 @@ The Transactions API allows you to create, read, update, and delete transaction 
 
 | Method | Endpoint | Description | Status |
 |--------|----------|-------------|--------|
-| GET | `/api/v1/transactions` | List transactions with filters | 🚧 Planned |
-| GET | `/api/v1/transactions/{id}` | Get transaction by ID | 🚧 Planned |
-| POST | `/api/v1/transactions` | Create new transaction | 🚧 Planned |
-| PATCH | `/api/v1/transactions/{id}` | Update transaction | 🚧 Planned |
-| DELETE | `/api/v1/transactions/{id}` | Soft delete transaction | 🚧 Planned |
+| GET | `/api/v1/transactions` | List transactions with filters | ✅ Implemented |
+| GET | `/api/v1/transactions/{id}` | Get transaction by ID | ✅ Implemented |
+| POST | `/api/v1/transactions` | Create new transaction | ✅ Implemented |
+| PATCH | `/api/v1/transactions/{id}` | Update transaction | ✅ Implemented |
+| DELETE | `/api/v1/transactions/{id}` | Archive (soft delete) transaction | ✅ Implemented |
+
+## Query Parameters (GET list)
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `property_id` | UUID | Filter by property |
+| `start_date` | date | Include transactions on/after this date |
+| `end_date` | date | Include transactions on/before this date |
+| `category` | string | Category name or value (`UTILITIES_GAS` or `utilities:gas`) |
+| `transaction_type` | string | `revenue`, `expense`, `capital`, `equity`, `transfer` |
+| `include_archived` | bool | Include archived transactions (default false) |
+| `limit` | int | Max results (default 500) |
+
+Results are ordered newest first.
 
 ## Transaction Categories
 
+Categories come from `core/database/enums.py::TransactionCategory` (hierarchical colon notation). Highlights:
+
 **Revenue:**
 
-- `revenue:rental_income` - Short-term rental income
+- `rental_income` — Airbnb bookings, traditional rent
 
-- `revenue:long_term_rental` - Traditional lease income
+**Operating expenses:**
 
-- `revenue:other` - Other income
+- `utilities:gas`, `utilities:water`, `utilities:electric`, `utilities:internet`, `utilities:other`
+- `repairs_maintenance`, `cleaning`, `supplies`
+- `insurance:property`, `insurance:liability`, `insurance:other`
+- `property_taxes`, `property_management`, `hoa_fees`
+- `professional:accounting`, `professional:legal`, `professional:other`
+- `bank_fees`, `interest:expense`, `credit_card_fees`
+- `advertising`, `licenses_permits`, `office_expense`, `travel`
 
-**Expenses:**
+**Capital (adds to basis):** `capital_improvement`, `furniture_fixtures`, `basis_adjustment`
 
-- `expense:utilities:electricity`
+**Member equity:** `member_contribution`, `member_distribution`
 
-- `expense:utilities:gas`
+**Fallback:** `uncategorized`
 
-- `expense:utilities:water`
-
-- `expense:utilities:internet`
-
-- `expense:maintenance:repairs`
-
-- `expense:maintenance:cleaning`
-
-- `expense:property_management`
-
-- `expense:insurance`
-
-- `expense:property_tax`
-
-- And 20+ more categories...
+Enum inputs accept either the name (`UTILITIES_GAS`) or the value (`utilities:gas`); responses always emit the value.
 
 ## Quick Examples
 
@@ -61,7 +67,7 @@ The Transactions API allows you to create, read, update, and delete transaction 
 curl http://localhost:8082/api/v1/transactions
 
 # Filter by category
-curl http://localhost:8082/api/v1/transactions?category=revenue:rental_income
+curl "http://localhost:8082/api/v1/transactions?category=rental_income"
 
 # Filter by date range
 curl "http://localhost:8082/api/v1/transactions?start_date=2024-01-01&end_date=2024-12-31"
@@ -76,34 +82,35 @@ curl -X POST http://localhost:8082/api/v1/transactions \
     "property_id": "{property-uuid}",
     "transaction_date": "2025-08-15",
     "amount": "16144.00",
-    "category": "revenue:rental_income",
-    "transaction_type": "REVENUE",
+    "category": "rental_income",
+    "transaction_type": "revenue",
     "description": "August 2025 rental income",
     "source_account": "Operating Account"
   }'
 ```
+
+### Archive a Transaction
+
+```bash
+curl -X DELETE http://localhost:8082/api/v1/transactions/{transaction-uuid}
+```
+
+Financial records are never hard-deleted: DELETE sets `extra_metadata.archived = true`, excludes the record from default listings, and preserves the prior state in the audit log.
 
 ## Transaction Schema
 
 **Key fields:**
 
 - `id` - UUID primary key
-
-- `property_id` - FK to property (nullable for LLC-level transactions)
-
+- `property_id` - FK to property (**required** — every transaction belongs to a property)
 - `transaction_date` - When transaction occurred
-
-- `amount` - Transaction amount (positive for revenue, expenses)
-
+- `amount` - Transaction amount (cannot be zero)
 - `category` - One of 30+ predefined categories
-
-- `transaction_type` - REVENUE or EXPENSE
-
+- `transaction_type` - `revenue`, `expense`, `capital`, `equity`, or `transfer`
 - `description` - Human-readable description
-
 - `source_account` - Bank account or source
-
-- `provenance` - Data lineage tracking
+- `provenance` - Data lineage tracking (JSON)
+- `extra_metadata` - Flexible JSON (includes `archived` flag when soft-deleted)
 
 ## Related Documentation
 
@@ -113,6 +120,4 @@ curl -X POST http://localhost:8082/api/v1/transactions \
 
 ---
 
-**Status:** 🚧 Planned for Phase 3
-
-**API endpoints will be added after Phase 2 chatbot completion.**
+**Status:** ✅ Implemented (tests: `tests/test_api_transactions.py`)

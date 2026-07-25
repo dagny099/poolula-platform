@@ -1,16 +1,96 @@
 {
-  "timestamp": "2026-01-07T19:18:41.652890",
+  "evaluator": "chatbot",
+  "timestamp": "2026-07-04T23:34:38.337107",
   "eval_set": "apps/evaluator/poolula_eval_set.jsonl",
   "total_questions": 20,
-  "average_score": 0.8443333333333334,
-  "average_score_pct": 84.43333333333334,
-  "passed": 15,
-  "warned": 5,
-  "failed": 0,
+  "average_score": 0.8276666666666668,
+  "average_score_pct": 82.76666666666668,
+  "passed": 16,
+  "warned": 2,
+  "failed": 2,
+  "failures": [
+    {
+      "question": "What insurance policies does Poolula have?",
+      "score": 0.6,
+      "expected_tools": [
+        "search_document_content"
+      ],
+      "actual_tools": [
+        "query_database"
+      ],
+      "reasons": [
+        "[tool_usage] Expected tool(s) ['search_document_content'] not used (actual: ['query_database'])"
+      ],
+      "sources": [
+        "Database Query: documents"
+      ],
+      "response_excerpt": "I don't have any insurance policy documents on file for Poolula LLC in the system. To get information about your current insurance coverage, you'll need to check with your insurance broker or review your policy documents directly.",
+      "expected_content": [
+        "insurance",
+        "polic"
+      ]
+    },
+    {
+      "question": "List all available business documents",
+      "score": 0.6,
+      "expected_tools": [
+        "list_business_documents"
+      ],
+      "actual_tools": [],
+      "reasons": [
+        "[tool_usage] Expected tool(s) ['list_business_documents'] not used (actual: none)"
+      ],
+      "sources": [],
+      "response_excerpt": "Here are all available business documents for Poolula LLC:\n\n1. **Annual Compliance Checklist** (2.2 KB)\n2. **EIN Assignment Letter** (13.7 KB)\n3. **LLC Formation Letter** (687.4 KB)\n4. **Statement of Authority - Living Trust** (146.1 KB)\n5. **Accounting Notes 2025** (1.9 MB)\n6. **LLC Binder Table of",
+      "expected_content": [
+        "document",
+        "available"
+      ]
+    },
+    {
+      "question": "How many Airbnb reservations did we have in August 2025?",
+      "score": 0.2,
+      "expected_tools": [
+        "query_database"
+      ],
+      "actual_tools": [],
+      "reasons": [
+        "[tool_usage] Expected tool(s) ['query_database'] not used (actual: none)",
+        "[content_relevance] Missing expected keyword(s): ['August', '2025', '5', 'reservation']"
+      ],
+      "sources": [],
+      "response_excerpt": "Let me adjust the query:",
+      "expected_content": [
+        "August",
+        "2025",
+        "5",
+        "reservation"
+      ]
+    },
+    {
+      "question": "List all Airbnb reservations in October 2025 with guest names",
+      "score": 0.2,
+      "expected_tools": [
+        "query_database"
+      ],
+      "actual_tools": [],
+      "reasons": [
+        "[tool_usage] Expected tool(s) ['query_database'] not used (actual: none)",
+        "[content_relevance] Missing expected keyword(s): ['October', '2025', 'reservation']"
+      ],
+      "sources": [],
+      "response_excerpt": "Let me correct that query:",
+      "expected_content": [
+        "October",
+        "2025",
+        "reservation"
+      ]
+    }
+  ],
   "results": [
     {
       "question": "What properties does Poolula LLC own?",
-      "response": "Poolula LLC owns one property:\n\n**900 S 9th St, Montrose, CO 81401**\n- Acquired: April 15, 2024\n- Purchase Price: $442,300\n- Total Basis: $452,300\n- Placed in Service: February 1, 2025\n- Status: Active\n\nThe property has a depreciable basis of $374,100, with the land valued at $78,200 and building at $364,100.",
+      "response": "Poolula LLC owns one property:\n\n**900 S 9th St, Montrose, CO 81401**\n- **Acquisition Date:** April 15, 2024\n- **Purchase Price:** $442,300\n- **Total Basis:** $452,300\n  - Land: $78,200\n  - Building: $364,100\n  - Furniture, Fixtures & Equipment: $10,000\n- **Depreciable Basis:** $374,100\n- **Placed in Service:** February 1, 2025\n- **Status:** Active",
       "sources": [
         {
           "text": "Database Query: properties",
@@ -47,11 +127,15 @@
             "address"
           ],
           "keywords_found": 1,
+          "keywords_missing": [
+            "address"
+          ],
           "total_keywords": 2,
-          "score": 0.5
+          "score": 0.5,
+          "reason": "Missing expected keyword(s): ['address']"
         },
         "completeness": {
-          "response_length": 310,
+          "response_length": 349,
           "score": 1.0
         }
       },
@@ -76,7 +160,7 @@
     },
     {
       "question": "What is the depreciable basis for all properties?",
-      "response": "The depreciable basis for all properties is **$374,100**.\n\nThis consists of:\n- Building basis: $364,100\n- Furniture, fixtures & equipment (FFE) basis: $10,000\n\nThe land basis of $78,200 is not depreciable, which is why the total depreciable basis ($374,100) is less than the total property basis ($452,300).",
+      "response": "The depreciable basis for all properties is **$374,100.00**.\n\nThis is for the single property in the portfolio:\n- **Address**: 900 S 9th St, Montrose, CO 81401\n- **Depreciable Basis**: $374,100.00 (building basis of $364,100 + FFE basis of $10,000)\n\nThe land basis of $78,200 is not depreciable, which is why it's excluded from the depreciable basis calculation.",
       "sources": [
         {
           "text": "Database Query: properties",
@@ -113,11 +197,12 @@
             "deprecia"
           ],
           "keywords_found": 2,
+          "keywords_missing": [],
           "total_keywords": 2,
           "score": 1.0
         },
         "completeness": {
-          "response_length": 307,
+          "response_length": 362,
           "score": 1.0
         }
       },
@@ -186,6 +271,7 @@
             "2024"
           ],
           "keywords_found": 3,
+          "keywords_missing": [],
           "total_keywords": 3,
           "score": 1.0
         },
@@ -215,8 +301,16 @@
     },
     {
       "question": "What insurance policies does Poolula have?",
-      "response": "No insurance policy documents are currently available in the system for Poolula LLC.",
-      "sources": [],
+      "response": "I don't have any insurance policy documents on file for Poolula LLC in the system. To get information about your current insurance coverage, you'll need to check with your insurance broker or review your policy documents directly.",
+      "sources": [
+        {
+          "text": "Database Query: documents",
+          "query_type": "documents",
+          "filters": {
+            "doc_type": "insurance"
+          }
+        }
+      ],
       "expected": {
         "question": "What insurance policies does Poolula have?",
         "type": "document",
@@ -234,9 +328,12 @@
           "expected": [
             "search_document_content"
           ],
-          "actual": [],
+          "actual": [
+            "query_database"
+          ],
           "correct": false,
-          "score": 0.0
+          "score": 0.0,
+          "reason": "Expected tool(s) ['search_document_content'] not used (actual: ['query_database'])"
         },
         "content_relevance": {
           "expected_keywords": [
@@ -244,11 +341,12 @@
             "polic"
           ],
           "keywords_found": 2,
+          "keywords_missing": [],
           "total_keywords": 2,
           "score": 1.0
         },
         "completeness": {
-          "response_length": 84,
+          "response_length": 230,
           "score": 1.0
         }
       },
@@ -273,8 +371,64 @@
     },
     {
       "question": "What is the business purpose of Poolula LLC?",
-      "response": "Based on the available information, Poolula LLC operates as a rental property business that manages real estate investments and rental operations. The company handles property acquisitions, tenant relationships, financial transactions, and compliance obligations related to rental property management.",
-      "sources": [],
+      "response": "Based on the available formation documents, the specific business purpose statement is not clearly detailed in the search results. However, based on the context of your inquiry and the nature of the business, **Poolula LLC is a rental property business** that owns and manages real estate properties. The formation documents reference property ownership, leases, and asset management consistent with a rental property operation.\n\nIf you need the exact statutory business purpose language from the Articles of Organization, I can search for that specific document.",
+      "sources": [
+        {
+          "text": "Poolula LLC Operating Agreement - Page 3",
+          "document_title": "Poolula LLC Operating Agreement",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 3,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        },
+        {
+          "text": "LLC Formation Letter - Page 2",
+          "document_title": "LLC Formation Letter",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 2,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        },
+        {
+          "text": "LLC Formation Letter - Page 1",
+          "document_title": "LLC Formation Letter",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 1,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        },
+        {
+          "text": "Poolula LLC Operating Agreement - Page 2",
+          "document_title": "Poolula LLC Operating Agreement",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 2,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        },
+        {
+          "text": "LLC Formation Letter - Page 2",
+          "document_title": "LLC Formation Letter",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 2,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        }
+      ],
       "expected": {
         "question": "What is the business purpose of Poolula LLC?",
         "type": "document",
@@ -293,9 +447,11 @@
           "expected": [
             "search_document_content"
           ],
-          "actual": [],
-          "correct": false,
-          "score": 0.0
+          "actual": [
+            "search_document_content"
+          ],
+          "correct": true,
+          "score": 1.0
         },
         "content_relevance": {
           "expected_keywords": [
@@ -303,24 +459,25 @@
             "purpose",
             "LLC"
           ],
-          "keywords_found": 2,
+          "keywords_found": 3,
+          "keywords_missing": [],
           "total_keywords": 3,
-          "score": 0.6666666666666666
+          "score": 1.0
         },
         "completeness": {
-          "response_length": 301,
+          "response_length": 563,
           "score": 1.0
         }
       },
       "score_components": [
         {
           "component": "tool_usage",
-          "score": 0.0,
+          "score": 1.0,
           "weight": 0.4
         },
         {
           "component": "content_relevance",
-          "score": 0.6666666666666666,
+          "score": 1.0,
           "weight": 0.4
         },
         {
@@ -329,11 +486,11 @@
           "weight": 0.2
         }
       ],
-      "total_score": 0.4666666666666667
+      "total_score": 1.0
     },
     {
       "question": "Show me total expenses by category for 2024",
-      "response": "No expense transactions were recorded for 2024. The database shows zero expense entries for the year.",
+      "response": "There are no expense transactions recorded for 2024 in the database.",
       "sources": [
         {
           "text": "Database Query: aggregate_transactions",
@@ -377,11 +534,16 @@
             "total"
           ],
           "keywords_found": 1,
+          "keywords_missing": [
+            "category",
+            "total"
+          ],
           "total_keywords": 3,
-          "score": 0.3333333333333333
+          "score": 0.3333333333333333,
+          "reason": "Missing expected keyword(s): ['category', 'total']"
         },
         "completeness": {
-          "response_length": 101,
+          "response_length": 68,
           "score": 1.0
         }
       },
@@ -406,7 +568,7 @@
     },
     {
       "question": "What compliance obligations are due soon?",
-      "response": "There are currently no compliance obligations due soon in the system.",
+      "response": "There are no compliance obligations currently recorded in the system. If you have specific obligations you'd like to track or need to add upcoming deadlines, please let me know the details.",
       "sources": [
         {
           "text": "Database Query: obligations",
@@ -442,12 +604,16 @@
             "obligation",
             "due"
           ],
-          "keywords_found": 2,
+          "keywords_found": 1,
+          "keywords_missing": [
+            "due"
+          ],
           "total_keywords": 2,
-          "score": 1.0
+          "score": 0.5,
+          "reason": "Missing expected keyword(s): ['due']"
         },
         "completeness": {
-          "response_length": 69,
+          "response_length": 189,
           "score": 1.0
         }
       },
@@ -459,7 +625,7 @@
         },
         {
           "component": "content_relevance",
-          "score": 1.0,
+          "score": 0.5,
           "weight": 0.4
         },
         {
@@ -468,11 +634,11 @@
           "weight": 0.2
         }
       ],
-      "total_score": 1.0
+      "total_score": 0.8
     },
     {
       "question": "List all available business documents",
-      "response": "There are currently no business documents available in the system.",
+      "response": "Here are all available business documents for Poolula LLC:\n\n1. **Annual Compliance Checklist** (2.2 KB)\n2. **EIN Assignment Letter** (13.7 KB)\n3. **LLC Formation Letter** (687.4 KB)\n4. **Statement of Authority - Living Trust** (146.1 KB)\n5. **Accounting Notes 2025** (1.9 MB)\n6. **LLC Binder Table of Contents** (2.4 KB)\n7. **Poolula LLC Operating Agreement** (318.9 KB)\n8. **Poolula LLC Articles of Organization** (179.6 KB)\n9. **airbnb_12_2024-11_2025.csv** (9.4 KB)\n\nThe documents include formation documents, compliance materials, operating agreements, and financial records.",
       "sources": [],
       "expected": {
         "question": "List all available business documents",
@@ -493,7 +659,8 @@
           ],
           "actual": [],
           "correct": false,
-          "score": 0.0
+          "score": 0.0,
+          "reason": "Expected tool(s) ['list_business_documents'] not used (actual: none)"
         },
         "content_relevance": {
           "expected_keywords": [
@@ -501,11 +668,12 @@
             "available"
           ],
           "keywords_found": 2,
+          "keywords_missing": [],
           "total_keywords": 2,
           "score": 1.0
         },
         "completeness": {
-          "response_length": 66,
+          "response_length": 579,
           "score": 1.0
         }
       },
@@ -576,8 +744,12 @@
             "2024"
           ],
           "keywords_found": 3,
+          "keywords_missing": [
+            "total"
+          ],
           "total_keywords": 4,
-          "score": 0.75
+          "score": 0.75,
+          "reason": "Missing expected keyword(s): ['total']"
         },
         "completeness": {
           "response_length": 60,
@@ -605,8 +777,64 @@
     },
     {
       "question": "Who are the members of Poolula LLC according to the operating agreement?",
-      "response": "I cannot find information about the members of Poolula LLC in the available documents. The operating agreement or formation documents containing member information are not accessible in the current document database.",
-      "sources": [],
+      "response": "According to the Poolula LLC Operating Agreement, the member is:\n\n**Rosalba Sotelo, Trustee of the Hidalgo-Sotelo Living Trust** (located at 13309 Kirkglen Drive, Austin, TX 78727)\n\nThe operating agreement indicates this is the initial member, and the structure allows for additional members to be admitted in the future, but currently there is only this one member.",
+      "sources": [
+        {
+          "text": "Poolula LLC Operating Agreement - Page 10",
+          "document_title": "Poolula LLC Operating Agreement",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 10,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        },
+        {
+          "text": "Statement of Authority - Living Trust - Page 1",
+          "document_title": "Statement of Authority - Living Trust",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 1,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        },
+        {
+          "text": "LLC Formation Letter - Page 1",
+          "document_title": "LLC Formation Letter",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 1,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        },
+        {
+          "text": "Statement of Authority - Living Trust - Page 1",
+          "document_title": "Statement of Authority - Living Trust",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 1,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        },
+        {
+          "text": "Poolula LLC Operating Agreement - Page 5",
+          "document_title": "Poolula LLC Operating Agreement",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 5,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        }
+      ],
       "expected": {
         "question": "Who are the members of Poolula LLC according to the operating agreement?",
         "type": "document",
@@ -625,9 +853,11 @@
           "expected": [
             "search_document_content"
           ],
-          "actual": [],
-          "correct": false,
-          "score": 0.0
+          "actual": [
+            "search_document_content"
+          ],
+          "correct": true,
+          "score": 1.0
         },
         "content_relevance": {
           "expected_keywords": [
@@ -636,18 +866,19 @@
             "operating"
           ],
           "keywords_found": 3,
+          "keywords_missing": [],
           "total_keywords": 3,
           "score": 1.0
         },
         "completeness": {
-          "response_length": 216,
+          "response_length": 366,
           "score": 1.0
         }
       },
       "score_components": [
         {
           "component": "tool_usage",
-          "score": 0.0,
+          "score": 1.0,
           "weight": 0.4
         },
         {
@@ -661,16 +892,17 @@
           "weight": 0.2
         }
       ],
-      "total_score": 0.6000000000000001
+      "total_score": 1.0
     },
     {
       "question": "Show me all utility expenses",
-      "response": "There are no utility expenses recorded in the system. In fact, there are no expense transactions of any type currently in the database.",
+      "response": "There are no utility gas expenses recorded in the system. Would you like me to search for other types of utility expenses (such as water, electric, or general utilities) or check a different expense category?",
       "sources": [
         {
           "text": "Database Query: transactions",
           "query_type": "transactions",
           "filters": {
+            "category": "UTILITIES_GAS",
             "transaction_type": "EXPENSE"
           }
         }
@@ -704,11 +936,12 @@
             "expense"
           ],
           "keywords_found": 2,
+          "keywords_missing": [],
           "total_keywords": 2,
           "score": 1.0
         },
         "completeness": {
-          "response_length": 135,
+          "response_length": 208,
           "score": 1.0
         }
       },
@@ -733,7 +966,7 @@
     },
     {
       "question": "What is the address of our first property?",
-      "response": "The address of our first property is **900 S 9th St, Montrose, CO 81401**. This property was acquired on April 15, 2024.",
+      "response": "The address of your first property is **900 S 9th St, Montrose, CO 81401**.",
       "sources": [
         {
           "text": "Database Query: properties",
@@ -770,11 +1003,12 @@
             "property"
           ],
           "keywords_found": 2,
+          "keywords_missing": [],
           "total_keywords": 2,
           "score": 1.0
         },
         "completeness": {
-          "response_length": 120,
+          "response_length": 75,
           "score": 1.0
         }
       },
@@ -799,8 +1033,64 @@
     },
     {
       "question": "What documents were filed for LLC formation?",
-      "response": "No LLC formation documents are currently available in the system.",
-      "sources": [],
+      "response": "The LLC formation documents filed for Poolula LLC include:\n\n1. **Articles of Organization** - The foundational document establishing the LLC\n2. **Operating Agreement** - Governing the internal operations and member rights/responsibilities\n3. **EIN Assignment Letter** - Confirming the federal tax ID number for the business\n4. **LLC Formation Letter** - Attorney guidance on formation requirements and compliance obligations\n\nThese documents establish Poolula LLC as a separate legal entity and outline the framework for its operation and compliance.",
+      "sources": [
+        {
+          "text": "LLC Formation Letter - Page 3",
+          "document_title": "LLC Formation Letter",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 3,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        },
+        {
+          "text": "LLC Formation Letter - Page 2",
+          "document_title": "LLC Formation Letter",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 2,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        },
+        {
+          "text": "LLC Formation Letter - Page 2",
+          "document_title": "LLC Formation Letter",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 2,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        },
+        {
+          "text": "LLC Formation Letter - Page 2",
+          "document_title": "LLC Formation Letter",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 2,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        },
+        {
+          "text": "LLC Formation Letter - Page 1",
+          "document_title": "LLC Formation Letter",
+          "file_type": "pdf",
+          "doc_type": "formation",
+          "page_number": 1,
+          "section_title": null,
+          "sheet_name": null,
+          "cell_range": null,
+          "row_number": null
+        }
+      ],
       "expected": {
         "question": "What documents were filed for LLC formation?",
         "type": "document",
@@ -819,9 +1109,11 @@
           "expected": [
             "search_document_content"
           ],
-          "actual": [],
-          "correct": false,
-          "score": 0.0
+          "actual": [
+            "search_document_content"
+          ],
+          "correct": true,
+          "score": 1.0
         },
         "content_relevance": {
           "expected_keywords": [
@@ -829,24 +1121,25 @@
             "LLC",
             "filed"
           ],
-          "keywords_found": 2,
+          "keywords_found": 3,
+          "keywords_missing": [],
           "total_keywords": 3,
-          "score": 0.6666666666666666
+          "score": 1.0
         },
         "completeness": {
-          "response_length": 65,
+          "response_length": 550,
           "score": 1.0
         }
       },
       "score_components": [
         {
           "component": "tool_usage",
-          "score": 0.0,
+          "score": 1.0,
           "weight": 0.4
         },
         {
           "component": "content_relevance",
-          "score": 0.6666666666666666,
+          "score": 1.0,
           "weight": 0.4
         },
         {
@@ -855,11 +1148,11 @@
           "weight": 0.2
         }
       ],
-      "total_score": 0.4666666666666667
+      "total_score": 1.0
     },
     {
       "question": "What is the total basis for property acquisitions?",
-      "response": "The total basis for property acquisitions is $452,300. This includes:\n\n- Land basis: $78,200\n- Building basis: $364,100  \n- Furniture, fixtures & equipment basis: $10,000\n\nThe property at 900 S 9th St, Montrose, CO was acquired on April 15, 2024 with a purchase price of $442,300 and total basis of $452,300.",
+      "response": "The total basis for property acquisitions is **$452,300.00**.\n\nThis consists of:\n- **Land basis**: $78,200.00\n- **Building basis**: $364,100.00\n- **Furniture, Fixtures & Equipment (FFE) basis**: $10,000.00\n\nThe property at 900 S 9th St, Montrose, CO 81401 was acquired on April 15, 2024, with a depreciable basis of $374,100.00.",
       "sources": [
         {
           "text": "Database Query: properties",
@@ -898,11 +1191,12 @@
             "property"
           ],
           "keywords_found": 3,
+          "keywords_missing": [],
           "total_keywords": 3,
           "score": 1.0
         },
         "completeness": {
-          "response_length": 308,
+          "response_length": 328,
           "score": 1.0
         }
       },
@@ -927,14 +1221,14 @@
     },
     {
       "question": "Show me revenue and expenses for the business",
-      "response": "There are currently no revenue or expense transactions recorded in the business database. The system shows zero transactions for both revenue and expenses.",
+      "response": "**Revenue and Expenses Summary**\n\n**Revenue:**\n- Rental Income: $16,144.00 (33 transactions)\n\n**Expenses:**\n- Property Management: $482.37 (31 transactions)\n\n**Net Income: $15,661.63**",
       "sources": [
         {
           "text": "Database Query: aggregate_transactions",
           "query_type": "aggregate_transactions",
           "filters": {
             "transaction_type": "EXPENSE",
-            "group_by": "type"
+            "group_by": "category"
           }
         }
       ],
@@ -967,11 +1261,12 @@
             "expense"
           ],
           "keywords_found": 2,
+          "keywords_missing": [],
           "total_keywords": 2,
           "score": 1.0
         },
         "completeness": {
-          "response_length": 155,
+          "response_length": 184,
           "score": 1.0
         }
       },
@@ -996,11 +1291,11 @@
     },
     {
       "question": "What was my rental income in July 2025?",
-      "response": "There were no rental income transactions recorded for July 2025. The total rental income for that month was $0.",
+      "response": "Your rental income in July 2025 was **$3,960.00** from 8 rental transactions.",
       "sources": [
         {
-          "text": "Database Query: transactions",
-          "query_type": "transactions",
+          "text": "Database Query: aggregate_transactions",
+          "query_type": "aggregate_transactions",
           "filters": {
             "category": "RENTAL_INCOME",
             "transaction_type": "REVENUE",
@@ -1042,11 +1337,15 @@
             "rental"
           ],
           "keywords_found": 3,
+          "keywords_missing": [
+            "3960"
+          ],
           "total_keywords": 4,
-          "score": 0.75
+          "score": 0.75,
+          "reason": "Missing expected keyword(s): ['3960']"
         },
         "completeness": {
-          "response_length": 111,
+          "response_length": 77,
           "score": 1.0
         }
       },
@@ -1071,19 +1370,8 @@
     },
     {
       "question": "How many Airbnb reservations did we have in August 2025?",
-      "response": "There were no Airbnb reservations recorded for August 2025. The database shows zero rental income transactions for that month.",
-      "sources": [
-        {
-          "text": "Database Query: transactions",
-          "query_type": "transactions",
-          "filters": {
-            "category": "RENTAL_INCOME",
-            "transaction_type": "REVENUE",
-            "start_date": "2025-08-01",
-            "end_date": "2025-08-31"
-          }
-        }
-      ],
+      "response": "Let me adjust the query:",
+      "sources": [],
       "expected": {
         "question": "How many Airbnb reservations did we have in August 2025?",
         "type": "database",
@@ -1103,11 +1391,10 @@
           "expected": [
             "query_database"
           ],
-          "actual": [
-            "query_database"
-          ],
-          "correct": true,
-          "score": 1.0
+          "actual": [],
+          "correct": false,
+          "score": 0.0,
+          "reason": "Expected tool(s) ['query_database'] not used (actual: none)"
         },
         "content_relevance": {
           "expected_keywords": [
@@ -1116,24 +1403,31 @@
             "5",
             "reservation"
           ],
-          "keywords_found": 4,
+          "keywords_found": 0,
+          "keywords_missing": [
+            "August",
+            "2025",
+            "5",
+            "reservation"
+          ],
           "total_keywords": 4,
-          "score": 1.0
+          "score": 0.0,
+          "reason": "Missing expected keyword(s): ['August', '2025', '5', 'reservation']"
         },
         "completeness": {
-          "response_length": 126,
+          "response_length": 24,
           "score": 1.0
         }
       },
       "score_components": [
         {
           "component": "tool_usage",
-          "score": 1.0,
+          "score": 0.0,
           "weight": 0.4
         },
         {
           "component": "content_relevance",
-          "score": 1.0,
+          "score": 0.0,
           "weight": 0.4
         },
         {
@@ -1142,11 +1436,11 @@
           "weight": 0.2
         }
       ],
-      "total_score": 1.0
+      "total_score": 0.2
     },
     {
       "question": "What was the total rental income from May 1 to July 31, 2025?",
-      "response": "There was no rental income recorded for the period from May 1 to July 31, 2025. The total rental income for that timeframe is $0.",
+      "response": "The total rental income from May 1 to July 31, 2025 was **$9,209.00** (22 transactions).",
       "sources": [
         {
           "text": "Database Query: aggregate_transactions",
@@ -1194,11 +1488,15 @@
             "rental"
           ],
           "keywords_found": 4,
+          "keywords_missing": [
+            "9209"
+          ],
           "total_keywords": 5,
-          "score": 0.8
+          "score": 0.8,
+          "reason": "Missing expected keyword(s): ['9209']"
         },
         "completeness": {
-          "response_length": 129,
+          "response_length": 88,
           "score": 1.0
         }
       },
@@ -1223,7 +1521,7 @@
     },
     {
       "question": "What was the total gross rental income for Q3 2025?",
-      "response": "There was no rental income recorded for Q3 2025 (July-September 2025). The total gross rental income for that period is $0.",
+      "response": "The total gross rental income for Q3 2025 was **$9,913.00** across 17 transactions.",
       "sources": [
         {
           "text": "Database Query: aggregate_transactions",
@@ -1269,11 +1567,15 @@
             "rental"
           ],
           "keywords_found": 3,
+          "keywords_missing": [
+            "9913"
+          ],
           "total_keywords": 4,
-          "score": 0.75
+          "score": 0.75,
+          "reason": "Missing expected keyword(s): ['9913']"
         },
         "completeness": {
-          "response_length": 123,
+          "response_length": 83,
           "score": 1.0
         }
       },
@@ -1298,19 +1600,8 @@
     },
     {
       "question": "List all Airbnb reservations in October 2025 with guest names",
-      "response": "There are no Airbnb reservations recorded for October 2025. The database shows zero rental income transactions for that month.",
-      "sources": [
-        {
-          "text": "Database Query: transactions",
-          "query_type": "transactions",
-          "filters": {
-            "category": "RENTAL_INCOME",
-            "transaction_type": "REVENUE",
-            "start_date": "2025-10-01",
-            "end_date": "2025-10-31"
-          }
-        }
-      ],
+      "response": "Let me correct that query:",
+      "sources": [],
       "expected": {
         "question": "List all Airbnb reservations in October 2025 with guest names",
         "type": "database",
@@ -1329,11 +1620,10 @@
           "expected": [
             "query_database"
           ],
-          "actual": [
-            "query_database"
-          ],
-          "correct": true,
-          "score": 1.0
+          "actual": [],
+          "correct": false,
+          "score": 0.0,
+          "reason": "Expected tool(s) ['query_database'] not used (actual: none)"
         },
         "content_relevance": {
           "expected_keywords": [
@@ -1341,24 +1631,30 @@
             "2025",
             "reservation"
           ],
-          "keywords_found": 3,
+          "keywords_found": 0,
+          "keywords_missing": [
+            "October",
+            "2025",
+            "reservation"
+          ],
           "total_keywords": 3,
-          "score": 1.0
+          "score": 0.0,
+          "reason": "Missing expected keyword(s): ['October', '2025', 'reservation']"
         },
         "completeness": {
-          "response_length": 126,
+          "response_length": 26,
           "score": 1.0
         }
       },
       "score_components": [
         {
           "component": "tool_usage",
-          "score": 1.0,
+          "score": 0.0,
           "weight": 0.4
         },
         {
           "component": "content_relevance",
-          "score": 1.0,
+          "score": 0.0,
           "weight": 0.4
         },
         {
@@ -1367,7 +1663,7 @@
           "weight": 0.2
         }
       ],
-      "total_score": 1.0
+      "total_score": 0.2
     }
   ]
 }

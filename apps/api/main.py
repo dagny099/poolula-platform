@@ -107,9 +107,12 @@ def health_check() -> Dict[str, Any]:
 
 
 # Import and mount routes
-from apps.api.routes import properties, chat
+from apps.api.routes import properties, transactions, obligations, documents, chat
 
 app.include_router(properties.router, prefix="/api/v1", tags=["properties"])
+app.include_router(transactions.router, prefix="/api/v1", tags=["transactions"])
+app.include_router(obligations.router, prefix="/api/v1", tags=["obligations"])
+app.include_router(documents.router, prefix="/api/v1", tags=["documents"])
 app.include_router(chat.router, prefix="/api", tags=["chat"])
 
 

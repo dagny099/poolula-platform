@@ -24,7 +24,7 @@ class Config:
 
     # Anthropic API settings
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
-    ANTHROPIC_MODEL: str = "claude-sonnet-4-20250514"
+    ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5")
 
     # OpenAI settings (future)
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
@@ -46,7 +46,7 @@ class Config:
     MAX_HISTORY: int = 2         # Number of conversation messages to remember
     
     # Database paths
-    CHROMA_PATH: str = "./chroma_db"  # ChromaDB storage location
+    CHROMA_PATH: str = os.getenv("POOLULA_CHROMA_PATH", "./chroma_db")  # ChromaDB storage location
     
     # Business document settings
     METADATA_CSV_PATH: str = "./metadata.csv"  # Path to document metadata CSV

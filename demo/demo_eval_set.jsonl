@@ -1,0 +1,20 @@
+{"question": "What properties does Poolula LLC own?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["property", "Juniper Bend"], "category": "property_info"}
+{"question": "What is the depreciable basis for all properties?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["basis", "deprecia"], "category": "property_financials"}
+{"question": "Show me all rental income transactions from 2024", "type": "database", "expected_tools": ["query_database"], "expected_content": ["rental", "income", "2024"], "category": "transactions"}
+{"question": "What insurance policies does Poolula have?", "type": "document", "expected_tools": ["search_document_content"], "expected_content": ["insurance", "Summit Ridge"], "category": "documents"}
+{"question": "What is the business purpose of Poolula LLC?", "type": "document", "expected_tools": ["search_document_content"], "expected_content": ["short-term rental", "LLC"], "category": "formation"}
+{"question": "Show me total expenses by category for 2025", "type": "database", "expected_tools": ["query_database"], "expected_content": ["expense", "category", "total"], "category": "aggregations"}
+{"question": "What compliance obligations are due soon?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["obligation", "due"], "category": "compliance"}
+{"question": "List all available business documents", "type": "document", "expected_tools": ["list_business_documents"], "expected_content": ["document", "available"], "category": "document_listing"}
+{"question": "What is the total rental income for 2025?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["rental", "income", "total", "2025"], "category": "aggregations"}
+{"question": "Who is the sole member of Poolula LLC?", "type": "document", "expected_tools": ["search_document_content"], "expected_content": ["Bluebird", "member"], "category": "governance"}
+{"question": "Which insurance carrier covers the property and when does the policy renew?", "type": "document", "expected_tools": ["search_document_content"], "expected_content": ["Summit Ridge", "May 1"], "category": "documents"}
+{"question": "What is the address of our first property?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["Juniper Bend", "Granite Pass"], "category": "property_info"}
+{"question": "Who is the registered agent for Poolula LLC?", "type": "document", "expected_tools": ["search_document_content"], "expected_content": ["Peakview", "registered agent"], "category": "formation"}
+{"question": "What is the total basis for property acquisitions?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["basis", "total", "property"], "category": "property_financials"}
+{"question": "Show me revenue and expenses for the business", "type": "hybrid", "expected_tools": ["query_database"], "expected_content": ["revenue", "expense"], "category": "hybrid"}
+{"question": "What was my rental income in July 2025?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["July", "2025", "3841", "rental"], "category": "airbnb_monthly"}
+{"question": "How many Airbnb reservations did we have in August 2025?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["August", "2025", "5", "reservation"], "category": "airbnb_count"}
+{"question": "What was the total rental income from May 1 to July 31, 2025?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["May", "July", "2025", "8401", "rental"], "category": "airbnb_range"}
+{"question": "What was the total gross rental income for Q3 2025?", "type": "database", "expected_tools": ["query_database"], "expected_content": ["Q3", "2025", "10149", "rental"], "category": "airbnb_quarterly"}
+{"question": "List all Airbnb reservations in October 2025 with guest names", "type": "database", "expected_tools": ["query_database"], "expected_content": ["October", "2025", "reservation"], "category": "airbnb_details"}

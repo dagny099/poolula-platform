@@ -7,12 +7,15 @@ Provides chatbot query interface and document search via RAG system
 import os
 import uuid
 from typing import Dict, Any, Optional
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from pydantic import BaseModel
+from sqlmodel import Session
 
+from apps.api import ingestion
 from apps.chatbot.rag_system import RAGSystem
 from apps.chatbot.config import Config
 from apps.dspy.runtime import run_dspy_program
+from core.database.connection import get_session
 from core.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -28,12 +31,9 @@ def get_rag_system() -> RAGSystem:
     """Get or create RAG system instance"""
     global _rag_system
     if _rag_system is None:
-        # Create config (reads ANTHROPIC_API_KEY from environment)
-        config = Config()
-        if not config.ANTHROPIC_API_KEY:
-            raise RuntimeError("ANTHROPIC_API_KEY environment variable not set")
-
-        _rag_system = RAGSystem(config=config)
+        # Provider-specific credential checks (ANTHROPIC_API_KEY, etc.) happen
+        # inside RAGSystem's provider factory, keyed off LLM_PROVIDER.
+        _rag_system = RAGSystem(config=Config())
         logger.info("RAG system initialized")
 
     return _rag_system
@@ -204,48 +204,53 @@ async def check_incoming_files() -> Dict[str, Any]:
         >>>     "files": ["document1.pdf", "document2.docx"]
         >>> }
     """
-    # TODO: Implement incoming files check
-    # For now, return empty
+    files = ingestion.list_incoming_files()
     return {
-        "count": 0,
-        "files": []
+        "count": len(files),
+        "files": files,
     }
 
 
 @router.post("/process-incoming")
-async def process_incoming_files() -> Dict[str, Any]:
+async def process_incoming(session: Session = Depends(get_session)) -> Dict[str, Any]:
     """
     Process files from incoming folder
 
-    Ingests documents from incoming folder into vector store.
+    Chunks and embeds each pending file into the vector store, registers a
+    Document row in the database (with provenance + audit log entry), and moves
+    the file to the processed folder. Duplicate content (by SHA-256 hash) is
+    skipped; failed files stay in the incoming folder for retry.
 
     Returns:
-        Processing result with count and file list
+        Processing result with processed, skipped, and failed file lists
 
     Example:
         >>> POST /api/process-incoming
         >>> {
-        >>>     "message": "Successfully processed 2 documents",
-        >>>     "processed_files": ["document1.pdf", "document2.docx"]
+        >>>     "message": "Successfully processed 2 document(s)",
+        >>>     "processed_files": ["document1.pdf", "document2.docx"],
+        >>>     "skipped_files": [],
+        >>>     "failed_files": []
         >>> }
     """
-    # TODO: Implement incoming files processing
-    # For now, return success with empty list
-    return {
-        "message": "No files to process",
-        "processed_files": []
-    }
+    try:
+        return ingestion.process_incoming_files(session)
+    except Exception as e:
+        logger.error(f"Error processing incoming files: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to process incoming files: {str(e)}")
 
 
 @router.post("/upload")
-async def upload_file() -> Dict[str, Any]:
+async def upload_file(file: UploadFile = File(...)) -> Dict[str, Any]:
     """
     Upload file to incoming folder
 
-    Receives file upload and saves to incoming folder for processing.
+    Saves the file to the incoming folder for later processing via
+    POST /api/process-incoming. Supported types: pdf, docx, txt, md,
+    xlsx, xls, csv (max 50 MB). Name collisions get a numeric suffix.
 
     Returns:
-        Upload confirmation
+        Upload confirmation with the stored filename
 
     Example:
         >>> POST /api/upload
@@ -255,6 +260,8 @@ async def upload_file() -> Dict[str, Any]:
         >>>     "filename": "document.pdf"
         >>> }
     """
-    # TODO: Implement file upload
-    # For now, return not implemented
-    raise HTTPException(status_code=501, detail="File upload not yet implemented")
+    stored_name = await ingestion.save_upload_file(file)
+    return {
+        "message": "File uploaded successfully",
+        "filename": stored_name,
+    }

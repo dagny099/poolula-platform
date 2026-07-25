@@ -1,12 +1,10 @@
 # Obligations API Reference
 
-*Coming soon*
-
 API endpoints for managing compliance obligations and deadlines.
 
 ## Overview
 
-The Obligations API allows you to create, read, update, and delete compliance deadlines, tax filings, and recurring obligations.
+The Obligations API allows you to create, read, update, and soft-delete compliance deadlines, tax filings, and recurring obligations. All mutations are recorded in the audit log.
 
 **Base URL:** `/api/v1/obligations`
 
@@ -14,37 +12,37 @@ The Obligations API allows you to create, read, update, and delete compliance de
 
 | Method | Endpoint | Description | Status |
 |--------|----------|-------------|--------|
-| GET | `/api/v1/obligations` | List obligations with filters | 🚧 Planned |
-| GET | `/api/v1/obligations/{id}` | Get obligation by ID | 🚧 Planned |
-| POST | `/api/v1/obligations` | Create new obligation | 🚧 Planned |
-| PATCH | `/api/v1/obligations/{id}` | Update obligation | 🚧 Planned |
-| DELETE | `/api/v1/obligations/{id}` | Soft delete obligation | 🚧 Planned |
+| GET | `/api/v1/obligations` | List obligations with filters | ✅ Implemented |
+| GET | `/api/v1/obligations/{id}` | Get obligation by ID | ✅ Implemented |
+| POST | `/api/v1/obligations` | Create new obligation | ✅ Implemented |
+| PATCH | `/api/v1/obligations/{id}` | Update obligation | ✅ Implemented |
+| DELETE | `/api/v1/obligations/{id}` | Soft delete (sets status=cancelled) | ✅ Implemented |
+
+## Query Parameters (GET list)
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `status` | string | `pending`, `due_soon`, `overdue`, `completed`, `cancelled` |
+| `obligation_type` | string | Type name or value (`TAX_FILING` or `tax:filing`) |
+| `property_id` | UUID | Filter by property |
+| `due_before` | date | Include obligations due on/before this date |
+| `due_after` | date | Include obligations due on/after this date |
+
+Results are ordered by due date (soonest first).
 
 ## Obligation Types
 
-**Tax-related:**
+From `core/database/enums.py::ObligationType`:
 
 - `tax:filing` - Tax return deadlines
-
-- `tax:payment` - Tax payment deadlines
-
-**Compliance:**
-
+- `tax:payment` - Tax/estimated payment deadlines
 - `compliance:periodic_report` - State annual reports
-
-- `compliance:license_renewal` - Business licenses
-
-**Property:**
-
-- `property:tax` - Property tax payments
-
-- `property:insurance` - Insurance renewals
-
-- `property:inspection` - Property inspections
-
-**Other:**
-
+- `insurance:renewal` - Insurance renewals
+- `license:renewal` - Business licenses
+- `rent:payment` - Ground rent (if applicable)
 - `other` - Miscellaneous obligations
+
+Enum inputs accept either the name (`TAX_FILING`) or the value (`tax:filing`); responses always emit the value.
 
 ## Quick Examples
 
@@ -57,8 +55,8 @@ curl http://localhost:8082/api/v1/obligations
 # Filter by status
 curl http://localhost:8082/api/v1/obligations?status=pending
 
-# Upcoming deadlines (next 30 days)
-curl http://localhost:8082/api/v1/obligations?upcoming=30
+# Deadlines due before a date
+curl "http://localhost:8082/api/v1/obligations?status=pending&due_before=2026-12-31"
 ```
 
 ### Create Obligation
@@ -193,6 +191,6 @@ uv run python scripts/seed_obligations.py --clear --year 2025
 
 ---
 
-**Status:** 🚧 Planned for Phase 3
+**Status:** ✅ Implemented (tests: `tests/test_api_obligations.py`)
 
-**Current:** Obligations can be seeded via script, API endpoints coming in Phase 3.
+Obligations can also be seeded via `scripts/seed_obligations.py`.
